@@ -26,6 +26,93 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+
+const SidebarContent = ({ subject, activeTab, setActiveTab, openNoteChapter, setOpenNoteChapter, openPracticeChapter, setOpenPracticeChapter, openQuizChapter, setOpenQuizChapter, handleNoteSubchapterClick, handlePracticeSubchapterClick, handleQuizSubchapterClick, noteMeta, problemMeta, quizMeta, isCompleted, isMobile, setSidebarOpen }) => (
+  <div className="h-full overflow-y-auto p-4">
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="font-semibold text-lg">Contents</h2>
+      {isMobile && <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}><X className="h-4 w-4" /></Button>}
+    </div>
+
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <TabsList className="w-full grid grid-cols-3 mb-4">
+        <TabsTrigger value="notes" className="text-xs"><FileText className="h-3 w-3 mr-1" />Notes</TabsTrigger>
+        <TabsTrigger value="practice" className="text-xs"><Code className="h-3 w-3 mr-1" />Practice</TabsTrigger>
+        <TabsTrigger value="quiz" className="text-xs"><HelpCircle className="h-3 w-3 mr-1" />Quiz</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="notes" className="space-y-2 mt-0">
+        {subject.chapters.map((chapter) => (
+          <Collapsible key={chapter.id} open={openNoteChapter === chapter.id} onOpenChange={() => setOpenNoteChapter(openNoteChapter === chapter.id ? null : chapter.id)}>
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
+                <span className="text-sm font-semibold">{chapter.title}</span>
+                <ChevronDown className={`h-5 w-5 transition-transform ${openNoteChapter === chapter.id ? 'rotate-180' : ''}`} />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pl-4 mt-1 space-y-1">
+              {chapter.subchapters.map((subchapter: any) => (
+                <button key={subchapter.id} onClick={() => { handleNoteSubchapterClick(subchapter.noteId); if (isMobile) setSidebarOpen(false); }} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${noteMeta?.id === subchapter.noteId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
+                  <div className="flex items-center justify-between">
+                    <span>{subchapter.title}</span>
+                    {isCompleted(subchapter.noteId) && <CheckCircle2 className="h-4 w-4 text-success" />}
+                  </div>
+                </button>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        ))}
+      </TabsContent>
+
+      <TabsContent value="practice" className="space-y-2 mt-0">
+        {subject.practiceChapters.map((chapter) => (
+          <Collapsible key={chapter.id} open={openPracticeChapter === chapter.id} onOpenChange={() => setOpenPracticeChapter(openPracticeChapter === chapter.id ? null : chapter.id)}>
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
+                <span className="text-sm font-semibold">{chapter.title}</span>
+                <ChevronDown className={`h-5 w-5 transition-transform ${openPracticeChapter === chapter.id ? 'rotate-180' : ''}`} />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pl-4 mt-1 space-y-1">
+              {chapter.subchapters.map((subchapter: any) => (
+                <button key={subchapter.id} onClick={() => { handlePracticeSubchapterClick(subchapter.problemId); if (isMobile) setSidebarOpen(false); }} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${problemMeta?.id === subchapter.problemId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
+                  <div className="flex items-center justify-between">
+                    <span>{subchapter.title}</span>
+                    {isCompleted(subchapter.problemId) && <CheckCircle2 className="h-4 w-4 text-success" />}
+                  </div>
+                </button>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        ))}
+      </TabsContent>
+
+      <TabsContent value="quiz" className="space-y-2 mt-0">
+        {subject.quizChapters.map((chapter) => (
+          <Collapsible key={chapter.id} open={openQuizChapter === chapter.id} onOpenChange={() => setOpenQuizChapter(openQuizChapter === chapter.id ? null : chapter.id)}>
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
+                <span className="text-sm font-semibold">{chapter.title}</span>
+                <ChevronDown className={`h-5 w-5 transition-transform ${openQuizChapter === chapter.id ? 'rotate-180' : ''}`} />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pl-4 mt-1 space-y-1">
+              {chapter.subchapters.map((subchapter: any) => (
+                <button key={subchapter.id} onClick={() => { handleQuizSubchapterClick(subchapter.quizId); if (isMobile) setSidebarOpen(false); }} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${quizMeta?.id === subchapter.quizId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
+                  <div className="flex items-center justify-between">
+                    <span>{subchapter.title}</span>
+                    {isCompleted(subchapter.quizId) && <CheckCircle2 className="h-4 w-4 text-success" />}
+                  </div>
+                </button>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        ))}
+      </TabsContent>
+    </Tabs>
+  </div>
+);
 
 export default function Learn() {
   const { subject: subjectSlug } = useParams<{ subject: string }>();
@@ -44,8 +131,6 @@ export default function Learn() {
   const [progress, setProgress] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const subject = getSubjectBySlug(subjectSlug || '');
-
   useEffect(() => {
     if (subjectSlug && user) {
       fetchProgress();
@@ -56,10 +141,15 @@ export default function Learn() {
   useEffect(() => {
     if (isMobile) {
       setSidebarOpen(false);
+    } else {
+      setSidebarOpen(true);
     }
   }, [isMobile]);
 
+  const subject = getSubjectBySlug(subjectSlug || '');
+
   const fetchProgress = async () => {
+    console.log('subjectSlug:', subjectSlug);
     try {
       const { data } = await supabase
         .from('progress')
@@ -101,7 +191,7 @@ export default function Learn() {
       toast.info("Already completed");
       return;
     }
-    const totalItems = (subject?.notes.length || 0) + (subject?.practiceProblems.reduce((acc, p) => acc + p.meta.items.length, 0) || 0) + (subject?.quizzes.length || 0);
+    const totalItems = (subject?.notes.length || 0) + (subject?.practiceProblems.reduce((acc, p) => acc + (Array.isArray(p.meta.items) ? p.meta.items.length : 0), 0) || 0) + (subject?.quizzes.length || 0);
     const newCompleted = [...completedLessons, itemId];
     const newPercent = (newCompleted.length / totalItems) * 100;
     try {
@@ -156,100 +246,29 @@ export default function Learn() {
     if (quizIndex !== -1) setSelectedQuiz(quizIndex);
   };
 
+  const sidebarProps = { subject, activeTab, setActiveTab, openNoteChapter, setOpenNoteChapter, openPracticeChapter, setOpenPracticeChapter, openQuizChapter, setOpenQuizChapter, handleNoteSubchapterClick, handlePracticeSubchapterClick, handleQuizSubchapterClick, noteMeta, problemMeta, quizMeta, isCompleted, isMobile, setSidebarOpen };
+
   return (
-    <div className="min-h-screen flex w-full">
-      <aside className={`${
-          sidebarOpen ? 'w-72' : 'w-0'
-        } transition-all duration-300 border-r bg-card flex-shrink-0 overflow-hidden`}>
-        <div className="h-full overflow-y-auto p-4">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-semibold text-lg">Contents</h2>
-            {isMobile && <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}><X className="h-4 w-4" /></Button>}
+    <div className="min-h-screen flex">
+      {isMobile ? (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-72 p-0">
+            <SidebarContent {...sidebarProps} />
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <aside className={`w-72 transition-[margin-left] duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : '-ml-72'} border-r bg-card flex-shrink-0`}>
+          <div className="w-72">
+            <SidebarContent {...sidebarProps} />
           </div>
-
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full grid grid-cols-3 mb-4">
-              <TabsTrigger value="notes" className="text-xs"><FileText className="h-3 w-3 mr-1" />Notes</TabsTrigger>
-              <TabsTrigger value="practice" className="text-xs"><Code className="h-3 w-3 mr-1" />Practice</TabsTrigger>
-              <TabsTrigger value="quiz" className="text-xs"><HelpCircle className="h-3 w-3 mr-1" />Quiz</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="notes" className="space-y-2 mt-0">
-              {subject.chapters.map((chapter) => (
-                <Collapsible key={chapter.id} open={openNoteChapter === chapter.id} onOpenChange={() => setOpenNoteChapter(openNoteChapter === chapter.id ? null : chapter.id)}>
-                  <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
-                      <span className="text-sm font-semibold">{chapter.title}</span>
-                      <ChevronDown className={`h-5 w-5 transition-transform ${openNoteChapter === chapter.id ? 'rotate-180' : ''}`} />
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pl-4 mt-1 space-y-1">
-                    {chapter.subchapters.map((subchapter: any) => (
-                      <button key={subchapter.id} onClick={() => handleNoteSubchapterClick(subchapter.noteId)} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${noteMeta?.id === subchapter.noteId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
-                        <div className="flex items-center justify-between">
-                          <span>{subchapter.title}</span>
-                          {isCompleted(subchapter.noteId) && <CheckCircle2 className="h-4 w-4 text-success" />}
-                        </div>
-                      </button>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="practice" className="space-y-2 mt-0">
-              {subject.practiceChapters.map((chapter) => (
-                <Collapsible key={chapter.id} open={openPracticeChapter === chapter.id} onOpenChange={() => setOpenPracticeChapter(openPracticeChapter === chapter.id ? null : chapter.id)}>
-                  <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
-                      <span className="text-sm font-semibold">{chapter.title}</span>
-                      <ChevronDown className={`h-5 w-5 transition-transform ${openPracticeChapter === chapter.id ? 'rotate-180' : ''}`} />
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pl-4 mt-1 space-y-1">
-                    {chapter.subchapters.map((subchapter: any) => (
-                      <button key={subchapter.id} onClick={() => handlePracticeSubchapterClick(subchapter.problemId)} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${problemMeta?.id === subchapter.problemId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
-                        <div className="flex items-center justify-between">
-                          <span>{subchapter.title}</span>
-                          {isCompleted(subchapter.problemId) && <CheckCircle2 className="h-4 w-4 text-success" />}
-                        </div>
-                      </button>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="quiz" className="space-y-2 mt-0">
-              {subject.quizChapters.map((chapter) => (
-                <Collapsible key={chapter.id} open={openQuizChapter === chapter.id} onOpenChange={() => setOpenQuizChapter(openQuizChapter === chapter.id ? null : chapter.id)}>
-                  <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
-                      <span className="text-sm font-semibold">{chapter.title}</span>
-                      <ChevronDown className={`h-5 w-5 transition-transform ${openQuizChapter === chapter.id ? 'rotate-180' : ''}`} />
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pl-4 mt-1 space-y-1">
-                    {chapter.subchapters.map((subchapter: any) => (
-                      <button key={subchapter.id} onClick={() => handleQuizSubchapterClick(subchapter.quizId)} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${quizMeta?.id === subchapter.quizId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
-                        <div className="flex items-center justify-between">
-                          <span>{subchapter.title}</span>
-                          {isCompleted(subchapter.quizId) && <CheckCircle2 className="h-4 w-4 text-success" />}
-                        </div>
-                      </button>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              ))}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </aside>
+        </aside>
+      )}
 
       <main className="flex-1 overflow-auto">
         <div className="container py-6">
           <div className="flex items-center gap-4 mb-6">
-            {!sidebarOpen && <Button variant="outline" size="sm" onClick={() => setSidebarOpen(true)}><Menu className="h-4 w-4" /></Button>}
+            {isMobile && !sidebarOpen && <Button variant="outline" size="sm" onClick={() => setSidebarOpen(true)}><Menu className="h-4 w-4" /></Button>}
+            {!isMobile && <Button variant="outline" size="sm" onClick={() => setSidebarOpen(!sidebarOpen)}><Menu className="h-4 w-4" /></Button>}
             <Button variant="ghost" onClick={() => navigate('/explore')} size="sm"><ArrowLeft className="mr-2 h-4 w-4" />Back</Button>
             <div>
               <h1 className="text-2xl font-bold">{subject.title}</h1>

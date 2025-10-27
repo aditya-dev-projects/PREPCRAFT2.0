@@ -11,6 +11,12 @@ import { developmentQuizzes } from './development/quiz';
 import { chapters as developmentChapters } from './development/chapters';
 import { practiceChapters as developmentPracticeChapters } from './development/practiceChapters';
 import { quizChapters as developmentQuizChapters } from './development/quizChapters';
+import { aptitudeNotes } from './aptitude/notes';
+import { aptitudePracticeProblems } from './aptitude/practice-problems';
+import { aptitudeQuizzes } from './aptitude/quiz';
+import { chapters as aptitudeChapters } from './aptitude/chapters';
+import { practiceChapters as aptitudePracticeChapters } from './aptitude/practiceChapters';
+import { quizChapters as aptitudeQuizChapters } from './aptitude/quizChapters';
 
 export interface SubjectConfig {
   slug: string;
@@ -46,12 +52,12 @@ export const subjects: SubjectConfig[] = [
     description: 'Enhance logical reasoning, quantitative abilities, and analytical skills',
     icon: Code2,
     color: 'hsl(var(--accent))',
-    notes: [],
-    practiceProblems: [],
-    quizzes: [],
-    chapters: [],
-    practiceChapters: [],
-    quizChapters: [],
+    notes: aptitudeNotes,
+    practiceProblems: aptitudePracticeProblems,
+    quizzes: aptitudeQuizzes,
+    chapters: aptitudeChapters,
+    practiceChapters: aptitudePracticeChapters,
+    quizChapters: aptitudeQuizChapters,
   },
   {
     slug: 'development',
