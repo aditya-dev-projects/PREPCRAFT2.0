@@ -12,6 +12,5 @@ export const spottingErrorsMeta = {
   id: 'spotting-errors',
   title: 'Spotting Errors',
   difficulty: 'beginner',
-  points: 5,
   estimatedTime: '10 min'
 };

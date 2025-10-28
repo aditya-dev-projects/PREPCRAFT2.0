@@ -12,6 +12,5 @@ export const readingComprehensionMeta = {
   id: 'reading-comprehension',
   title: 'Reading Comprehension',
   difficulty: 'beginner',
-  points: 5,
   estimatedTime: '10 min'
 };

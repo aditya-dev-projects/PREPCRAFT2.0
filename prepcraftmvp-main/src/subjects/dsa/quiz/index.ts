@@ -11,8 +11,7 @@ export const dsaQuizzes = [
     meta: {
       id: 'dsa-basics-of-programming-quiz',
       title: 'Basics of Programming Quiz',
-      difficulty: 'easy',
-      points: 15
+      difficulty: 'easy'
     }
   },
   {
@@ -22,8 +21,7 @@ export const dsaQuizzes = [
     meta: {
       id: 'dsa-array-quiz',
       title: 'Array Quiz',
-      difficulty: 'medium',
-      points: 20
+      difficulty: 'medium'
     }
   },
   {
@@ -33,8 +31,7 @@ export const dsaQuizzes = [
     meta: {
       id: 'dsa-sorting-quiz',
       title: 'Sorting Quiz',
-      difficulty: 'medium',
-      points: 25
+      difficulty: 'medium'
     }
   },
   {
@@ -44,8 +41,7 @@ export const dsaQuizzes = [
     meta: {
       id: 'dsa-problem-solving-quiz',
       title: 'Problem Solving Quiz',
-      difficulty: 'hard',
-      points: 30
+      difficulty: 'hard'
     }
   }
 ];

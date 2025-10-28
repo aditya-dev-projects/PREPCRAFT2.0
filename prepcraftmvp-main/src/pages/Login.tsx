@@ -16,10 +16,14 @@ export default function Login() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
   if (user) {
-    navigate("/dashboard");
-    return null;
+    return null; // or a loading spinner
   }
 
   const handleLogin = async (e: React.FormEvent) => {

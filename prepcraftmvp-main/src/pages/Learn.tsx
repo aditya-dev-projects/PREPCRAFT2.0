@@ -29,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const SidebarContent = ({ subject, activeTab, setActiveTab, openNoteChapter, setOpenNoteChapter, openPracticeChapter, setOpenPracticeChapter, openQuizChapter, setOpenQuizChapter, handleNoteSubchapterClick, handlePracticeSubchapterClick, handleQuizSubchapterClick, noteMeta, problemMeta, quizMeta, isCompleted, isMobile, setSidebarOpen }) => (
-  <div className="h-full overflow-y-auto p-4">
+  <div className="p-4">
     <div className="flex items-center justify-between mb-6">
       <h2 className="font-semibold text-lg">Contents</h2>
       {isMobile && <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}><X className="h-4 w-4" /></Button>}
@@ -149,13 +149,14 @@ export default function Learn() {
   const subject = getSubjectBySlug(subjectSlug || '');
 
   const fetchProgress = async () => {
-    console.log('subjectSlug:', subjectSlug);
+    if (!subject) return;
+    console.log('subjectId:', subject.id);
     try {
       const { data } = await supabase
         .from('progress')
         .select('*')
         .eq('user_id', user?.id)
-        .eq('subject_id', subjectSlug)
+        .eq('subject_id', subject.id)
         .maybeSingle();
 
       if (data) {
@@ -163,7 +164,7 @@ export default function Learn() {
       } else {
         const { data: newProgress } = await supabase
           .from('progress')
-          .insert({ user_id: user?.id, subject_id: subjectSlug, completed_lessons: [], percent: 0 })
+          .insert({ user_id: user?.id, subject_id: subject.id, completed_lessons: [], percent: 0 })
           .select()
           .single();
         setProgress(newProgress);
@@ -184,8 +185,8 @@ export default function Learn() {
     }
   };
 
-  const handleComplete = async (itemId: string, points: number) => {
-    if (!progress || !user) return;
+  const handleComplete = async (itemId: string) => {
+    if (!progress || !user || !subject) return;
     const completedLessons = progress.completed_lessons || [];
     if (completedLessons.includes(itemId)) {
       toast.info("Already completed");
@@ -196,14 +197,31 @@ export default function Learn() {
     const newPercent = (newCompleted.length / totalItems) * 100;
     try {
       await supabase.rpc('update_user_streak', { user_id_param: user.id });
-      await supabase.from('progress').update({ completed_lessons: newCompleted, percent: newPercent, points_earned: (progress.points_earned || 0) + points }).eq('user_id', user.id).eq('subject_id', subjectSlug);
-      const { data: currentProfile } = await supabase.from('profiles').select('points').eq('id', user.id).single();
-      await supabase.from('profiles').update({ points: (currentProfile?.points || 0) + points }).eq('id', user.id);
-      toast.success(`+${points} points! Streak updated!`);
+      await supabase.from('progress').update({ completed_lessons: newCompleted, percent: newPercent, last_accessed: new Date().toISOString() }).eq('user_id', user.id).eq('subject_id', subject.id);
+      toast.success(`Progress updated!`);
       fetchProgress();
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to update progress");
+    }
+  };
+
+  const handleReset = async () => {
+    if (!user || !subject) return;
+
+    try {
+      // Reset the progress for the subject
+      await supabase
+        .from('progress')
+        .update({ completed_lessons: [], percent: 0 })
+        .eq('user_id', user.id)
+        .eq('subject_id', subject.id);
+
+      toast.success("Progress for this subject has been reset.");
+      fetchProgress();
+    } catch (error) {
+      console.error('Error resetting progress:', error);
+      toast.error("Failed to reset progress.");
     }
   };
 
@@ -249,22 +267,20 @@ export default function Learn() {
   const sidebarProps = { subject, activeTab, setActiveTab, openNoteChapter, setOpenNoteChapter, openPracticeChapter, setOpenPracticeChapter, openQuizChapter, setOpenQuizChapter, handleNoteSubchapterClick, handlePracticeSubchapterClick, handleQuizSubchapterClick, noteMeta, problemMeta, quizMeta, isCompleted, isMobile, setSidebarOpen };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       {isMobile ? (
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="w-72 p-0">
+          <SheetContent side="left" className="w-72 p-0 overflow-y-auto">
             <SidebarContent {...sidebarProps} />
           </SheetContent>
         </Sheet>
       ) : (
-        <aside className={`w-72 transition-[margin-left] duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : '-ml-72'} border-r bg-card flex-shrink-0`}>
-          <div className="w-72">
-            <SidebarContent {...sidebarProps} />
-          </div>
+        <aside className={`w-72 transition-[margin-left] duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : '-ml-72'} border-r bg-card flex-shrink-0 h-full overflow-y-auto`}>
+          <SidebarContent {...sidebarProps} />
         </aside>
       )}
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 h-full overflow-y-auto">
         <div className="container py-6">
           <div className="flex items-center gap-4 mb-6">
             {isMobile && !sidebarOpen && <Button variant="outline" size="sm" onClick={() => setSidebarOpen(true)}><Menu className="h-4 w-4" /></Button>}
@@ -281,10 +297,16 @@ export default function Learn() {
               {activeTab === 'notes' && NoteComponent && (
                 <div>
                   <NoteComponent />
-                  {noteMeta && !isCompleted(noteMeta.id) && (
+                  {noteMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground"><Trophy className="h-4 w-4" /><span>{noteMeta.points} points</span><Badge variant="secondary">{noteMeta.difficulty}</Badge></div>
-                      <Button onClick={() => handleComplete(noteMeta.id, noteMeta.points)}>Mark Complete</Button>
+                      {isCompleted(noteMeta.id) ? (
+                        <Button variant="destructive" onClick={handleReset}>Reset Point</Button>
+                      ) : (
+                        <Button onClick={() => handleComplete(noteMeta.id, noteMeta.points)}>
+                          Mark Complete
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -297,10 +319,15 @@ export default function Learn() {
               {activeTab === 'quiz' && QuizComponent && (
                 <div>
                   <QuizComponent />
-                  {quizMeta && !isCompleted(quizMeta.id) && (
+                  {quizMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground"><Trophy className="h-4 w-4" /><span>{quizMeta.points} points</span></div>
-                      <Button onClick={() => handleComplete(quizMeta.id, quizMeta.points)}>Complete Quiz</Button>
+                      {isCompleted(quizMeta.id) ? (
+                        <Button variant="destructive" onClick={handleReset}>Reset Progress</Button>
+                      ) : (
+                        <Button onClick={() => handleComplete(quizMeta.id)}>
+                          Mark as Completed
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>

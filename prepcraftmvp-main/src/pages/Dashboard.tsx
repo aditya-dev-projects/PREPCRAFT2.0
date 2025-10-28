@@ -80,17 +80,7 @@ export default function Dashboard() {
       <div className="grid gap-6 md:grid-cols-3 mb-8">
         <StreakDisplay days={profile?.streak_days || 0} />
         
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-primary/20 p-4">
-              <Target className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary">{profile?.points || 0}</div>
-              <div className="text-sm text-muted-foreground">total points</div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
@@ -136,7 +126,7 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent className="space-y-4">
           {subjects.map((subject) => {
-            const subjectProgress = progress.find(p => p.subject_id === subject.slug);
+            const subjectProgress = progress.find(p => p.subject_id === subject.id);
             const percent = subjectProgress?.percent || 0;
             
             return (

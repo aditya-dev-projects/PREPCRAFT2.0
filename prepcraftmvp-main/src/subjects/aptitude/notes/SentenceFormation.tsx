@@ -12,6 +12,5 @@ export const sentenceFormationMeta = {
   id: 'sentence-formation',
   title: 'Sentence Formation',
   difficulty: 'beginner',
-  points: 5,
   estimatedTime: '10 min'
 };

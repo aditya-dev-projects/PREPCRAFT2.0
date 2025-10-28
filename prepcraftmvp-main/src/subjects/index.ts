@@ -19,6 +19,7 @@ import { practiceChapters as aptitudePracticeChapters } from './aptitude/practic
 import { quizChapters as aptitudeQuizChapters } from './aptitude/quizChapters';
 
 export interface SubjectConfig {
+  id: string;
   slug: string;
   title: string;
   description: string;
@@ -34,6 +35,7 @@ export interface SubjectConfig {
 
 export const subjects: SubjectConfig[] = [
   {
+    id: 'a3a3a3a3-3a3a-3a3a-3a3a-3a3a3a3a3a3a',
     slug: 'dsa',
     title: 'Data Structures & Algorithms',
     description: 'Master fundamental data structures and algorithmic problem-solving techniques',
@@ -47,6 +49,7 @@ export const subjects: SubjectConfig[] = [
     quizChapters: dsaQuizChapters,
   },
   {
+    id: 'b4b4b4b4-4b4b-4b4b-4b4b-4b4b4b4b4b4b',
     slug: 'aptitude',
     title: 'Aptitude',
     description: 'Enhance logical reasoning, quantitative abilities, and analytical skills',
@@ -60,6 +63,7 @@ export const subjects: SubjectConfig[] = [
     quizChapters: aptitudeQuizChapters,
   },
   {
+    id: 'c5c5c5c5-5c5c-5c5c-5c5c-5c5c5c5c5c5c',
     slug: 'development',
     title: 'Development',
     description: 'Learn modern web development, frameworks, and best practices',
@@ -73,6 +77,7 @@ export const subjects: SubjectConfig[] = [
     quizChapters: developmentQuizChapters,
   },
   {
+    id: 'd6d6d6d6-6d6d-6d6d-6d6d-d6d6d6d6d6d6',
     slug: 'cs-fundamentals',
     title: 'CS Fundamentals',
     description: 'Core computer science concepts including OS, DBMS, Networks, and more',

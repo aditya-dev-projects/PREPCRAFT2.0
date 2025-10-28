@@ -32,8 +32,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-variables-data-types',
       title: 'Variables & Data Types',
-      difficulty: 'easy',
-      points: 5
+      difficulty: 'easy'
     }
   },
   {
@@ -43,8 +42,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-conditional-statements',
       title: 'Conditional Statements',
-      difficulty: 'easy',
-      points: 5
+      difficulty: 'easy'
     }
   },
   {
@@ -54,8 +52,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-operators',
       title: 'Operators',
-      difficulty: 'easy',
-      points: 5
+      difficulty: 'easy'
     }
   },
   {
@@ -65,8 +62,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-loops',
       title: 'Loops',
-      difficulty: 'easy',
-      points: 5
+      difficulty: 'easy'
     }
   },
   {
@@ -76,8 +72,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-functions',
       title: 'Functions',
-      difficulty: 'easy',
-      points: 5
+      difficulty: 'easy'
     }
   },
   {
@@ -87,8 +82,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-array-basics',
       title: 'Array Basics',
-      difficulty: 'easy',
-      points: 10
+      difficulty: 'easy'
     }
   },
   {
@@ -98,8 +92,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-2d-arrays',
       title: '2D Arrays',
-      difficulty: 'medium',
-      points: 15
+      difficulty: 'medium'
     }
   },
   {
@@ -109,8 +102,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-strings',
       title: 'Strings',
-      difficulty: 'easy',
-      points: 10
+      difficulty: 'easy'
     }
   },
   {
@@ -120,8 +112,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-what-is-sorting',
       title: 'What Is Sorting',
-      difficulty: 'easy',
-      points: 5
+      difficulty: 'easy'
     }
   },
   {
@@ -131,8 +122,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-bubble-sort',
       title: 'Bubble Sort',
-      difficulty: 'easy',
-      points: 10
+      difficulty: 'easy'
     }
   },
   {
@@ -142,8 +132,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-selection-sort',
       title: 'Selection Sort',
-      difficulty: 'easy',
-      points: 10
+      difficulty: 'easy'
     }
   },
   {
@@ -153,8 +142,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-insertion-sort',
       title: 'Insertion Sort',
-      difficulty: 'easy',
-      points: 10
+      difficulty: 'easy'
     }
   },
   {
@@ -164,8 +152,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-counting',
       title: 'Counting',
-      difficulty: 'medium',
-      points: 15
+      difficulty: 'medium'
     }
   },
   {
@@ -175,8 +162,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-recursion',
       title: 'Recursion',
-      difficulty: 'medium',
-      points: 20
+      difficulty: 'medium'
     }
   },
   {
@@ -186,8 +172,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-backtracking',
       title: 'Backtracking',
-      difficulty: 'hard',
-      points: 25
+      difficulty: 'hard'
     }
   },
   {
@@ -197,8 +182,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-divide-and-conqueror',
       title: 'Divide & Conqueror',
-      difficulty: 'medium',
-      points: 20
+      difficulty: 'medium'
     }
   },
   {
@@ -208,8 +192,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-bit-manipulation',
       title: 'Bit Manipulation',
-      difficulty: 'hard',
-      points: 25
+      difficulty: 'hard'
     }
   },
   {
@@ -219,8 +202,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-time-and-space-complexity',
       title: 'Time & Space Complexity',
-      difficulty: 'medium',
-      points: 15
+      difficulty: 'medium'
     }
   },
   {
@@ -230,8 +212,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-greedy-algorithim',
       title: 'Greedy Algorithim',
-      difficulty: 'medium',
-      points: 20
+      difficulty: 'medium'
     }
   },
   {
@@ -241,8 +222,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-basic-of-oops',
       title: 'Basic Of OOPs',
-      difficulty: 'medium',
-      points: 15
+      difficulty: 'medium'
     }
   },
   {
@@ -252,8 +232,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-advanced-oops',
       title: 'Advanced OOPs',
-      difficulty: 'hard',
-      points: 20
+      difficulty: 'hard'
     }
   },
   {
@@ -263,8 +242,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-array-lists',
       title: 'Array Lists',
-      difficulty: 'easy',
-      points: 10
+      difficulty: 'easy'
     }
   },
   {
@@ -274,8 +252,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-linked-lists',
       title: 'Linked Lists',
-      difficulty: 'medium',
-      points: 20
+      difficulty: 'medium'
     }
   },
   {
@@ -285,8 +262,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-stacks',
       title: 'Stacks',
-      difficulty: 'easy',
-      points: 15
+      difficulty: 'easy'
     }
   },
   {
@@ -296,8 +272,7 @@ export const dsaNotes = [
     meta: {
       id: 'dsa-queues',
       title: 'Queues',
-      difficulty: 'easy',
-      points: 15
+      difficulty: 'easy'
     }
   }
 ];

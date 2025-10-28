@@ -12,6 +12,5 @@ export const synonymsAndAntonymsMeta = {
   id: 'synonyms-antonyms',
   title: 'Synonyms & Antonyms',
   difficulty: 'beginner',
-  points: 5,
   estimatedTime: '10 min'
 };

@@ -12,6 +12,5 @@ export const idiomsAndPhrasesMeta = {
   id: 'idioms-phrases',
   title: 'Idioms & Phrases',
   difficulty: 'beginner',
-  points: 5,
   estimatedTime: '10 min'
 };
