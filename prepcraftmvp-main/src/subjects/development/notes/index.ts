@@ -1,66 +1,66 @@
-import { WhatIsWebDevelopment, whatIsWebDevelopmentMeta } from './WhatIsWebDevelopment';
-import { ClientServerArchitecture, clientServerArchitectureMeta } from './ClientServerArchitecture';
-import { FrontendVsBackend, frontendVsBackendMeta } from './FrontendVsBackend';
-import { IntroToMernStack, introToMernStackMeta } from './IntroToMernStack';
-import { DevEnvSetup, devEnvSetupMeta } from './DevEnvSetup';
-import { CodeEditors, codeEditorsMeta } from './CodeEditors';
-import { TerminalBasics, terminalBasicsMeta } from './TerminalBasics';
+import { WhatIsWebDevelopment, whatIsWebDevelopment} from './Chapter 1/WhatIsWebDevelopment';
+import { ClientServerArchitecture, clientServerArchitectureMeta } from './Chapter 1/ClientServerArchitecture';
+import { FrontendVsBackend, frontendVsBackendMeta } from './Chapter 1/FrontendVsBackend';
+import { IntroToMernStack, introToMernStackMeta } from './Chapter 1/IntroToMernStack';
+import { DevEnvSetup, devEnvSetupMeta } from './Chapter 1/DevEnvSetup';
+import { CodeEditors, codeEditorsMeta } from './Chapter 1/CodeEditors';
+import { TerminalBasics, terminalBasicsMeta } from './Chapter 1/TerminalBasics';
 
 // Chapter 2
-import IntroductionToVersionControl from './IntroductionToVersionControl';
-import GitInstallationConfiguration from './GitInstallationConfiguration';
-import GitBasics from './GitBasics';
-import WorkingWithBranchesMerging from './WorkingWithBranchesMerging';
-import GitHubIntroductionAccountSetup from './GitHubIntroductionAccountSetup';
-import RemoteRepositories from './RemoteRepositories';
-import CollaborationWorkflows from './CollaborationWorkflows';
-import GitBestPractices from './GitBestPractices';
+import IntroductionToVersionControl from './Chapter 2/IntroductionToVersionControl';
+import GitInstallationConfiguration from './Chapter 2/GitInstallationConfiguration';
+import GitBasics from './Chapter 2/GitBasics';
+import WorkingWithBranchesMerging from './Chapter 2/WorkingWithBranchesMerging';
+import GitHubIntroductionAccountSetup from './Chapter 2/GitHubIntroductionAccountSetup';
+import RemoteRepositories from './Chapter 2/RemoteRepositories';
+import CollaborationWorkflows from './Chapter 2/CollaborationWorkflows';
+import GitBestPractices from './Chapter 2/GitBestPractices';
 
 // Chapter 3
-import HTML5Essentials from './HTML5Essentials';
-import HTMLCompleteGuide from './HTMLCompleteGuide';
-import CSS3CompleteGuide from './CSS3CompleteGuide';
-import CSSLayout from './CSSLayout';
-import CSSAnimations from './CSSAnimations';
-import ResponsiveDesign from './ResponsiveDesign';
-import CSSPreprocessors from './CSSPreprocessors';
-import BrowserDeveloperTools from './BrowserDeveloperTools';
+import HTML5Essentials from './Chapter 3/HTML5Essentials';
+import HTMLCompleteGuide from './Chapter 3/HTMLCompleteGuide';
+import CSS3CompleteGuide from './Chapter 3/CSS3CompleteGuide';
+import CSSLayout from './Chapter 3/CSSLayout';
+import CSSAnimations from './Chapter 3/CSSAnimations';
+import ResponsiveDesign from './Chapter 3/ResponsiveDesign';
+import CSSPreprocessors from './Chapter 3/CSSPreprocessors';
+import BrowserDeveloperTools from './Chapter 3/BrowserDeveloperTools';
 
 // Chapter 4
-import JavaScriptBasics from './JavaScriptBasics';
-import ControlStructures from './ControlStructures';
-import FunctionsScope from './FunctionsScope';
-import ArraysMethods from './ArraysMethods';
-import ObjectsMethods from './ObjectsMethods';
-import DOMManipulationEvents from './DOMManipulationEvents';
-import ES6Features from './ES6Features';
-import AsynchronousJavaScript from './AsynchronousJavaScript';
-import ErrorHandlingDebugging from './ErrorHandlingDebugging';
-import JsMiniProject from './JsMiniProject';
-import MiniProjectPreview from './MiniProjectPreview';
+import JavaScriptBasics from './Chapter 4/JavaScriptBasics';
+import ControlStructures from './Chapter 4/ControlStructures';
+import FunctionsScope from './Chapter 4/FunctionsScope';
+import ArraysMethods from './Chapter 4/ArraysMethods';
+import ObjectsMethods from './Chapter 4/ObjectsMethods';
+import DOMManipulationEvents from './Chapter 4/DOMManipulationEvents';
+import ES6Features from './Chapter 4/ES6Features';
+import AsynchronousJavaScript from './Chapter 4/AsynchronousJavaScript';
+import ErrorHandlingDebugging from './Chapter 4/ErrorHandlingDebugging';
+import JsMiniProject from './Chapter 4/JsMiniProject';
+import MiniProjectPreview from './Chapter 4/MiniProjectPreview';
 
 // Chapter 5
-import IntroductionToCSSFrameworks from './IntroductionToCSSFrameworks';
-import BootstrapFundamentals from './BootstrapFundamentals';
-import TailwindCSSSetup from './TailwindCSSSetup';
-import TailwindCSSUtilityClasses from './TailwindCSSUtilityClasses';
-import TailwindCSSResponsiveDesign from './TailwindCSSResponsiveDesign';
-import TailwindCSSComponents from './TailwindCSSComponents';
-import CSSFrameworkComparison from './CSSFrameworkComparison';
+import IntroductionToCSSFrameworks from './Chapter 5/IntroductionToCSSFrameworks';
+import BootstrapFundamentals from './Chapter 5/BootstrapFundamentals';
+import TailwindCSSSetup from './Chapter 5/TailwindCSSSetup';
+import TailwindCSSUtilityClasses from './Chapter 5/TailwindCSSUtilityClasses';
+import TailwindCSSResponsiveDesign from './Chapter 5/TailwindCSSResponsiveDesign';
+import TailwindCSSComponents from './Chapter 5/TailwindCSSComponents';
+import CSSFrameworkComparison from './Chapter 5/CSSFrameworkComparison';
 
 // Chapter 6
-import IntroductionToReact from './IntroductionToReact';
-import CreateReactApp from './CreateReactApp';
-import JSXSyntax from './JSXSyntax';
-import PropsCommunication from './PropsCommunication';
-import StateManagement from './StateManagement';
-import EventHandling from './EventHandling';
-import ConditionalRendering from './ConditionalRendering';
-import ReactHooks from './ReactHooks';
-import ReactRouter from './ReactRouter';
-import FormsValidation from './FormsValidation';
-import ComponentLifecycle from './ComponentLifecycle';
-import ReactMiniProjects from './ReactMiniProjects';
+import IntroductionToReact from './Chapter 6/IntroductionToReact';
+import CreateReactApp from './Chapter 6/CreateReactApp';
+import JSXSyntax from './Chapter 6/JSXSyntax';
+import PropsCommunication from './Chapter 6/PropsCommunication';
+import StateManagement from './Chapter 6/StateManagement';
+import EventHandling from './Chapter 6/EventHandling';
+import ConditionalRendering from './Chapter 6/ConditionalRendering';
+import ReactHooks from './Chapter 6/ReactHooks';
+import ReactRouter from './Chapter 6/ReactRouter';
+import FormsValidation from './Chapter 6/FormsValidation';
+import ComponentLifecycle from './Chapter 6/ComponentLifecycle';
+import ReactMiniProjects from './Chapter 6/ReactMiniProjects';
 
 // Chapter 7
 import IntroductionToNode from './IntroductionToNode';
