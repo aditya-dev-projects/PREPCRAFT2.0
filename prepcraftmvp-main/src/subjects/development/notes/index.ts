@@ -1,4 +1,5 @@
-import { WhatIsWebDevelopment, whatIsWebDevelopment} from './Chapter 1/WhatIsWebDevelopment';
+// This is the new, correct line you added
+import * as WhatIsWebDevelopmentModule from './Chapter 1/WhatIsWebDevelopment';
 import { ClientServerArchitecture, clientServerArchitectureMeta } from './Chapter 1/ClientServerArchitecture';
 import { FrontendVsBackend, frontendVsBackendMeta } from './Chapter 1/FrontendVsBackend';
 import { IntroToMernStack, introToMernStackMeta } from './Chapter 1/IntroToMernStack';
@@ -11,7 +12,7 @@ import IntroductionToVersionControl from './Chapter 2/IntroductionToVersionContr
 import GitInstallationConfiguration from './Chapter 2/GitInstallationConfiguration';
 import GitBasics from './Chapter 2/GitBasics';
 import WorkingWithBranchesMerging from './Chapter 2/WorkingWithBranchesMerging';
-import GitHubIntroductionAccountSetup from './Chapter 2/GitHubIntroductionAccountSetup';
+import GitHubIntroductionAccountSetup from './Chapter 2/GitHubIntroductionAccountSetup';  
 import RemoteRepositories from './Chapter 2/RemoteRepositories';
 import CollaborationWorkflows from './Chapter 2/CollaborationWorkflows';
 import GitBestPractices from './Chapter 2/GitBestPractices';
@@ -111,7 +112,7 @@ import AggregationPipeline from './AggregationPipeline';
 import DatabaseMiniProject from './DatabaseMiniProject';
 
 export const developmentNotes = [
-  { component: WhatIsWebDevelopment, meta: whatIsWebDevelopmentMeta },
+  { component: (WhatIsWebDevelopmentModule as any).WhatIsWebDevelopment ?? (WhatIsWebDevelopmentModule as any).whatIsWebDevelopment, meta: (WhatIsWebDevelopmentModule as any).whatIsWebDevelopmentMeta ?? (WhatIsWebDevelopmentModule as any).whatIsWebDevelopment },
   { component: ClientServerArchitecture, meta: clientServerArchitectureMeta },
   { component: FrontendVsBackend, meta: frontendVsBackendMeta },
   { component: IntroToMernStack, meta: introToMernStackMeta },

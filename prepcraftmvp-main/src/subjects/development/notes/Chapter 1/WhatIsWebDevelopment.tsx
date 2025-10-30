@@ -1,8 +1,8 @@
 import React from 'react';
 
-export const WhatIsWebDevelopment: React.FC = () => {
+export const whatIsWebDevelopment: React.FC = () => { // This is the component that will be used to render the note     
   return (
-    <div className="p-6 bg-gray-800 text-white">
+    <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
       <h1 className="text-3xl font-bold mb-4">What is Web Development?</h1>
       <div className="space-y-4">
         <p className="text-lg opacity-90">
@@ -37,20 +37,20 @@ export const WhatIsWebDevelopment: React.FC = () => {
         <p className="opacity-90">
           Every single website is built using these three core technologies. They are the essential trio of the web.
         </p>
-        <div className="p-4 bg-gray-700 rounded-lg">
+        <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
           <h3 className="font-bold">HTML (HyperText Markup Language): The Skeleton</h3>
           <p className="text-sm opacity-90">Provides the fundamental structure and content. Analogy: The wooden frame and walls of a house.</p>
-          <pre className="mt-2 p-2 bg-black rounded text-sm text-gray-300"><code>{'<h1>This is a Main Heading</h1>\n<p>This is a paragraph of text.</p>\n<button>Click Me</button>'}</code></pre>
+          <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'<h1>This is a Main Heading</h1>\n<p>This is a paragraph of text.</p>\n<button>Click Me</button>'}</code></pre>
         </div>
-        <div className="p-4 bg-gray-700 rounded-lg">
+        <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
           <h3 className="font-bold">CSS (Cascading Style Sheets): The Appearance</h3>
           <p className="text-sm opacity-90">Provides the style, colors, fonts, and layout. Analogy: The paint, wallpaper, and furniture.</p>
-          <pre className="mt-2 p-2 bg-black rounded text-sm text-gray-300"><code>{'h1 {\n  color: blue;\n  font-size: 32px;\n}\nbutton {\n  background-color: green;\n  color: white;\n}'}</code></pre>
+          <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'h1 {\n  color: blue;\n  font-size: 32px;\n}\nbutton {\n  background-color: green;\n  color: white;\n}'}</code></pre>
         </div>
-        <div className="p-4 bg-gray-700 rounded-lg">
+        <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
           <h3 className="font-bold">JavaScript (JS): The Brain</h3>
           <p className="text-sm opacity-90">Adds interactivity and functionality, making the website dynamic. Analogy: The electricity and plumbing.</p>
-          <pre className="mt-2 p-2 bg-black rounded text-sm text-gray-300"><code>{"button.addEventListener('click', () => {\n  document.body.style.backgroundColor = 'darkmode';\n});"}</code></pre>
+          <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{"button.addEventListener('click', () => {\n  document.body.style.backgroundColor = 'darkmode';\n});"}</code></pre>
         </div>
 
         <h2 className="text-2xl font-semibold pt-4">4. Frontend Development (The "Client-Side")</h2>
