@@ -53,10 +53,10 @@ const SidebarContent = ({ subject, activeTab, setActiveTab, openNoteChapter, set
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 mt-1 space-y-1">
               {chapter.subchapters.map((subchapter: any) => (
-                <button key={subchapter.id} onClick={() => { handleNoteSubchapterClick(subchapter.noteId); if (isMobile) setSidebarOpen(false); }} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${noteMeta?.id === subchapter.noteId ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
+                <button key={subchapter.id} onClick={() => { handleNoteSubchapterClick(subchapter.id); if (isMobile) setSidebarOpen(false); }} className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${noteMeta?.id === subchapter.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>
                   <div className="flex items-center justify-between">
                     <span>{subchapter.title}</span>
-                    {isCompleted(subchapter.noteId) && <CheckCircle2 className="h-4 w-4 text-success" />}
+                    {isCompleted(subchapter.id) && <CheckCircle2 className="h-4 w-4 text-success" />}
                   </div>
                 </button>
               ))}
@@ -238,8 +238,9 @@ export default function Learn() {
     );
   }
 
-  const NoteComponent = selectedNote !== null ? subject.notes[selectedNote]?.component : null;
-  const noteMeta = selectedNote !== null ? subject.notes[selectedNote]?.meta : null;
+  const note = selectedNote !== null ? subject.notes[selectedNote] : null;
+  const NoteComponent = note?.component;
+  const noteMeta = note?.meta;
   
   const ProblemComponent = selectedProblem !== null ? subject.practiceProblems[selectedProblem]?.component : null;
   const problemMeta = selectedProblem !== null ? subject.practiceProblems[selectedProblem]?.meta : null;
@@ -296,7 +297,7 @@ export default function Learn() {
             <CardContent className="p-6">
               {activeTab === 'notes' && NoteComponent && (
                 <div>
-                  <NoteComponent />
+                  <NoteComponent noteId={noteMeta.id} />
                   {noteMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground"><Trophy className="h-4 w-4" /><span>{noteMeta.points} points</span><Badge variant="secondary">{noteMeta.difficulty}</Badge></div>
