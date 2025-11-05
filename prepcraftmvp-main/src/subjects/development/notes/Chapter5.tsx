@@ -623,7 +623,7 @@ const Chapter5 = ({ noteId }: { noteId: string }) => {
               <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
                 {'/* In your main.css file */\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n@layer components {\n  .btn-primary {\n    @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700;\n  }\n}'}
               </code></pre>
-              <p className="opacity-90 mt-2">Now your HTML is much cleaner: `<button class="btn-primary">...</button>`</p>
+              <p className="opacity-90 mt-2">Now your HTML is much cleaner: `&lt;button class="btn-primary"&gt;...&lt;/button&gt;`</p>
             </div>
             
             <h2 className="text-2xl font-semibold pt-4">4. Solution 2: Framework Components (Best Practice)</h2>
@@ -809,7 +809,6 @@ const Chapter5 = ({ noteId }: { noteId: string }) => {
             </div>
         </div>
       );
-IA
   }
 };
 
