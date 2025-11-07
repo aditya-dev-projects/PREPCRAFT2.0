@@ -1,22 +1,64 @@
 import React from 'react';
-import { developmentQuizzes } from '../subjects/development/developmentQuizzes';
+// FIX: Import all the individual chapter quiz data
+import { Chapter1Quiz } from '../subjects/development/quiz/Chapter1Quiz';
+import { Chapter2Quiz } from '../subjects/development/quiz/Chapter2Quiz';
+import { Chapter3Quiz } from '../subjects/development/quiz/Chapter3Quiz';
+import { Chapter4Quiz } from '../subjects/development/quiz/Chapter4Quiz';
+import { Chapter5Quiz } from '../subjects/development/quiz/Chapter5Quiz';
+import { Chapter6Quiz } from '../subjects/development/quiz/Chapter6Quiz';
+import { Chapter7Quiz } from '../subjects/development/quiz/Chapter7Quiz';
+import { Chapter8Quiz } from '../subjects/development/quiz/Chapter8Quiz';
+import { Chapter9Quiz } from '../subjects/development/quiz/Chapter9Quiz';
+import { Chapter10Quiz } from '../subjects/development/quiz/Chapter10Quiz';
+
+// FIX: Merge all quiz objects into one
+const allDevelopmentQuizzes = {
+  ...Chapter1Quiz,
+  ...Chapter2Quiz,
+  ...Chapter3Quiz,
+  ...Chapter4Quiz,
+  ...Chapter5Quiz,
+  ...Chapter6Quiz,
+  ...Chapter7Quiz,
+  ...Chapter8Quiz,
+  ...Chapter9Quiz,
+  ...Chapter10Quiz,
+};
+
+// --- Types ---
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: string;
+}
 
 interface QuizDisplayProps {
   subchapterId: string;
 }
 
+// FIX: Helper function to safely get quiz data from the merged object
+const getQuizData = (id: string): QuizQuestion[] | undefined => {
+  return (allDevelopmentQuizzes as Record<string, QuizQuestion[]>)[id];
+};
+
 const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
-  const quizzes = developmentQuizzes[subchapterId];
+  // FIX: Use the helper to get the correct quiz questions
+  const quizzes = getQuizData(subchapterId);
+  
+  // Get a clean title from the ID
+  const title = subchapterId
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
 
   if (!quizzes || quizzes.length === 0) {
-    return <div className="p-4 text-gray-600">No quizzes available for this subchapter yet.</div>;
+    return <div className="p-4 text-muted-foreground">No quizzes available for this subchapter yet.</div>;
   }
 
   return (
-    <div className="p-8 font-sans max-w-4xl mx-auto">
-      <h3 className="text-2xl font-bold mb-4">Quiz: {subchapterId.replace(/-/g, ' ').toUpperCase()}</h3>
+    <div className="prose prose-slate dark:prose-invert max-w-none">
+      <h1 className="text-3xl font-bold mb-6">Quiz: {title}</h1>
       {quizzes.map((quiz, index) => (
-        <div key={index} className="mb-6 p-4 border rounded-lg shadow-sm bg-white">
+        <div key={index} className="mb-6 p-4 border rounded-lg shadow-sm bg-background">
           <p className="font-semibold text-lg mb-2">{index + 1}. {quiz.question}</p>
           <div className="space-y-2">
             {quiz.options.map((option, optIndex) => (
@@ -29,7 +71,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
                   className="mr-2"
                   disabled // Disable for display, enable for interactive quiz
                 />
-                <label htmlFor={`quiz-${subchapterId}-${index}-option-${optIndex}`} className="text-gray-700">
+                <label htmlFor={`quiz-${subchapterId}-${index}-option-${optIndex}`} className="text-foreground">
                   {option}
                 </label>
               </div>

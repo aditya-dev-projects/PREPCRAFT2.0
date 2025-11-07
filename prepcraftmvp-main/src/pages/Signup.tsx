@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // <-- Import useEffect
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -32,11 +32,13 @@ export default function Signup() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Redirect if already logged in
-  if (user) {
-    navigate("/dashboard");
-    return null;
-  }
+  // FIX: Move redirect logic into a useEffect
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +89,11 @@ export default function Signup() {
       toast.error(error.message || "Failed to signup with Google");
     }
   };
+
+  // Show nothing (or a loader) while redirecting
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background p-4">

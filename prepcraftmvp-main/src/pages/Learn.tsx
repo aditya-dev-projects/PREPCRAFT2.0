@@ -126,10 +126,10 @@ const SidebarContent = ({
                     handleNoteSubchapterClick(subchapter.id);
                     if (isMobile) setSidebarOpen(false);
                   }}
-                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${
+                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
                     noteMeta?.id === subchapter.id
                       ? "text-black"
-                      : "hover:bg-muted"
+                      : ""
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -145,7 +145,7 @@ const SidebarContent = ({
         ))}
       </TabsContent>
 
-      {/* Practice Section (hover + active fix) */}
+      {/* Practice Section */}
       <TabsContent value="practice" className="space-y-2 mt-0">
         {subject.practiceChapters.map((chapter: any) => (
           <Collapsible
@@ -157,10 +157,6 @@ const SidebarContent = ({
               )
             }
           >
-            {/* FIXED: The stray logic was here. 
-              The <CollapsibleTrigger> now correctly wraps its single child `div`.
-              I also added cursor-pointer for consistency.
-            */}
             <CollapsibleTrigger className="w-full" asChild>
               <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer">
                 <span className="text-sm font-semibold">{chapter.title}</span>
@@ -176,18 +172,18 @@ const SidebarContent = ({
                 <button
                   key={subchapter.id}
                   onClick={() => {
-                    handlePracticeSubchapterClick(subchapter.problemId);
+                    handlePracticeSubchapterClick(subchapter.practiceProblemId);
                     if (isMobile) setSidebarOpen(false);
                   }}
-                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${
-                    problemMeta?.id === subchapter.problemId
+                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                    problemMeta?.id === subchapter.practiceProblemId
                       ? "text-black"
-                      : "hover:bg-muted"
+                      : ""
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{subchapter.title}</span>
-                    {isCompleted(subchapter.problemId) && (
+                    {isCompleted(subchapter.practiceProblemId) && (
                       <CheckCircle2 className="h-4 w-4 text-success" />
                     )}
                   </div>
@@ -231,10 +227,10 @@ const SidebarContent = ({
                     handleQuizSubchapterClick(subchapter.quizId);
                     if (isMobile) setSidebarOpen(false);
                   }}
-                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm ${
+                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
                     quizMeta?.id === subchapter.quizId
                       ? "text-black"
-                      : "hover:bg-muted"
+                      : ""
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -276,10 +272,23 @@ export default function Learn() {
 
   const subject = getSubjectBySlug(subjectSlug || "");
 
+  // FIX: Added the missing updateLastVisited function
+  const updateLastVisited = async () => {
+    try {
+      await supabase.rpc("update_user_streak", { user_id_param: user?.id });
+      await supabase
+        .from("profiles")
+        .update({ last_visited: `/learn/${subjectSlug}` })
+        .eq("id", user?.id);
+    } catch (error) {
+      console.error("Error updating last visited:", error);
+    }
+  };
+
   useEffect(() => {
     if (subjectSlug && user) {
       fetchProgress();
-      updateLastVisited();
+      updateLastVisited(); // This call will now work
     }
   }, [subjectSlug, user]);
 
@@ -316,18 +325,6 @@ export default function Learn() {
       console.error("Error fetching progress:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const updateLastVisited = async () => {
-    try {
-      await supabase.rpc("update_user_streak", { user_id_param: user?.id });
-      await supabase
-        .from("profiles")
-        .update({ last_visited: `/learn/${subjectSlug}` })
-        .eq("id", user?.id);
-    } catch (error) {
-      console.error("Error updating last visited:", error);
     }
   };
 
@@ -529,14 +526,14 @@ export default function Learn() {
               {/* Practice */}
               {activeTab === "practice" && ProblemComponent && (
                 <div>
-                  <ProblemComponent />
+                  <ProblemComponent subchapterId={problemMeta.subchapterId} />
                 </div>
               )}
 
               {/* Quiz */}
               {activeTab === "quiz" && QuizComponent && (
                 <div>
-                  <QuizComponent />
+                  <QuizComponent subchapterId={quizMeta.subchapterId} />
                   {quizMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
                       {isCompleted(quizMeta.id) ? (

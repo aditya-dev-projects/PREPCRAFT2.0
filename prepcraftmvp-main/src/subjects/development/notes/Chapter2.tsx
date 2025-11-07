@@ -1,1029 +1,817 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+// --- Reusable Helper Components (Light Theme) ---
+
+const CodeBlock = ({ code, language = 'javascript' }: { code: string, language?: string }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = code.trim();
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      navigator.clipboard.writeText(code.trim()).then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }).catch(navErr => {
+        console.error('Clipboard API also failed: ', navErr);
+      });
+    }
+  };
+
+  return (
+    <div className="relative my-4">
+      <pre className={`bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm language-${language}`}>
+        <code>{code.trim()}</code>
+      </pre>
+      <button
+        onClick={handleCopy}
+        className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-semibold py-1 px-2 rounded-md transition-all duration-200"
+      >
+        {isCopied ? 'Copied!' : 'Copy'}
+      </button>
+    </div>
+  );
+};
+
+const Code = ({ children }: { children: React.ReactNode }) => (
+  <code className="bg-gray-200 text-red-700 font-mono px-1.5 py-0.5 rounded-md text-sm">
+    {children}
+  </code>
+);
+
+// --- Main Chapter 2 Component ---
 
 const Chapter2 = ({ noteId }: { noteId: string }) => {
-  switch (noteId) {
-    case 'introduction-to-version-control':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.1: Introduction to Version Control</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Version Control is a system that records changes to a file or set of files over time so that you can recall specific versions later. It's a fundamental tool in software development that allows you to track your project's history, revert to previous versions, and collaborate with others without overwriting each other's work.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Time Machine for Your Code</h2>
-            <p className="opacity-90">
-              Imagine you're working on a project. You make a change that breaks everything, and you wish you could go back to the version you had an hour ago. Version Control is that time machine.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">Analogy: Save Points in a Video Game</h3>
-              <ul className="list-disc ml-6 space-y-2 opacity-90 mt-2">
-                <li>Every time you reach a significant milestone (e.g., a feature is complete), you create a "save point" called a <strong>commit</strong>.</li>
-                <li>This commit saves a snapshot of your entire project at that exact moment.</li>
-                <li>If you later make a mistake, you can simply load a previous save point, effectively undoing all the changes made since then.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. What Problem Does VCS Solve?</h2>
-            <p className="opacity-90">
-              Without a Version Control System (VCS), collaboration is chaotic. You end up with a folder full of files like:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>`project_final.zip`</li>
-                <li>`project_final_v2.zip`</li>
-                <li>`project_final_v2_sara_edits.zip`</li>
-                <li>`project_final_v3_REALLY_FINAL.zip`</li>
-              </ul>
-              <p className="mt-2 opacity-90">This is slow, error-prone, and makes it impossible to merge changes from different people. A VCS automates this entire process.</p>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">3. Centralized vs. Distributed VCS</h2>
-            <p className="opacity-90">
-              There are two main types of version control systems.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                  <h3 className="font-bold">Centralized (CVCS)</h3>
-                  <p className="text-sm opacity-90 mt-1">Has a single central server that stores all the project history. Developers "check out" files from that server. (e.g., Subversion, CVS).</p>
-                  <p className="text-sm opacity-90 mt-1"><strong>Weakness:</strong> If the central server goes down, nobody can work or save their changes.</p>
-              </div>
-              <div>
-                  <h3 className="font-bold">Distributed (DVCS)</h3>
-                  <p className="text-sm opacity-90 mt-1">Every developer gets a full copy (a "clone") of the entire project's history. (e.g., <strong>Git</strong>, Mercurial).</p>
-                  <p className="text-sm opacity-90 mt-1"><strong>Strength:</strong> You can work offline, make commits, and view history. If the main server fails, any developer's clone can be used to restore it.</p>
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">4. Why Git Won the "VCS Wars"</h2>
-            <p className="opacity-90">
-              Git is the most popular VCS in the world because it is:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Fast:</strong> Most operations (like committing and branching) are nearly instantaneous because they happen on your local machine.</li>
-                <li><strong>Powerful Branching:</strong> Git's system for creating and merging branches is its killer feature, making it painless to work on multiple features in parallel.</li>
-                <li><strong>Distributed:</strong> As mentioned above, this provides flexibility and redundancy.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">5. Git vs. GitHub: The Tool vs. The Service</h2>
-            <p className="opacity-90">
-              This is a crucial distinction for beginners.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                  <h3 className="font-bold">Git</h3>
-                  <p className="text-sm opacity-90 mt-1">Git is the <strong>software</strong>, the version control system itself. It is a command-line tool you install and run locally on your computer to track your files.</p>
-              </div>
-              <div>
-                  <h3 className="font-bold">GitHub</h3>
-                  <p className="text-sm opacity-90 mt-1">GitHub is a <strong>web-based service</strong> (a company) that hosts your Git projects. It's a "clubhouse" for your code. It provides a remote, central location to store your code, collaborate with others, and manage your projects.</p>
-              </div>
-            </div>
-            <p className="mt-2 opacity-90">You use <strong>Git</strong> on your computer, and you push your code to <strong>GitHub</strong> to back it up and share it. (Other services like GitLab and Bitbucket are alternatives to GitHub).</p>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. The Three "Trees" of Git</h2>
-            <p className="opacity-90">
-              To understand Git commands, you must visualize these three areas where your code lives:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Working Directory:</strong> Your project folder; the files you are currently editing. This is your "messy workshop."</li>
-                <li><strong>Staging Area (or Index):</strong> An intermediate area. When you `git add` a file, you move it from the workshop to a "ready for shipping" box.</li>
-                <li><strong>Repository (.git directory):</strong> Your project's permanent history. When you `git commit`, you take the "shipping box" (Staging Area) and save it forever in your project's history log.</li>
-              </ol>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">7. The Basic Workflow in a Nutshell</h2>
-            <p className="opacity-90">
-              The fundamental, everyday workflow of Git is a two-step process:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>`git add` (Stage):</strong> You tell Git which of your changes you want to include in your next save point.</li>
-                <li><strong>`git commit` (Save):</strong> You create the save point, permanently recording the staged changes into your project's history with a descriptive message.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. What is a "Repository"?</h2>
-            <p className="opacity-90">
-              A repository (or "repo") is the entire collection of files and folders associated with a project, along with its complete history of changes. When you run `git init` in a folder, you are creating a new local repository.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">9. What is a "Commit"?</h2>
-            <p className="opacity-90">
-              A commit is a snapshot of your repository at a specific point in time. It is the fundamental unit of Git. Each commit has a unique ID (a SHA hash), an author, an email, a timestamp, and a message explaining the change.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">10. What is a "Branch"?</h2>
-            <p className="opacity-90">
-              A branch is a lightweight, movable pointer to a specific commit. The default branch is usually called `main` or `master`. Branching allows you to create an independent line of development to work on a new feature without affecting the stable `main` branch.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">11. Why is it Essential for Collaboration?</h2>
-            <p className="opacity-90">
-              Git allows multiple developers to work on the same project at the same time.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Developer A can work on the "login" feature on their own branch.</li>
-                <li>Developer B can work on the "user-profile" feature on a different branch.</li>
-                <li>When both features are complete, Git provides tools to **merge** these different branches back together into the `main` branch, combining their work.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">12. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Remember these key ideas as you begin your journey with Git.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Version Control is like a time machine for your code.</li>
-                <li>Git is the local tool; GitHub is the cloud-based service for hosting and collaboration.</li>
-                <li>The core workflow is to `add` your changes to a staging area and then `commit` them to your history.</li>
-                <li>Branching is Git's most powerful feature and is essential for both solo and team development.</li>
-              </ul>
-            </div>
-
+  switch (noteId) {
+    case 'introduction-to-version-control':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.1: Introduction to Version Control</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: Save Points in a Video Game</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Imagine your project is a video game. A <strong>Version Control System (VCS)</strong> is your "save" functionality.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>A <strong>commit</strong> is a "save point" that you create, capturing a snapshot of your entire project at that moment.</li>
+              <li>If you make a terrible mistake (like deleting a key file or breaking a feature), you can simply "load your last save" (revert to a previous commit) and pretend it never happened.</li>
+              <li>Without it, you'd be stuck with file names like `project_final_v2_REALLY_FINAL.zip`, which is impossible to manage.</li>
+            </ul>
           </div>
-        </div>
-      );
-    case 'git-installation-configuration':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.2: Git Installation & Configuration</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Before you can start using the powerful features of Git, you need to perform a one-time setup on your computer. This chapter walks you through installing the Git software and, most importantly, configuring it with your identity.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: Your Developer ID Card</h2>
-            <p className="opacity-90">
-              Think of this process like getting hired for a new job. First, you are given the company's tools (<strong>installing Git</strong>). Then, you are given an ID card that identifies you as an employee (<strong>configuring Git</strong>). You need both before you can start working on any projects. This initial setup ensures that every change (commit) you make is stamped with your name and email.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">2. Checking for Existing Git</h2>
-            <p className="opacity-90">
-              Before installing, it's a good idea to check if Git is already on your system. Open your terminal and type:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git --version'}
-              </code></pre>
-              <p className="mt-2 opacity-90">If you see a version number (e.g., `git version 2.39.0`), you already have Git installed and can skip to step 6.</p>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">3. Installing on Windows</h2>
-            <p className="opacity-90">
-              The recommended way to install Git on Windows is to use the official installer.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Go to the official website: <a href="https://git-scm.com/downloads" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">git-scm.com/downloads</a>.</li>
-                <li>Download the installer for Windows.</li>
-                <li>Run the installer. It will present you with many options. For beginners, it is safe to accept all the default options by clicking "Next" repeatedly.</li>
-                <li>This installation also includes **Git BASH**, a terminal for Windows that is much better for running Git commands than the default Command Prompt.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. Installing on macOS</h2>
-            <p className="opacity-90">
-              macOS users have a couple of easy options.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Xcode Command Line Tools:</strong> The easiest way. Open your terminal and type `git --version`. If you don't have it, a popup will appear asking you to install the "command line developer tools". Follow the prompts.</li>
-                <li><strong>Homebrew:</strong> If you use the Homebrew package manager, you can simply run:
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'brew install git'}</code></pre>
-                </li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Installing on Linux (Debian/Ubuntu)</h2>
-            <p className="opacity-90">
-              You can install Git directly from your terminal using the `apt` package manager.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'sudo apt update\nsudo apt install git'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">6. Crucial First-Time Config: `user.name`</h2>
-            <p className="opacity-90">
-              Once Git is installed, you **must** tell it your name. This name will be attached to every commit you make.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git config --global user.name "Your Name"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Crucial First-Time Config: `user.email`</h2>
-            <p className="opacity-90">
-              Similarly, you must tell Git your email address. This should be the same email you use for your GitHub account.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git config --global user.email "youremail@example.com"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Good Practice: Set Default Branch Name</h2>
-            <p className="opacity-90">
-              The historical default branch name was `master`. The modern, inclusive standard is `main`. You can tell Git to use `main` as the default for all new repositories you create.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git config --global init.defaultBranch main'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">9. Good Practice: Configure Your Text Editor</h2>
-            <p className="opacity-90">
-              Sometimes, Git will need to open a text editor (e.g., to write a complex commit message). You can tell it to use VS Code.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git config --global core.editor "code --wait"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">10. Checking Your Configuration</h2>
-            <p className="opacity-90">
-              To check all your configuration settings, you can run:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git config --list'}
-              </code></pre>
-              <p className="mt-2 opacity-90">This will show you your saved name, email, default branch, and more.</p>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">11. Authentication with GitHub (SSH)</h2>
-            <p className="opacity-90">
-              To connect your local Git to GitHub securely without typing your password every time, you should use SSH.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Generate an SSH Key:</strong> Run `ssh-keygen` in your terminal and press Enter to accept the defaults.</li>
-                <li><strong>Copy Your Public Key:</strong> Copy the contents of the public key file (usually `~/.ssh/id_rsa.pub`).</li>
-                {/* FIX: Escaped > characters */}
-                <li><strong>Add Key to GitHub:</strong> In GitHub, go to Settings &gt; SSH and GPG keys &gt; New SSH key, and paste your key.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">12. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              This one-time setup is crucial for a smooth development workflow.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Install Git using the official installer for your OS.</li>
-                <li>Configure your `user.name` and `user.email` immediately.</li>
-                <li>Set your default branch to `main`.</li>
-                <li>Add your SSH key to GitHub to enable secure, password-less connections.</li>
-              </ul>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Version Control</strong> is a system that records changes to a file or set of files over time so that you can recall specific versions later. It's a non-negotiable tool in professional software development.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Centralized (CVCS):</strong> An older model (e.g., Subversion) where a single central server holds all the history. If the server goes down, no one can work.</li>
+              <li><strong>Distributed (DVCS):</strong> The modern model. <strong>Git</strong> is a DVCS. Every developer gets a full copy (a "clone") of the entire project's history. This provides redundancy and allows for offline work.</li>
+            </ul>
+            <p><strong>Core Git Terminology:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Repository (Repo):</strong> The entire project, including all its files and the complete history.</li>
+              <li><strong>Commit:</strong> A single snapshot (a "save point") of the project's history.</li>
+              <li><strong>Branch:</strong> An independent line of development. The default is called `main`.</li>
+              <li><strong>Working Directory:</strong> The actual folder and files you are currently editing.</li>
+              <li><strong>Staging Area (Index):</strong> An intermediate area where you place files you *intend* to include in your next commit.</li>
+              <li><strong>Git vs. GitHub:</strong> <strong>Git</strong> is the *software* you run locally. <strong>GitHub</strong> is a *website* (a service) that hosts your repositories in the cloud for backup and collaboration.</li>
+            </ul>
           </div>
-        </div>
-      );
-    case 'git-basics':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.3: Git Basics (Init, Add, Commit, Status, Log)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Now that Git is installed and configured, it's time to learn the core, everyday commands that you will use constantly. These five commands—`init`, `status`, `add`, `commit`, and `log`—form the fundamental workflow for tracking changes in any project.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: The Three Trees</h2>
-            <p className="opacity-90">
-              To understand Git, you must visualize three "trees" or areas where your code lives. These commands move changes between them.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Working Directory:</strong> Your project folder; the files you are currently editing. This is your "messy workshop."</li>
-                <li><strong>Staging Area (or Index):</strong> An intermediate area. When you `git add` a file, you move it from the workshop to a "ready for shipping" box.</li>
-                <li><strong>Local Repository (.git):</strong> Your project's permanent history. When you `git commit`, you save a snapshot of the staging area to your history.</li>
-              </ol>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">Example: The Two-Step Commit Process</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>The fundamental workflow is a two-step process: you `add` changes to the staging area, then `commit` what's in the staging area to your history.</p>
+            <CodeBlock code={`
+# You make some changes to 'index.html'
 
-            <h2 className="text-2xl font-semibold pt-4">2. `git init`: Initializing a Repository</h2>
-            <p className="opacity-90">
-              This is the first command you run in a new project. It tells Git to start tracking the current folder.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Navigate to your project's root folder in the terminal.</li>
-                <li>Run the command:
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'git init'}</code></pre>
-                </li>
-                <li>This creates a hidden `.git` subdirectory where Git stores all its tracking information. You only run this once per project.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. `git status`: Your Project Dashboard</h2>
-            <p className="opacity-90">
-              This is your most-used command. It tells you the current state of your repository. Run it often!
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <p className="opacity-90">`git status` will show you:</p>
-              <ul className="list-disc ml-6 space-y-2 opacity-90 mt-2">
-                <li><strong>Untracked files:</strong> New files Git doesn't know about yet.</li>
-                <li><strong>Modified files:</strong> Files that have been changed but not yet staged.</li>
-                <li><strong>Staged files:</strong> Files that are ready to be committed.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. `git add`: The Staging Area</h2>
-            <p className="opacity-90">
-              The `git add` command moves changes from your working directory to the staging area. This is how you tell Git which changes you want to include in your next save point.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Stage a single file'}<br/>
-                {'git add index.html'}<br/><br/>
-                {'# Stage multiple files'}<br/>
-                {'git add styles.css script.js'}<br/><br/>
-                {'# Stage ALL new and modified files in the project'}<br/>
-                {'git add .'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. `git commit`: Creating a Save Point</h2>
-            <p className="opacity-90">
-              This command takes all the changes from the staging area and saves them as a permanent snapshot in your repository's history.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <p className="opacity-90">The `-m` flag allows you to add a "commit message" directly from the command line. This message is mandatory and should describe the changes you made.</p>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'git commit -m "Add initial HTML structure for homepage"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. How to Write a Good Commit Message</h2>
-            <p className="opacity-90">
-              Writing clear commit messages is a critical skill. A good message follows these rules:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Use the imperative mood (e.g., "Add feature", "Fix bug" instead of "Added feature", "Fixed bug").</li>
-                <li>Keep the subject line short (under 50 characters).</li>
-                <li>If more detail is needed, skip a line and write a longer body.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. `git log`: Viewing Your Project's History</h2>
-            <p className="opacity-90">
-              This command shows you the history of all the commits you have made, starting with the most recent.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <p className="opacity-90">It will display the unique commit hash (ID), the author, the date, and the commit message for each save point.</p>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# View the full commit history'}<br/>
-                {'git log'}<br/><br/>
-                {'# View a more condensed, one-line history'}<br/>
-                {'git log --oneline'}<br/><br/>
-                {'# View a history with branches and merge info'}<br/>
-                {'git log --oneline --graph'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. The Basic Workflow Cycle</h2>
-            <p className="opacity-90">
-              Your everyday local workflow will be a constant cycle of these 3 commands:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Work:</strong> You edit your files (e.g., `index.html`, `styles.css`).</li>
-                <li><strong>Check:</strong> You run `git status` to see what you've changed.</li>
-                <li><strong>Stage:</strong> You run `git add .` to move all your changes to the staging area.</li>
-                <li><strong>Commit:</strong> You run `git commit -m "Your message"` to save those changes to your history.</li>
-                <li>Repeat.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Memorize this core loop, as it's the foundation for everything else in Git.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>`git init` is run only once at the very beginning.</li>
-                <li>`git status` is your "are we there yet?" command. Use it all the time.</li>
-                <li>The `add` to `commit` sequence is the two-step process to save your work.</li>
-                <li>`git log` is your "where have I been?" command to view your history.</li>
-              </ul>
-            </div>
+# Step 1: Add the file to the staging area
+# This says "I want to include this change in my next save."
+git add index.html
+
+# Step 2: Commit the staged changes
+# This creates the permanent snapshot in your history.
+git commit -m "Feat: Add basic HTML structure for homepage"
+            `} language="bash" />
           </div>
-        </div>
-      );
-    case 'working-with-branches-merging':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.4: Working with Branches & Merging</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Branching is arguably the most powerful feature of Git. It allows you to diverge from the main line of development and work in isolation without affecting that main line. This chapter covers the essential commands for creating, switching between, and merging branches, which is the core of collaborative development.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Parallel Universe</h2>
-            <p className="opacity-90">
-              Think of your main codebase (the `main` branch) as your project's "official timeline." A branch is like creating a copy of this timeline where you can safely experiment with a new feature.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>You can make changes, commit, and break things in your new branch without any impact on the stable, main timeline.</li>
-                <li>Once you are happy with your new feature, you can **merge** your experimental timeline back into the official one.</li>
-                <li>If the feature doesn't work out, you can simply delete the branch (the parallel universe) with no side effects.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. What is the `main` Branch?</h2>
-            <p className="opacity-90">
-              The `main` branch (formerly `master`) is the default branch in your repository. It should be considered your "single source of truth"—the stable, working, deployable version of your project. You should never commit broken code directly to `main`.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. The Feature Branch Workflow</h2>
-            <p className="opacity-90">
-              This is the standard professional workflow. Instead of committing directly to `main`, you follow these steps:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Create a new branch for the feature you are working on (e.g., `user-login`).</li>
-                <li>Make all your commits on this new branch.</li>
-                <li>When the feature is complete, merge the `user-login` branch back into `main`.</li>
-                <li>Delete the `user-login` branch.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. `git branch`: Listing and Creating</h2>
-            <p className="opacity-90">
-              This command is for managing your branches.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# List all branches in your local repository'}<br/>
-                {'git branch'}<br/><br/>
-                {'# Create a new branch named "new-feature"'}<br/>
-                {'git branch new-feature'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">5. `git checkout`: Switching Branches</h2>
-            <p className="opacity-90">
-              This command is like a "time travel" switch. It changes your entire working directory to match the state of a different branch.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Switch to the "new-feature" branch'}<br/>
-                {'git checkout new-feature'}<br/><br/>
-                {'# Switch back to the "main" branch'}<br/>
-                {'git checkout main'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. The `checkout -b` Shortcut</h2>
-            <p className="opacity-90">
-              Creating a new branch and switching to it is so common that there is a shortcut command that does both at once.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Create a new branch "login-page" AND switch to it'}<br/>
-                {'git checkout -b login-page'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. `git merge`: Combining Your Work</h2>
-            <p className="opacity-90">
-              Once you've completed your work on a feature branch, you'll want to merge it back into your `main` branch.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">The Merge Workflow:</h3>
-              <ol className="list-decimal ml-6 space-y-2 opacity-90 mt-2">
-                <li>First, switch to the branch you want to merge **into** (the receiving branch, usually `main`).</li>
-                <li>Run the `git merge` command, specifying the name of the branch you want to bring in.</li>
-              </ol>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Switch to the main branch'}<br/>
-                {'git checkout main'}<br/><br/>
-                {'# Merge the "login-page" branch into main'}<br/>
-                {'git merge login-page'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Merge Conflicts: What They Are</h2>
-            <p className="opacity-90">
-              A merge conflict occurs when Git is unable to automatically resolve differences in code between two branches. This happens when the **same line of code** was changed in both the branches you are trying to merge. Git will pause the merge and ask you to fix it manually.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. How to Resolve a Merge Conflict</h2>
-            <p className="opacity-90">
-              When a conflict occurs, Git will mark the conflicted lines in the file with special markers:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'<<<<<<< HEAD'}<br/>
-                {'  // Code from your current branch (e.g., main)'}<br/>
-                {'======='}<br/>
-                {'  // Code from the branch you are merging in'}<br/>
-                {'>>>>>>> login-page'}
-              </code></pre>
-              <h3 className="font-bold mt-2">Resolution Steps:</h3>
-              <ol className="list-decimal ml-6 space-y-2 opacity-90 mt-2">
-                <li>Open the conflicted file in your code editor.</li>
-                <li>Manually edit the file to keep the code you want and delete the conflicting code and the special markers.</li>
-                <li>Save the file.</li>
-                <li>Run `git add` on the file you just fixed.</li>
-                <li>Run `git commit` to complete the merge.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">10. `git branch -d`: Deleting a Branch</h2>
-            <p className="opacity-90">
-              After a feature branch has been successfully merged into `main`, it's good practice to delete it to keep your repository clean.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Delete the "login-page" branch'}<br/>
-                {'git branch -d login-page'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">11. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Branching is the key to safe and parallel development.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Always work on a feature branch, never directly on `main`.</li>
-                {/* FIX: Escaped < and > */}
-                <li>Use `git checkout -b &lt;branch-name&gt;` to create and switch to a new branch.</li>
-                <li>Use `git merge` to combine your finished work back into `main`.</li>
-                <li>Don't be afraid of merge conflicts; they are a normal part of the process.</li>
-              </ul>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the real difference between Git and GitHub?</strong>
+                <p className="pl-4"><strong>Git</strong> is the *tool* (the software) on your computer that tracks changes. <strong>GitHub</strong> is the *service* (the website) that *hosts* your Git repositories in the cloud. You don't need GitHub to use Git, but you use GitHub to back up your code and collaborate with others.</p>
+              </li>
+              <li>
+                <strong>Why is Git a "Distributed" VCS and why is that better?</strong>
+                <p className="pl-4">It's "distributed" because every developer who "clones" a project gets a *full copy of the entire project history*. This is better than a "centralized" system (like Subversion) for two reasons: 1) You can work, commit, and view history entirely offline. 2) If the main server (GitHub) is down, the project isn't lost—every developer has a complete backup on their machine.</p>
+              </li>
+            </ul>
           </div>
-        </div>
-      );
-    case 'github-introduction-account-setup':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.5: GitHub Introduction & Account Setup</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              GitHub is the single most important platform for software developers. It is a web-based service that hosts your Git repositories, enabling collaboration, code sharing, and portfolio building. This chapter covers what GitHub is, how to set up your professional account, and how to create your first remote repository.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Social Network for Developers</h2>
-            <p className="opacity-90">
-              The best way to think of GitHub is as a professional social network, like LinkedIn, but centered entirely around your code. It's the place where you showcase your work, collaborate with others, and build your reputation as a developer.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Your <strong>Profile</strong> is your resume.</li>
-                <li>Your <strong>Repositories</strong> are your projects or portfolio pieces.</li>
-                <li>Your <strong>Commits</strong> are your work history.</li>
-                <li><strong>Following</strong> others and <strong>starring</strong> their projects is how you network.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Git vs. GitHub (Recap)</h2>
-            <p className="opacity-90">
-              It's crucial to remember the distinction: <strong>Git</strong> is the local tool, and <strong>GitHub</strong> is the remote service.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Git:</strong> The version control software on your computer.</li>
-                <li><strong>GitHub:</strong> The website where you store your repositories in the cloud.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Why Use GitHub?</h2>
-            <p className="opacity-90">
-              Using GitHub is essential for modern development for three reasons:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Collaboration:</strong> It's the central hub where team members can share code, review changes, and merge features.</li>
-                <li><strong>Backup:</strong> It's a cloud backup for your entire project history. If your computer is lost or broken, your code is safe.</li>
-                <li><strong>Portfolio:</strong> A GitHub profile with interesting projects is a powerful tool when applying for jobs.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. Signing Up: Creating Your Account</h2>
-            <p className="opacity-90">
-              Your GitHub profile is your public face as a developer. Setting it up professionally is a critical first step.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Go to `github.com` and click "Sign up".</li>
-                <li>Choose a <strong>professional username</strong>. A good format is `firstname-lastname` or a variation. Avoid unprofessional names.</li>
-                <li>Use an email address that you check regularly.</li>
-                <li>Verify your email address to activate your account.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Crafting a Professional Profile</h2>
-            <p className="opacity-90">
-              Once your account is created, take a few minutes to make it look professional.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Upload a clear profile picture (or headshot).</strong></li>
-                <li><strong>Write a concise bio:</strong> Describe your skills and interests (e.g., "Software developer focused on React and Node.js").</li>
-                <li><strong>Pin Your Best Repositories:</strong> You can pin up to 6 of your most impressive projects directly to your profile page.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. The Profile README: A Special Repository</h2>
-            <p className="opacity-90">
-              GitHub has a special feature: if you create a new repository with the **exact same name as your username**, the `README.md` file in that repository will be displayed prominently on your profile page. This is the best place to create a detailed, custom "about me" page.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Creating Your First Remote Repository</h2>
-            <p className="opacity-90">
-              A repository (or "repo") is a container for a project. Here’s how to create one on GitHub.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>On the GitHub homepage, click the **"+"** icon in the top-right corner and select **"New repository"**.</li>
-                <li>Give your repository a short, memorable name (e.g., `my-portfolio-website`).</li>
-                <li>Add a one-line description of the project.</li>
-                <li>Keep the repository **Public** so that potential employers can see your work.</li>
-                <li><strong>Important:</strong> Check the box to **"Add a README file"**. This initializes the repository with a file.</li>
-                <li>Click **"Create repository"**.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Authentication: SSH vs. HTTPS</h2>
-            <p className="opacity-90">
-              To connect your local machine to GitHub, you need to authenticate.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>HTTPS:</strong> The simpler method. You just use your GitHub username and a <strong>Personal Access Token</strong> (PAT) as your password. (GitHub no longer supports password authentication).</li>
-                <li><strong>SSH (Recommended):</strong> The more secure and convenient method. You generate a "key pair" on your computer and give the "public key" to GitHub. This allows you to connect without typing a password every time.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Your GitHub profile is a key part of your professional identity.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Create a clean, professional profile and username.</li>
-                <li>Create a special repository matching your username to build a Profile README.</li>
-                <li>Set up SSH authentication for a secure and easy workflow.</li>
-                <li>Always initialize new repositories with a README file.</li>
-              </ul>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
-        </div>
-      );
-    case 'remote-repositories':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.6: Remote Repositories (Push, Pull, Clone, Fetch)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              While Git is powerful for tracking changes on your local machine, its true potential is unlocked when you collaborate using remote repositories. A remote repository is a version of your project that is hosted on the internet, most commonly on a service like GitHub. This chapter covers the essential commands for interacting with these remotes.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: The Central Library</h2>
-            <p className="opacity-90">
-              Think of the remote repository on GitHub as the **central library** for your project. Your local repository on your computer is your **personal copy** that you've checked out.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>When you want to start working on a project, you **clone** it (check out the book).</li>
-                <li>When you've made changes and want to share them, you **push** your updates back to the library.</li>
-                <li>When you want to get the latest updates from others, you **pull** them from the library.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">2. What is a "Remote"?</h2>
-            <p className="opacity-90">
-              A "remote" is a bookmark or a nickname that refers to a repository hosted on the internet. By default, when you clone a repository, Git automatically creates a remote named **`origin`** that points to the URL you cloned from.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. `git clone`: Getting a Local Copy</h2>
-            <p className="opacity-90">
-              This is the first command you'll use to work on an existing project. It downloads a full copy of a remote repository, including its entire history, and automatically sets up the `origin` remote for you.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Go to the GitHub repository page, click the "Code" button, and copy the URL'}<br/>
-                {'git clone https://github.com/user/project.git'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. `git remote`: Managing Remotes</h2>
-            <p className="opacity-90">
-              You can use the `git remote` command to manage your remote connections.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# List all your remotes (usually just "origin")'}<br/>
-                {'git remote -v'}<br/><br/>
-                {'# Add a new remote (e.g., to link a local repo you started with `git init`)'}<br/>
-                {'git remote add origin https://github.com/user/project.git'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. `git push`: Sending Your Changes</h2>
-            <p className="opacity-90">
-              After you have made and committed changes locally, the `git push` command uploads your committed changes from your local repository to the remote repository. This is how you share your work.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Push changes from your local "main" branch to the remote "origin"'}<br/>
-                {'git push origin main'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. `git fetch`: Downloading Changes (Safely)</h2>
-            <p className="opacity-90">
-              `git fetch` downloads all the new data from the remote repository but **does not integrate** any of it into your local working files. It's like checking for mail and seeing there are new letters, but leaving them in the mailbox. It's safe because it doesn't change your current work.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. `git pull`: Downloading and Merging</h2>
-            <p className="opacity-90">
-              `git pull` is actually two commands in one: it first runs `git fetch` to download the new data, and then it immediately runs `git merge` to automatically integrate those changes into your current branch. It's like getting the mail and immediately mixing it with your current papers.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Fetch vs. Pull: Which to Use?</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Use `git pull`</strong> for your daily workflow to stay updated. It's the most common and convenient way to sync your code.</li>
-                <li><strong>Use `git fetch`</strong> when you want to see what others have done without immediately affecting your own local branches.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. The Standard Collaborative Workflow</h2>
-            <p className="opacity-90">
-              When working on a team, you will follow a daily cycle:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Start Your Day:</strong> `git pull origin main` to get the latest changes from the team.</li>
-                <li><strong>Create a Branch:</strong> `git checkout -b my-new-feature` to start your work.</li>
-                <li><strong>Work & Commit:</strong> `git add .` and `git commit -m "..."` as you complete your work.</li>
-                <li><strong>Push Your Branch:</strong> `git push origin my-new-feature` to share your branch.</li>
-                <li><strong>End of Day:</strong> Switch back to `main`, `git pull` again, and repeat.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      );
-    case 'collaboration-workflows':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.7: Collaboration Workflows (Forks, Pull Requests, Issues)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              While `git push` and `git pull` are great for small teams with shared access, the true power of GitHub shines in open-source and large-scale collaboration. This is managed through a structured process involving forks, pull requests, and issues, which allows anyone to contribute to a project in a safe and organized way.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: The "Suggestion Box" Model</h2>
-            <p className="opacity-90">
-              Think of a public project on GitHub as a town's suggestion box. You can't just walk into the mayor's office and change the town's plans yourself. Instead, you follow a formal process:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                  <li>You take a copy of the town's plans for yourself (a <strong>Fork</strong>).</li>
-                  <li>You work on your suggestion on your own copy.</li>
-                  <li>You submit your revised plan back to the town council (a <strong>Pull Request</strong>).</li>
-                  <li>The council reviews your suggestion and decides whether to merge it into the official plans.</li>
-                  <li><strong>Issues</strong> are a public notice board where residents can report problems (bugs) or suggest new ideas.</li>
-              </ol>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Workflow 1: Shared Repository (For Teams)</h2>
-            <p className="opacity-90">
-              This is the most common model for company teams or small groups where everyone is a trusted collaborator.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Everyone has "push" access to the same single, central repository.</li>
-                <li>All work is done on <strong>feature branches</strong> (e.g., `fix-login-bug`).</li>
-                <li>When a feature is done, the developer opens a **Pull Request** to merge their branch into the `main` branch.</li>
-                <li>Other team members review the code, approve it, and then it is merged.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Workflow 2: The Fork & Pull Model (For Open Source)</h2>
-            <p className="opacity-90">
-              This model is used when you want to contribute to a project you don't have write access to (e.g., a public open-source project).
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>You **Fork** the original repository. This creates a personal copy of the project under your own GitHub account.</li>
-                <li>You **Clone** your fork to your local machine.</li>
-                <li>You create a branch, make changes, and push them to **your fork**.</li>
-                <li>You open a **Pull Request** from your fork's branch to the **original project's** `main` branch.</li>
-              </ol>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">4. What is a "Fork"?</h2>
-            <p className="opacity-90">
-              A fork is a personal, server-side copy of a repository. Forking allows you to freely experiment with changes without affecting the original project. It's the first step in contributing to an open-source project.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. What is a "Pull Request" (PR)?</h2>
-            <p className="opacity-90">
-              A Pull Request is the heart of collaboration on GitHub. It's a formal request to the project maintainers to "pull" your committed changes into their repository. It provides a platform for **code review**, allowing team members to comment on your changes line-by-line, suggest improvements, and have a discussion before the code is merged.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. What are "Issues"?</h2>
-            <p className="opacity-90">
-              Issues are a powerful project management tool built into every GitHub repository. They are used to track bug reports, feature requests, and other tasks.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>They create a transparent way for users to report problems ("I found a bug!").</li>
-                <li>They allow maintainers to plan new features ("We should add a dark mode.").</li>
-                <li>Pull Requests can be linked to Issues to automatically close the issue when the code is merged.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Keeping Your Fork in Sync</h2>
-            <p className="opacity-90">
-              If the original project you forked is updated, your fork will become outdated. You need to sync it.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Add the original repository as a new remote called **`upstream`**:
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'git remote add upstream https://github.com/original-owner/project.git'}</code></pre>
-                </li>
-                <li>Fetch the changes from the original project:
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'git fetch upstream'}</code></pre>
-                </li>
-                <li>Switch to your `main` branch and merge the original project's changes:
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'git checkout main\ngit merge upstream/main'}</code></pre>
-                </li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. The Full Open Source Workflow</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Fork the project.</li>
-                <li>Clone your fork.</li>
-                <li>Add the original repo as the `upstream` remote.</li>
-                <li>Create a new branch for your feature (`git checkout -b my-fix`).</li>
-                <li>Write your code, `add`, and `commit` your changes.</li>
-                <li>Push your branch to your fork (`git push origin my-fix`).</li>
-                <li>Open a Pull Request on GitHub.</li>
-                <li>Participate in the code review and wait for it to be merged.</li>
-              </ol>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              This workflow might seem complex, but it's designed for safety and quality.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Issues:</strong> Discuss problems and features.</li>
-                <li><strong>Fork:</strong> Get your own copy.</li>
-                <li><strong>Branch:</strong> Work in isolation.</li>
-                <li><strong>Pull Request:</strong> Propose your changes for review.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      );
-    case 'git-best-practices':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">2.8: Git Best Practices & .gitignore</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Knowing Git commands is one thing; using them effectively is another. Following best practices is what separates a beginner from a professional developer. These practices ensure your project history is clean, understandable, and easy to manage, especially when working in a team.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Clean Project Diary</h2>
-            <p className="opacity-90">
-              Think of your Git history (`git log`) as the official diary of your project. Each commit is an entry. A good diary is easy to read, with clear entries that explain what happened and why. A bad diary (`git commit -m "stuff"`) is messy and unhelpful. Git best practices are all about maintaining a clean, professional diary.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">2. The `.gitignore` File: What It Is</h2>
-            <p className="opacity-90">
-              A `.gitignore` file is a simple text file you create in the root of your repository. You list files and folders in it that you want Git to **intentionally ignore**.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. What to Ignore with `.gitignore`</h2>
-            <p className="opacity-90">
-              You must ignore any file that is not your original source code. This includes:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Dependencies:</strong> The `node_modules` folder. This can be thousands of files and can be easily reinstalled by anyone who clones your project using `npm install`.</li>
-                <li><strong>Environment Variables:</strong> Files like `.env` that contain secret keys, database passwords, and API credentials. **Never commit secrets to your repository.**</li>
-                <li><strong>Compiled/Generated Files:</strong> Any code that is generated by a build process (e.g., a `dist` or `build` folder).</li>
-                <li><strong>System Files:</strong> OS-specific files like `.DS_Store` (macOS) or `Thumbs.db` (Windows).</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. Example `.gitignore` File</h2>
-            <p className="opacity-90">
-              A typical `.gitignore` file for a MERN stack project would look like this:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Dependencies'}<br/>
-                {'node_modules/'}<br/><br/>
-                {'# Build output'}<br/>
-                {'dist/'}<br/>
-                {'build/'}<br/><br/>
-                {'# Environment variables'}<br/>
-                {'.env'}<br/>
-                {'.env.local'}<br/><br/>
-                {'# Log files'}<br/>
-                {'*.log'}<br/><br/>
-                {'# OS files'}<br/>
-                {'.DS_Store'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Best Practice: Commit Atomically</h2>
-            <p className="opacity-90">
-              Your commits should be "atomic"—that is, each commit should represent a **single, logical change**.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Bad Commit:</strong> "Add login feature, fix header bug, and update footer text" (This is three separate changes).</li>
-                <li><strong>Good Commits:</strong>
-                  <ol className="list-decimal ml-6 space-y-1">
-                    <li>`Feat: Add user login form structure`</li>
-                    <li>`Fix: Correct header alignment on mobile`</li>
-                    <li>`Docs: Update footer copyright year`</li>
-                  </ol>
-                </li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. Best Practice: Write Good Commit Messages</h2>
-            <p className="opacity-90">
-              A good commit message is crucial for collaboration. It should have two parts:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Subject Line:</strong> A short summary (50 characters or less) in the imperative mood. Start with a type like `Feat:`, `Fix:`, `Docs:`, `Style:`, or `Refactor:`.</li>
-                <li><strong>Body (Optional):</strong> A more detailed explanation of *what* changed and *why* it was changed.</li>
-              </ul>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'# Good Commit Message\nFeat: Add rate limiting to login API\n\n- Add express-rate-limit package\n- Apply middleware to /api/auth routes\n- Prevents brute-force attacks by limiting to 5 requests per minute.'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Best Practice: Branching Strategy</h2>
-            <p className="opacity-90">
-              Never commit directly to the `main` branch. The `main` branch should always be stable and deployable.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Always create a new, descriptively named branch for every new feature or bug fix (e.g., `fix/login-bug`, `feat/user-dashboard`).</li>
-                <li>Do all your work on this feature branch.</li>
-                <li>Open a Pull Request to merge your branch into `main`.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Best Practice: Pull Before You Push</h2>
-            <p className="opacity-90">
-              When working on a team, always update your local `main` branch with the latest changes from the remote (`git pull origin main`) *before* you start a new feature branch. This ensures you are working from the most up-to-date version of the code and helps prevent merge conflicts.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Adopting these practices will make you a more effective and professional developer.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li>Create a detailed `.gitignore` file at the start of every project.</li>
-                <li>Branch for every new feature or fix. Keep `main` clean.</li>
-                <li>Make small, atomic commits with clear, descriptive messages.</li>
-                <li>Pull regularly to stay in sync with the remote repository.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      );
-    default:
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-            <h1 className="text-3xl font-bold mb-4">Select a Subchapter</h1>
-            <div className="space-y-4">
-              <p className="text-lg opacity-90">Please select a topic from the sidebar to view the notes.</p>
-            </div>
         </div>
       );
-// FIX: Removed invalid characters at the end of the file
-  }
+    case 'git-installation-configuration':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.2: Git Installation & Configuration</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: Your Developer ID Card</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is a one-time setup. Think of it like starting a new job. <strong>Installing Git</strong> is like being given the company's tools. <strong>Configuring Git</strong> is like getting your official employee ID badge.</p>
+            <p>You can't do any work without the tools, and the company won't accept your work unless it's "stamped" with your ID. This configuration ensures every commit you make is tagged with your name and email, so everyone knows who made what change.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Before using Git, you must install it and set your global configuration. These settings are stored in a `.gitconfig` file in your user's home directory.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Installation:</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>Windows:</strong> Download and run the installer from <a href="https://git-scm.com/downloads" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">git-scm.com/downloads</a>. Accept all the default settings. This will also install **Git BASH**, a superior terminal.</li>
+                  <li><strong>macOS:</strong> Open the terminal and run `git --version`. If you don't have it, it will prompt you to install the "Xcode Command Line Tools."</li>
+                  <li><strong>Linux (Ubuntu/Debian):</strong> Run `sudo apt update && sudo apt install git`.</li>
+                </ul>
+              </li>
+              <li><strong>Global Configuration:</strong> After installing, you **must** set your identity. The `--global` flag means this setting will apply to *all* Git projects on your computer.
+                <ul className="list-disc ml-6 mt-2">
+                  <li>`git config --global user.name "Your Name"`</li>
+                  <li>`git config --global user.email "youremail@example.com"` (Use the same email as your GitHub account).</li>
+                </ul>
+              </li>
+              <li><strong>Recommended Config:</strong> You should also set your default branch name to `main` (the modern standard) and set VS Code as your default editor.
+                <ul className="list-disc ml-6 mt-2">
+                  <li>`git config --global init.defaultBranch main`</li>
+                  <li>`git config --global core.editor "code --wait"`</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The One-Time Setup Commands</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Run these commands in your terminal one by one to install and configure Git.</p>
+            <CodeBlock code={`
+# 1. Check if Git is already installed
+git --version
+
+# If not, install it (see steps above).
+
+# 2. Set your name (CRITICAL)
+git config --global user.name "Your Name"
+
+# 3. Set your email (CRITICAL)
+git config --global user.email "youremail@github.com"
+
+# 4. Set default branch to 'main' (Recommended)
+git config --global init.defaultBranch main
+
+# 5. Check your settings
+git config --list
+# You should see your name, email, and default branch
+            `} language="bash" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Why is this configuration mandatory?</strong>
+                <p className="pl-4">Git is a *distributed* system. If you and a teammate both make commits, Git *must* have a way to label who made which change. This configuration provides that label. Without it, Git won't let you make commits.</p>
+              </li>
+              <li>
+                <strong>What's the difference between SSH and HTTPS authentication for GitHub?</strong>
+                <p className="pl-4"><strong>HTTPS</strong> is easier to set up but requires you to enter a **Personal Access Token** (PAT) as a password. <strong>SSH</strong> is more secure and convenient. You generate a "key pair" on your computer and give the "public key" to GitHub. After that, you can push and pull from your machine without ever typing a password.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'git-basics':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.3: Git Basics (Init, Add, Commit, Status, Log)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Two-Step Save</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>In Git, saving your work is a deliberate, two-step process. Think of it like shipping a package:</p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>`git add` (Staging):</strong> You've finished editing `file1.txt` and `file2.js`. You "stage" them by putting them in a "shipping box" (the <strong>Staging Area</strong>). Your other messy files (`notes.txt`) are left on your desk.</li>
+              <li><strong>`git commit` (Committing):</strong> You seal the "shipping box" and write a label on it describing the contents (the <strong>commit message</strong>). You then store this box in your permanent history log (the <strong>Repository</strong>).</li>
+            </ol>
+            <p>This two-step process allows you to build a single, logical commit from changes in multiple files.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>These are the five fundamental commands for all local development.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`git init`</strong>: Initializes a new Git repository. You run this *once* in your project's root folder. It creates a hidden `.git` directory that tracks all history.</li>
+              <li><strong>`git status`</strong>: Your most-used command. It shows the current state of your <strong>Working Directory</strong> and <strong>Staging Area</strong>. It tells you which files are untracked, modified, or staged.</li>
+              <li><strong>`git add [file]`</strong>: Moves a file's changes from the Working Directory to the Staging Area, preparing it for a commit.
+                <ul>
+                  <li><Code>git add file.txt</Code>: Stages a single file.</li>
+                  <li><Code>git add .</Code>: Stages *all* new and modified files in the current directory.</li>
+                </ul>
+              </li>
+              <li><strong>`git commit -m "message"`</strong>: Takes all changes in the Staging Area and creates a new permanent snapshot (a <strong>commit</strong>) in your Local Repository. The `-m` flag lets you write your commit message inline.</li>
+              <li><strong>`git log`</strong>: Shows a history of all commits on your current branch, with the newest at the top.
+                <ul>
+                  <li><Code>git log --oneline</Code>: A cleaner, one-line view of the history.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The Core Local Workflow</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is a complete simulation of a local workflow. Run these commands in your terminal.</p>
+            <CodeBlock code={`
+# 1. Create a new project folder and move into it
+mkdir my-git-project
+cd my-git-project
+
+# 2. Initialize a new Git repository
+git init
+
+# 3. Create a new file
+echo "Hello Git" > readme.md
+
+# 4. Check the status: 'readme.md' will be 'untracked'
+git status
+
+# 5. Stage the new file
+git add readme.md
+
+# 6. Check the status again: 'readme.md' is now 'staged'
+git status
+
+# 7. Commit the staged file to history
+git commit -m "Initial commit: Add readme.md"
+
+# 8. Check the status: 'working tree clean'
+git status
+
+# 9. View the commit history
+git log --oneline
+            `} language="bash" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the point of the Staging Area? Why not just commit directly?</strong>
+                <p className="pl-4">The staging area gives you fine-grained control. Imagine you've made changes to 10 files, but only 5 of them are related to "Feature A" (the other 5 are for "Bug B"). The staging area lets you `git add` *only* the 5 files for "Feature A" and make a clean, atomic commit for just that feature. Then, you can `git add` the other 5 files and make a separate commit for "Bug B".</p>
+              </li>
+              <li>
+                <strong>I just made a commit, but I have a typo in the message. How do I fix it?</strong>
+                <p className="pl-4">If it's the *very last* commit and you haven't pushed it, you can easily fix it with: `git commit --amend -m "My new corrected message"`. This replaces the previous commit with a new one.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'working-with-branches-merging':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.4: Working with Branches & Merging</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: Parallel Universes</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is Git's most powerful feature. Think of your `main` branch as the "Official Timeline."</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>When you want to work on a new feature (e.g., a "dark mode"), you create a new <strong>branch</strong>. This is like creating a "Parallel Universe" that is a perfect copy of the official timeline.</li>
+              <li>You can make any changes, add commits, and even break things in this parallel universe, and the "Official Timeline" (`main`) remains perfectly safe and stable.</li>
+              <li>Once your feature is finished and working, you perform a <strong>merge</strong>, which magically copies all the changes from your parallel universe back into the official timeline.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A <strong>branch</strong> is a lightweight, movable pointer to a specific commit. The <strong>`main`</strong> branch is the default branch and should always represent your stable, production-ready code.</p>
+            <p>The <strong>Feature Branch Workflow</strong> is the standard professional practice:</p>
+            <ol className="list-decimal ml-6 space-y-1">
+              <li>Create a new branch for your feature (e.g., `feat/user-login`).</li>
+              <li>Work and make commits on that branch.</li>
+              <li>When finished, merge your feature branch back into `main`.</li>
+              <li>Delete your feature branch.</li>
+            </ol>
+            <p><strong>Core Branching Commands:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`git branch`</strong>: Lists all your local branches.</li>
+              <li><strong>`git branch [name]`</strong>: Creates a new branch.</li>
+              <li><strong>`git checkout [name]`</strong>: Switches your Working Directory to the specified branch.</li>
+              <li><strong>`git checkout -b [name]`</strong>: The most-used shortcut. It **c**reates a **n**ew **b**ranch and **checks** it **out** in one step.</li>
+              <li><strong>`git merge [name]`</strong>: Merges the specified branch's history *into your current branch*.</li>
+              <li><strong>`git branch -d [name]`</strong>: Deletes a local branch (only if it has been merged).</li>
+            </ul>
+            <p>A <strong>Merge Conflict</strong> occurs when you try to merge two branches that have *edited the same line of code*. Git will pause the merge and ask you to manually choose which version to keep.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The Full Feature Branch Workflow</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This script simulates a developer adding a new feature.</p>
+            <CodeBlock code={`
+# 1. You are on the main branch, which is clean
+# (Run 'git init' and make an initial commit first)
+
+# 2. Create and switch to a new branch for your feature
+git checkout -b feat/add-about-page
+
+# 3. Do your work: create a new file
+echo "About Us" > about.html
+
+# 4. Stage and commit your work *on this branch*
+git add about.html
+git commit -m "Feat: Add basic about page"
+
+# 5. Your feature is done! Go back to the main branch
+git checkout main
+
+# 6. Merge the feature branch *into* main
+git merge feat/add-about-page
+# Output: 'Fast-forward merge...'
+
+# 7. Now 'main' has the 'about.html' file. Clean up by deleting the branch.
+git branch -d feat/add-about-page
+            `} language="bash" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What is a "merge conflict" and how do I fix it?</strong>
+                <p className="pl-4">A merge conflict happens when you and another developer edit the *same lines* in the *same file* on different branches. When you try to merge, Git doesn't know whose change to keep. To fix it:
+                  1. Git will mark the file with `&lt;&lt;&lt;&lt;&lt;&lt;&lt;`, `=======`, `&gt;&gt;&gt;&gt;&gt;&gt;&gt;` symbols.
+                  2. You manually edit the file to delete the markers and keep the code you want.
+                  3. You run `git add [conflicted-file]` to mark it as resolved.
+                  4. You run `git commit` to finalize the merge.</p>
+              </li>
+              <li>
+                <strong>What's the difference between `git merge` and `git rebase`?</strong>
+                <p className="pl-4">This is a classic advanced question. <strong>Merge</strong> is simple: it takes all commits from your feature branch and joins them to `main` with a special "merge commit." This creates a "diamond" shape in your history. <strong>Rebase</strong> is cleaner: it *rewrites history*. It takes your feature branch commits and re-plays them, one by one, *on top* of the latest `main` branch, creating a perfectly straight, linear history.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'github-introduction-account-setup':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.5: GitHub Introduction & Account Setup</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: A Social Network for Code</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>If Git is your local, private diary, <strong>GitHub</strong> is the "social network" or "publishing house" where you share your work. It's your professional portfolio.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Your Profile Page:</strong> Your "author bio."</li>
+              <li><strong>Your Repositories:</strong> Your "published books" that others can read, "star" (like), or "fork" (copy).</li>
+              <li><strong>Your Commits:</strong> Your public work history, showing how active you are.</li>
+            </ul>
+            <p>You use <strong>Git</strong> (the tool) to write your book, and <strong>GitHub</strong> (the service) to publish and share it.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>GitHub</strong> is a web-based service that hosts Git repositories. It is the central platform for <strong>collaboration</strong>, <strong>code backup</strong>, and <strong>open-source development</strong>. (Alternatives include GitLab and Bitbucket).</p>
+            <p><strong>Key Features:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Remote Repositories:</strong> A cloud-based location to store your code.</li>
+              <li><strong>Pull Requests:</strong> A formal process for reviewing and merging code. (See 2.7).</li>
+              <li><strong>Issues:</strong> A project management tool for tracking bugs and feature requests.</li>
+              <li><strong>Forks:</strong> Personal copies of other users' repositories.</li>
+            </ul>
+            <p><strong>Setting Up Your Profile:</strong></p>
+            <ol className="list-decimal ml-6 space-y-1">
+              <li>Sign up at `github.com`.</li>
+              <li><strong>Choose a professional username</strong> (e.g., `ana-dev`, `j-smith`). Avoid names like `coderking99`.</li>
+              <li><strong>Upload a clear profile picture.</strong></li>
+              <li><strong>Write a concise bio</strong> that states who you are and what technologies you use (e.g., "Full-Stack Developer specializing in React and Node.js").</li>
+              <li><strong>Pin your best projects</strong> to your profile to showcase your skills.</li>
+            </ol>
+            <p><strong>Profile README:</strong> This is a special feature. If you create a new repository with the <strong>exact same name as your username</strong>, the `README.md` file in that repo will be displayed as your main profile page. This is the best way to create a detailed portfolio.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: Creating a Profile README</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>1. On GitHub, create a new repository with the *exact same name* as your username (e.g., `your-username`).</p>
+            <p>2. Check the "Add a README file" box.</p>
+            <p>3. Edit that `README.md` file and add content. This is written in **Markdown**.</p>
+            <CodeBlock code={`
+### Hi there, I'm [Your Name] 👋
+
+- 🔭 I’m currently working on... a MERN stack e-commerce site.
+- 🌱 I’m currently learning... TypeScript and GraphQL.
+- 👯 I’m looking to collaborate on... open-source React projects.
+- 📫 How to reach me: ... myemail@example.com
+
+<!-- You can add stats, tech icons, etc. -->
+            `} language="markdown" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What should I put on my GitHub profile to get a job?</strong>
+                <p className="pl-4">Employers want to see *activity* and *quality*. A good profile has:
+                  1. A professional picture, username, and bio.
+                  2. 6-8 pinned repositories with clear names.
+                  3. Each pinned repo must have a good `README.md` file explaining what the project is, what tech it uses, and how to run it. A live demo link is even better.
+                  4. A "green" contribution graph, showing consistent coding practice.</p>
+              </li>
+              <li>
+                <strong>Do I need GitHub to use Git?</strong>
+                <p className="pl-4">No. Git is a 100% local tool. You can use it on your computer right now without ever touching the internet. GitHub is just the most popular *cloud service* for *hosting* your Git repositories and collaborating with others.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'remote-repositories':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.6: Remote Repositories (Push, Pull, Clone, Fetch)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Central Library</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Your <strong>local repository</strong> (on your laptop) is your personal copy of a book. The <strong>remote repository</strong> (on GitHub) is the "master copy" in the central library.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`git clone`</strong>: Checking out the book from the library for the first time. You get a full copy of its entire history.</li>
+              <li><strong>`git push`</strong>: After making your own notes (commits) in your copy, you "push" your changes to the library to update the master copy.</li>
+              <li><strong>`git pull`</strong>: Your teammate just "pushed" an update. You "pull" their changes from the library's master copy to sync them with your personal copy.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A <strong>remote</strong> is a bookmark—a name (like `origin`) that points to the URL of a repository on a service like GitHub. These commands manage the flow of data between your local repo and the remote repo.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`git clone [url]`</strong>: Downloads a full copy of a remote repository to your machine. It automatically creates the `origin` remote, pointing to that URL. This is the starting point for 99% of projects.</li>
+              <li><strong>`git remote -v`</strong>: Lists all your remote connections.</li>
+              <li><strong>`git remote add [name] [url]`</strong>: Connects a local repository (one you started with `git init`) to a remote one. (e.g., `git remote add origin ...`).</li>
+              <li><strong>`git push [remote-name] [branch-name]`</strong>: Uploads your local branch and all its commits to the remote. (e.g., `git push origin main`). This is how you *share* your work.</li>
+              <li><strong>`git pull [remote-name] [branch-name]`</strong>: The most common command. It *downloads* remote changes and *merges* them into your current local branch. (e.g., `git pull origin main`). This is how you *get* updates from others.</li>
+              <li><strong>`git fetch [remote-name]`</strong>: A "safer" version of pull. It *only downloads* the remote changes but does **not** merge them. It just updates your "local copy" of the remote branches, allowing you to inspect the changes before you manually merge them.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The Full Sync Workflow</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This shows two scenarios: starting a new project and contributing to an existing one.</p>
+            <CodeBlock code={`
+# --- Scenario 1: Starting from scratch ---
+
+# 1. Create a local repo
+git init
+echo "My Project" > README.md
+git add .
+git commit -m "Initial commit"
+
+# 2. Go to GitHub and create a new, *empty* repo.
+#    GitHub will give you this URL:
+# 3. Link your local repo to the remote one
+git remote add origin https://github.com/YourName/my-project.git
+
+# 4. Push your 'main' branch to 'origin'
+# -u sets 'origin main' as the default for future pushes
+git push -u origin main
+
+
+# --- Scenario 2: Working on an existing project ---
+
+# 1. Get the project from GitHub
+git clone https://github.com/SomeoneElse/their-project.git
+cd their-project
+
+# 2. (Work and make local commits...)
+# git checkout -b my-feature
+# (edit files)
+# git add .
+# git commit -m "Add my feature"
+
+# 3. Before pushing, check for updates from others
+git pull origin main
+
+# 4. Now, push your new feature branch
+git push origin my-feature
+            `} language="bash" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between `git fetch` and `git pull`?</strong>
+                <p className="pl-4">This is a classic question. `git pull` is actually two commands in one: `git fetch` + `git merge`.
+                  * <strong>`fetch`</strong> just *downloads* the new data from the remote but doesn't change your working files. It's safe.
+                  * <strong>`pull`</strong> *downloads* the new data AND *merges* it into your current branch, which can sometimes cause merge conflicts.</p>
+              </li>
+              <li>
+                <strong>My `git push` was rejected. What's the most likely reason?</strong>
+                <p className="pl-4">The most common reason is that your teammate pushed changes to the same branch *after* your last `git pull`. The remote now has commits that you don't have locally. Git rejects your push to prevent you from overwriting their work. The fix is to `git pull` first (which will merge their changes), resolve any conflicts, and *then* `git push`.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'collaboration-workflows':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.7: Collaboration Workflows (Forks & Pull Requests)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Suggestion Box Model</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Think of a public project on GitHub as a town's official blueprint, locked in a display case. You can't just walk up and edit it.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`Fork`</strong>: You use the "Fork" button on GitHub to get your *own personal copy* of the blueprint. This copy is yours to mess with.</li>
+              <li><strong>Branch & Commit</strong>: You take your copy home (`git clone`) and work on your suggestion in a new branch (e.g., `add-park-bench`).</li>
+              <li><strong>`Pull Request (PR)`</strong>: When you're done, you submit your revised blueprint back to the town council as a "Pull Request." You are *requesting* that they *pull* your changes into the *official* blueprint.</li>
+              <li><strong>Code Review</strong>: The council (project maintainers) reviews your changes, suggests edits, and (if they like it) approves and merges your PR.</li>
+              <li><strong>`Issues`</strong>: A separate "public notice board" where anyone can report a bug ("pothole on Main St") or request a feature ("we need a new park").</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This workflow is the core of open-source collaboration and is used by most large teams for quality control.</p>
+            <p><strong>Two Main Workflows:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>1. Shared Repository Model (Internal Teams):</strong>
+                <ul>
+                  <li>Everyone on the team clones the *same* central repository.</li>
+                  <li>Everyone can push branches directly to that repo (e.g., `git push origin my-feature`).</li>
+                  <li>To merge to `main`, a developer opens a <strong>Pull Request</strong> from their `my-feature` branch to the `main` branch *within the same repository*.</li>
+                  <li>A teammate reviews the code, approves, and merges.</li>
+                </ul>
+              </li>
+              <li><strong>2. Fork & Pull Model (Open Source / External):</strong>
+                <ul>
+                  <li>A contributor <strong>Forks</strong> the original repo, creating a copy on their own GitHub account.</li>
+                  <li>They clone *their fork* (`git clone git@github.com:Contributor/project.git`).</li>
+                  <li>They make changes and push a new branch to *their fork* (`git push origin my-feature`).</li>
+                  <li>They go to GitHub and open a <strong>Pull Request</strong> from `Contributor/project:my-feature` to `OriginalOwner/project:main`.</li>
+                  <li>The original project maintainers review and merge the PR.</li>
+                </ul>
+              </li>
+            </ul>
+            <p><strong>Syncing Your Fork:</strong> The original project will get new updates, making your fork "stale." You must pull those changes into your fork.
+            <br/>1. Add the original repo as a remote: `git remote add upstream https://...`
+            <br/>2. Fetch the original's changes: `git fetch upstream`
+            <br/>3. Merge the original's `main` into your `main`: `git checkout main` then `git merge upstream/main`
+            </p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The Open Source Contribution (Conceptual Steps)</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is the full conceptual workflow. (Replace URLs and names).</p>
+            <CodeBlock code={`
+# 1. (On GitHub): Click the "Fork" button on the 'original/project' repo.
+
+# 2. Clone *your* fork to your local machine
+git clone https://github.com/YourName/project.git
+cd project
+
+# 3. Add the *original* repo as a remote named 'upstream'
+git remote add upstream https://github.com/original/project.git
+
+# 4. Sync your main branch with the original (a good habit)
+git pull upstream main
+
+# 5. Create a new branch for your bug fix
+git checkout -b fix/typo-in-docs
+
+# 6. Make your changes and commit
+echo "Fixed a typo" > README.md
+git add .
+git commit -m "Docs: Fix typo in README"
+
+# 7. Push *your new branch* to *your fork* ('origin')
+git push origin fix/typo-in-docs
+
+# 8. (On GitHub): Go to your fork and click "New Pull Request".
+#    Base: 'original/project' at 'main'
+#    Compare: 'YourName/project' at 'fix/typo-in-docs'
+#    Then, submit the PR.
+            `} language="bash" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between a "branch" and a "fork"?</strong>
+                <p className="pl-4">A <strong>branch</strong> is an independent line of development *inside* a repository. A <strong>fork</strong> is a completely separate *copy* of the entire repository, under your own account. You fork a project once, but you might create dozens of branches within your fork.</p>
+              </li>
+              <li>
+                <strong>What is a "code review" and why is it important?</strong>
+                <p className="pl-4">A code review is the process of having other developers read and critique your code *before* it gets merged. This is the primary purpose of a Pull Request. It is the single most important practice for:
+                  1. Catching bugs and logic errors.
+                  2. Enforcing consistent code style.
+                  3. Sharing knowledge and mentoring junior developers.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'git-best-practices':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">2.8: Git Best Practices & .gitignore</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: A Clean Project Diary</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Think of your `git log` as your project's official diary. Following best practices is the difference between a diary that's easy to read and one that's a total mess.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Bad Commit:</strong> `git commit -m "stuff"` (This is like a diary entry that just says "stuff happened." It's useless.)</li>
+              <li><strong>Good Commit:</strong> `git commit -m "Feat: Add user login page"` (This is a clear, dated entry that explains *what* changed and *why*.)</li>
+              <li><strong>`.gitignore` file:</strong> This is a list of things *not* to put in the diary, like your personal shopping lists or junk mail (`node_modules`, `.env`).</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Following these practices is what separates a junior from a senior developer. They make your project maintainable and collaborative.</p>
+            <p><strong>1. The `.gitignore` File:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>This is a text file named `.gitignore` in your project's root.</li>
+              <li>Any file or folder pattern listed in it will be **ignored** by Git.</li>
+              <li><strong>You MUST ignore:</strong>
+                <ul>
+                  <li>`node_modules/`: This folder is huge and can be re-created by anyone running `npm install`.</li>
+                  <li>`.env`: This file contains your **secret keys** and **passwords**. Never, ever commit this.</li>
+                  <li>Build output: `/build`, `/dist`</li>
+                  <li>OS files: `.DS_Store`, `Thumbs.db`</li>
+                </ul>
+              </li>
+            </ul>
+            <p><strong>2. Atomic Commits:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>A commit should represent a **single, logical change**.</li>
+              <li><strong>Bad:</strong> One commit with "Fix header bug, add login page, and update docs."</li>
+              <li><strong>Good:</strong> Three separate commits: `Fix: Correct header alignment`, `Feat: Add user login form`, `Docs: Update README`. This makes it easy to revert one change without affecting the others.</li>
+            </ul>
+            <p><strong>3. Good Commit Messages:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>Use the **imperative mood** (e.g., "Add feature," not "Added feature").</li>
+              <li>Use a **prefix** to categorize the change:
+                <ul>
+                  <li>`Feat:` (a new feature)</li>
+                  <li>`Fix:` (a bug fix)</li>
+                  <li>`Docs:` (documentation changes)</li>
+                  <li>`Style:` (formatting, semicolons, etc.)</li>
+                  <li>`Refactor:` (changing code structure without changing behavior)</li>
+                </ul>
+              </li>
+            </ul>
+            <p><strong>4. Branching Strategy:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Never commit directly to `main`</strong>.</li>
+              <li>Always create a new, descriptively-named **feature branch** for every task (e.g., `feat/user-auth`).</li>
+              <li>Merge to `main` only via a Pull Request.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: A Professional `.gitignore` (Node.js/React)</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is a perfect starting `.gitignore` file for any MERN stack project. You should create this file *before* your first commit.</p>
+            <CodeBlock code={`
+# Dependencies
+# This folder is re-created by 'npm install'
+/node_modules
+
+# Build Output
+# This folder is re-created by 'npm run build'
+/build
+/dist
+
+# Environment Variables
+# CONTAINS SECRETS! DO NOT COMMIT!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Log files
+*.log
+npm-debug.log*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+            `} language="bash" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>I accidentally committed my `.env` file and pushed it to GitHub. What do I do?</strong>
+                <p className="pl-4">This is a critical situation.
+                  1. **Immediately** go to that service (e.g., your database provider, AWS) and **revoke/regenerate all keys and passwords** in that file. Assume they are already stolen.
+                  2. To remove the file from your *history* (just removing it in a new commit is not enough), you must use an advanced command like `git filter-branch` or the `bfg-repo-cleaner` tool.
+                  3. Add `.env` to your `.gitignore` file *now* to prevent it from happening again.</p>
+              </li>
+              <li>
+                <strong>Why use the imperative mood ("Add feature") in commit messages?</strong>
+                <p className="pl-4">It's a Git convention. A commit is a *patch* or a *set of instructions* that takes your code from one state to the next. The commit message should describe what *applying* the commit will do. Think: "This commit will... `Add a new feature`" or "This commit will... `Fix a bug`."</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    default:
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h1 className="text-3xl font-bold mb-4">Select a Subchapter</h1>
+          <div className="space-y-4">
+            <p className="text-lg text-gray-700">Please select a topic from the sidebar to view the notes.</p>
+          </div>
+        </div>
+      );
+  }
 };
 
 export default Chapter2;

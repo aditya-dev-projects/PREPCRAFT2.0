@@ -1,13 +1,13 @@
 import QuizDisplay from '../../../components/QuizDisplay';
-import { chapters } from '../chapters';
+import { quizChapters } from '../quizChapters'; // <-- FIX: Changed from 'chapters'
 
-export const developmentQuizzes = chapters.flatMap(chapter =>
+export const developmentQuizzes = quizChapters.flatMap(chapter => // <-- FIX
   chapter.subchapters.map(subchapter => ({
     component: QuizDisplay,
     meta: {
-      id: `${subchapter.id}-quiz`,
+      id: subchapter.quizId, // <-- FIX: Use quizId
       title: `${subchapter.title} Quiz`,
-      subchapterId: subchapter.id, // Pass subchapter.id to QuizDisplay
+      subchapterId: subchapter.quizId, // <-- FIX: Pass quizId
     },
   }))
 );

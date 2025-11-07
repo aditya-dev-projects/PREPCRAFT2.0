@@ -1,13 +1,17 @@
 import PracticeProblemDisplay from '../../../components/PracticeProblemDisplay';
-import { chapters } from '../chapters';
+// Import from 'practiceChapters' instead of 'chapters'
+import { practiceChapters } from '../practiceChapters';
 
-export const developmentPracticeProblems = chapters.flatMap(chapter =>
+// Map over 'practiceChapters'
+export const developmentPracticeProblems = practiceChapters.flatMap(chapter =>
   chapter.subchapters.map(subchapter => ({
     component: PracticeProblemDisplay,
     meta: {
-      id: `${subchapter.id}-practice`,
+      // FIX: Use 'subchapter.practiceProblemId' as shown in your error
+      id: subchapter.practiceProblemId,
       title: `${subchapter.title} Practice Problems`,
-      subchapterId: subchapter.id, // Pass subchapter.id to PracticeProblemDisplay
+      // FIX: Pass 'subchapter.practiceProblemId' to the display component
+      subchapterId: subchapter.practiceProblemId, 
     },
   }))
 );

@@ -16,10 +16,21 @@
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     <meta property="og:title" content="PREPCRAFT">
-  <meta name="twitter:title" content="PREPCRAFT">
-  <meta property="og:description" content="Project PrepCraft">
-  <meta name="twitter:description" content="Project PrepCraft">
-</head>
+    <meta name="twitter:title" content="PREPCRAFT">
+    <meta property="og:description" content="Project PrepCraft">
+    <meta name="twitter:description" content="Project PrepCraft">
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('Service worker unregistered');
+          }
+        });
+      }
+    </script>
+    </head>
 
   <body>
     <div id="root"></div>
