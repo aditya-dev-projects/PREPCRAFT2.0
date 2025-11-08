@@ -1,37 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext, useRef, createContext } from 'react';
+// Note: 'react-router-dom' is a separate install: npm install react-router-dom
+// We import them here so the examples are contextually correct.
+import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 
-// --- Reusable Helper Components (Required for self-contained file) ---
+// --- Reusable Helper Components (Light Theme) ---
 
-// Reusable component for styling code blocks (with Copy button)
-const CodeBlock = ({ code }: { code: string }) => {
+const CodeBlock = ({ code, language = 'javascript' }: { code: string, language?: string }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = () => {
-    const textArea = document.createElement('textarea');
-    textArea.value = code.trim();
-    textArea.style.position = 'absolute';
-    textArea.style.left = '-9999px';
-    textArea.style.opacity = '0';
-    document.body.appendChild(textArea);
-    textArea.select();
     try {
+      const textArea = document.createElement('textarea');
+      textArea.value = code.trim();
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
       document.execCommand('copy');
+      document.body.removeChild(textArea);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
+      navigator.clipboard.writeText(code.trim()).then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }).catch(navErr => {
+        console.error('Clipboard API also failed: ', navErr);
+      });
     }
-    document.body.removeChild(textArea);
   };
 
   return (
-    <div className="relative">
-      <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto text-sm my-4">
+    <div className="relative my-4">
+      <pre className={`bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm language-${language}`}>
         <code>{code.trim()}</code>
       </pre>
       <button
         onClick={handleCopy}
-        className="absolute top-2 right-2 bg-gray-600 hover:bg-gray-500 text-white text-xs font-semibold py-1 px-2 rounded-md transition-all duration-200"
+        className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-semibold py-1 px-2 rounded-md transition-all duration-200"
       >
         {isCopied ? 'Copied!' : 'Copy'}
       </button>
@@ -39,481 +47,488 @@ const CodeBlock = ({ code }: { code: string }) => {
   );
 };
 
-// Reusable component for inline code
 const Code = ({ children }: { children: React.ReactNode }) => (
-  <code className="bg-gray-200 text-red-700 font-mono text-sm rounded px-1 py-0.5">
+  <code className="bg-gray-200 text-red-700 font-mono px-1.5 py-0.5 rounded-md text-sm">
     {children}
   </code>
 );
 
-// Reusable component for note sections
-const NoteSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
-  <section className="mb-6">
-    <h3 className="text-2xl font-semibold border-b-2 border-gray-300 pb-2 mb-3">{title}</h3>
-    <div className="text-gray-700 space-y-3">{children}</div>
-  </section>
-);
-
-// Reusable component for quiz sections
-const QuizSection = ({ children }: { children: React.ReactNode }) => (
-  <section className="mt-8">
-    <h3 className="text-2xl font-semibold border-b-2 border-gray-300 pb-2 mb-3">Test Your Knowledge</h3>
-    <ol className="list-decimal list-inside space-y-2 text-gray-700">
-      {children}
-    </ol>
-  </section>
-);
-
-// --- Chapter 6 Part 2 Component ---
+// --- Main Chapter 6, Part 2 Component ---
 
 const Chapter6Part2 = ({ noteId }: { noteId: string }) => {
   switch (noteId) {
     case 'conditional-rendering':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">6.7: Conditional Rendering & Lists</h2>
-
-          <NoteSection title="Concept">
-            <p><strong className="text-gray-900">Conditional Rendering</strong> refers to displaying different elements or components based on a state or prop value (a condition).</p>
-            <h4 className="text-lg font-semibold mt-2">Primary Conditional Techniques:</h4>
-            <ol className="list-decimal list-inside ml-4 space-y-2">
-              <li><strong className="text-gray-900">Ternary Operator:</strong> Used for simple *either/or* logic directly inside JSX.
-                <ul className="list-disc ml-6 mt-1">
-                  <li><Code>{'{'}isLoggedIn ? &lt;Welcome /&gt; : &lt;Login /&gt;{'}'}</Code></li>
-                </ul>
-              </li>
-              <li><strong className="text-gray-900">Logical AND (<Code>&amp;&amp;</Code>):</strong> Used for rendering a component *only* if a condition is true, otherwise rendering nothing (`null`).
-                <ul className="list-disc ml-6 mt-1">
-                  <li><Code>{'{'}unreadCount &gt; 0 &amp;&amp; &lt;Notification /&gt;{'}'}</Code></li>
-                </ul>
-              </li>
-              <li><strong className="text-gray-900">If/Else (Outside JSX):</strong> Best for complex branching logic. You compute what to render *before* the `return` statement.</li>
-              <li><strong className="text-gray-900">Rendering Null:</strong> A component that returns <Code>null</Code> will effectively hide itself from the DOM without interfering with the rest of the layout.</li>
-            </ol>
-            <h4 className="text-lg font-semibold mt-4">Rendering Lists with <Code>.map()</Code> & Keys:</h4>
-            <p>To render multiple items from an array, the <strong className="text-gray-900">JavaScript <Code>.map()</Code> method</strong> is mandatory inside JSX.</p>
-            <ul className="list-disc ml-6 space-y-1">
-              <li><strong className="text-gray-900">Keys are Mandatory:</strong> Every element rendered within a list must have a unique, stable <Code>key</Code> prop.</li>
-              <li><strong className="text-gray-900">Key Purpose:</strong> Keys help React identify which items have changed, been added, or been removed, ensuring efficient updates (diffing) to the Virtual DOM.</li>
-              <li><strong className="text-red-600">Anti-Pattern:</strong> Using the array index as the key is only safe if the list is completely static and never re-ordered.</li>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">6.7: Conditional Rendering & Lists</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Doorman</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A <strong>conditional render</strong> is like a doorman at a club. The doorman checks your name (the <strong>condition</strong>).</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Ternary Operator:</strong> If you're on the list (<code>true</code>), you see the <code>&lt;Welcome /&gt;</code> component. If not (<code>false</code>), you see the <code>&lt;Login /&gt;</code> component.</li>
+              <li><strong>Logical AND (<code>&amp;&amp;</code>):</strong> The doorman <em>only</em> lets you in if you're on the list. If you're not, he does nothing and you see nothing.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Example demonstrating conditional rendering and list generation.</p>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Conditional Rendering</strong> is the process of displaying different JSX based on a condition (a prop or state).</p>
+            <p><strong>Techniques (inside JSX):</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Ternary Operator:</strong> Best for <code>if/else</code> logic.
+                <br/><Code>{'{'}isLoggedIn ? &lt;Dashboard /&gt; : &lt;LoginForm /&gt;{'}'}</Code>
+              </li>
+              <li><strong>Logical AND Operator (<code>&amp;&amp;</code>):</strong> Best for <code>if</code> logic (with no else).
+                <br/><Code>{'{'}unreadMessages &gt; 0 &amp;&amp; &lt;Notification /&gt;{'}'}</Code>
+              </li>
+            </ul>
+            <p><strong>Techniques (outside JSX):</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>You can use a full <code>if/else</code> statement <em>before</em> your `return` statement to decide what to render.</li>
+              <li>Returning <code>null</code> from a component will render nothing.</li>
+            </ul>
+            
+            <p className="mt-4"><strong>Rendering Lists:</strong></p>
+            <p>You must use the JavaScript <strong><code>.map()</code></strong> method to transform an array of data into an array of JSX elements.</p>
+            <p><strong>The `key` Prop:</strong> This is a <strong>critical, mandatory rule</strong>. When rendering a list, you must provide a <code>key</code> prop to the root element inside the map.
+              <ul className="list-disc ml-6 mt-2">
+                <li>The <code>key</code> must be a <strong>string or number</strong> that is <strong>stable and unique</strong> among its siblings.</li>
+                <li><strong>Best Practice:</strong> Use a unique ID from your data (e.g., `item.id`).</li>
+                <li><strong>Anti-Pattern:</strong> Do <em>not</em> use the array `index` as a key if the list can be re-ordered, filtered, or have items added/deleted. This can cause major bugs with state and UI updates.</li>
+              </ul>
+            </p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: Conditional List with Keys</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This component renders a list of users, but only if the user is logged in and the list isn't empty.</p>
             <CodeBlock code={`
 import React from 'react';
 
-const tasks = [
-  { id: 101, text: 'Review PR', done: false },
-  { id: 102, text: 'Submit Report', done: true },
-  { id: 103, text: 'Team Meeting', done: false },
-];
+type User = {
+  id: number;
+  name: string;
+};
 
-function TaskList({ tasks, isLoggedIn }) {
-  // 1. If/Else (Exit early technique)
+type UserListProps = {
+  isLoggedIn: boolean;
+  users: User[];
+};
+
+function UserList({ isLoggedIn, users }: UserListProps) {
+  // 1. Conditional (early return)
   if (!isLoggedIn) {
-    return <h3>Please log in to view tasks.</h3>;
+    return <p>Please log in to see the user list.</p>;
   }
 
+  // 2. Conditional (Ternary)
   return (
     <div>
-      {/* 2. Logical AND (&&) */}
-      {tasks.length === 0 && <p className="text-blue-500">You have no tasks!</p>}
-
-      <ul className="list-disc ml-4">
-        {/* 3. List Rendering with .map() */}
-        {tasks.map(task => (
-          // Key is crucial and stable (using task.id)
-          <li key={task.id}>
-            {task.text} 
-            {/* 4. Ternary Operator */}
-            {task.done 
-              ? <span className="text-green-600 font-semibold ml-2"> (Completed)</span>
-              : <span className="text-red-600 font-semibold ml-2"> (Pending)</span>
-            }
-          </li>
-        ))}
-      </ul>
+      <h2>User List</h2>
+      {users.length === 0 ? (
+        // 3. Conditional (Logical AND could also work here)
+        <p>No users found.</p>
+      ) : (
+        // 4. List Rendering with .map() and key
+        <ul>
+          {users.map(user => (
+            <li key={user.id}>{user.name}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
 
-// Main App component for context
+// Example usage in App.tsx
 function App() {
-  const userIsLoggedIn = true;
-  return <TaskList tasks={tasks} isLoggedIn={userIsLoggedIn} />;
+  const mockUsers = [
+    { id: 101, name: 'Alice' },
+    { id: 102, name: 'Bob' },
+  ];
+  
+  return <UserList isLoggedIn={true} users={mockUsers} />;
 }
 
 export default App;
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p className="font-semibold">Diagram: Conditional Logic Flow in JSX</p>
-            <div className="font-mono p-4 bg-gray-100 rounded">
-              <p>Condition True?</p>
-              <p>| &nbsp;&nbsp;&nbsp; |</p>
-              <p>V &nbsp;&nbsp;&nbsp; V</p>
-              <p>Yes (Truthy) &nbsp;&nbsp;&nbsp; No (Falsy)</p>
-              <p>| &nbsp;&nbsp;&nbsp; |</p>
-              <p>V &nbsp;&nbsp;&nbsp; V</p>
-              <p>Condition <Code>&amp;&amp;</Code> &lt;Element/&gt; &nbsp;&nbsp;&nbsp; Renders `null` (nothing)</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;Condition <Code>?</Code> &lt;A/&gt; <Code>:</Code> &lt;B/&gt; &nbsp;&nbsp;&nbsp; Renders &lt;B/&gt;</p>
-            </div>
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Companies:</strong> <strong className="text-gray-900">Wipro</strong>, <strong className="text-gray-900">TCS</strong>. They frequently test the difference between the ternary and `&&` operators.</li>
-              <li><strong className="text-gray-900">Key Question:</strong> "What is the primary risk of using an array index as a key?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"If the list items are re-ordered, added, or deleted, React can lose track of the original components. This causes visual bugs (e.g., input fields losing focus) and incorrect state association, leading to performance issues and hard-to-debug logic."</li>
-                </ul>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Why is using the array `index` as a `key` so bad?</strong>
+                <p className="pl-4">React uses keys to track the <em>identity</em> of each element. If you have a list `[A, B, C]` and you delete `A`, the list becomes `[B, C]`. If you used indexes, React sees `index 0` (now `B`) and `index 1` (now `C`). It thinks you just <em>mutated</em> `A` into `B` and `B` into `C`, and deleted `C`. This will break any state inside the `li` components. A stable ID (`item.id`) tells React, "Item A was deleted, B and C are unchanged."</p>
               </li>
-              <li><strong className="text-gray-900">Key Question:</strong> "How do you render nothing in React?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"Return <Code>null</Code> from the component or use the Logical AND operator (<Code>&amp;&amp;</Code>) where the first operand is falsy."</li>
-                </ul>
+              <li>
+                <strong>How do I render <em>nothing</em>?</strong>
+                <p className="pl-4">Return <code>null</code>. For example: <code>if (!show) {'{'} return null; {'}'}</code>. This is a common pattern for hiding components.</p>
               </li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Putting an `if/else` statement directly inside JSX. This is invalid. <strong className="text-gray-900">Only expressions</strong> are allowed inside JSX braces.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What is the correct operator for rendering an element only if a condition is true?</li>
-            <li>What property is mandatory when rendering a list using <Code>.map()</Code>?</li>
-            <li>When is it acceptable to use the array index as the list key?</li>
-            <li>What happens if a component returns <Code>null</Code>?</li>
-          </QuizSection>
-
-          <div className="mt-8 pt-4 border-t-2 border-gray-900">
-            <h3 className="text-xl font-semibold mb-2">Quick Recap</h3>
-            <ul className="list-disc ml-6 space-y-1">
-              <li>Use the <strong className="text-gray-900">Ternary Operator</strong> (<Code>? :</Code>) for <strong className="text-gray-900">either/or</strong> rendering.</li>
-              <li>Use <strong className="text-gray-900">Logical AND</strong> (<Code>&amp;&amp;</Code>) for <strong className="text-gray-900">hide/show</strong> logic.</li>
-              <li>The <strong className="text-gray-900">key</strong> prop is mandatory for all list items.</li>
-              <li><strong className="text-red-600">Avoid</strong> using the array index as a key for dynamic lists.</li>
-            </ul>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
         </div>
       );
     case 'react-hooks':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">6.8: React Hooks (useEffect, useContext, useRef)</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">6.8: React Hooks (useEffect, useContext, useRef)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Component's "Utility Belt"</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>If a functional component is a superhero, <strong>Hooks</strong> are its utility belt. They are functions (all starting with `use`) that let you add "powers" to your simple function.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong><code>useState</code>:</strong> Gives your component "Memory" (state).</li>
+              <li><strong><code>useEffect</code>:</strong> Gives your component "Super-Hearing" to listen for things <em>outside</em> of itself (like an API call finishing, or the component "dying").</li>
+              <li><strong><code>useContext</code>:</strong> Gives your component "Telepathy" to read global data from a provider far away, without needing props.</li>
+              <li><strong><code>useRef</code>:</strong> Gives your component a "Grappling Hook" to get a direct reference to a DOM element (like an input field).</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Concept">
-            <p><strong className="text-gray-900">Hooks</strong> are special functions that let you "hook into" React features (like state and lifecycle methods) from functional components. They replaced class components for managing state and side effects.</p>
-            <h4 className="text-lg font-semibold mt-2">The Rules of Hooks (Mandatory):</h4>
-            <ol className="list-decimal list-inside ml-4 space-y-2">
-              <li><strong className="text-gray-900">Only Call at the Top Level:</strong> Do not call Hooks inside loops, conditions, or nested functions.</li>
-              <li><strong className="text-gray-900">Only Call from React Functions:</strong> Call them only from functional components or custom Hooks.</li>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Hooks</strong> are functions that let you "hook into" React state and lifecycle features from functional components.</p>
+            <p><strong>The Rules of Hooks (CRITICAL):</strong></p>
+            <ol className="list-decimal ml-6 space-y-1">
+              <li><strong>Only call Hooks at the top level.</strong> Do <em>not</em> call them inside loops, conditions, or nested functions.</li>
+              <li><strong>Only call Hooks from React functional components</strong> (or from your own custom Hooks).</li>
             </ol>
-            <h4 className="text-lg font-semibold mt-4">Key Hooks:</h4>
-            <ul className="list-disc ml-6 space-y-3">
-              <li><strong className="text-gray-900"><Code>useEffect</Code> (Side Effects):</strong> Used to handle actions that happen *outside* the normal render cycle (e.g., data fetching, subscriptions, manual DOM manipulation).
-                <ul className="list-disc ml-6 mt-1">
-                  <li>Accepts a callback function and an optional **dependency array** (<Code>deps</Code>).</li>
-                  <li>Returns an optional **cleanup function** to stop side effects (e.g., clearing timers, removing listeners).</li>
+            <p><strong>Key Hooks (Beyond `useState`):</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong><code>useEffect(fn, [deps])</code>:</strong> The "Effect" Hook. It's for <em>side effects</em> (data fetching, timers, subscriptions).
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong><code>fn</code>:</strong> The function to run.</li>
+                  <li><strong><code>[deps]</code> (Dependency Array):</strong> Controls <em>when</em> the effect runs.
+                    <ul className="list-disc ml-6 mt-2">
+                      <li><code>[]</code> (Empty Array): Runs once when the component "mounts". Perfect for initial data fetching.</li>
+                      <li><code>[prop, state]</code>: Runs on mount <em>and</em> any time `prop` or `state` changes.</li>
+                      <li>(No Array): Runs after <em>every single render</em>. (Usually a bug!)</li>
+                    </ul>
+                  </li>
+                  <li><strong>Cleanup Function:</strong> The function you `return` from your effect. React runs this on "unmount" to prevent memory leaks (e.g., `clearInterval`).</li>
                 </ul>
               </li>
-              <li><strong className="text-gray-900"><Code>useContext</Code> (State Access):</strong> Allows a component to subscribe to context changes, enabling global state sharing without "prop drilling" (passing props down many levels).
-                <ul className="list-disc ml-6 mt-1">
-                  <li>Requires a <Code>Context Object</Code> (created by <Code>React.createContext()</Code>) and a <Code>Provider</Code> component.</li>
-                </ul>
-              </li>
-              <li><strong className="text-gray-900"><Code>useRef</Code> (References):</strong> Used to access the DOM directly or to hold a mutable value that should *not* cause a re-render when it changes.
-                <ul className="list-disc ml-6 mt-1">
-                  <li>Returns an object: <Code>{'{ current: value }'}</Code>. Changes to <Code>current</Code> are not tracked by React.</li>
+              <li><strong><code>useContext(MyContext)</code>:</strong> Consumes data from a React Context. It finds the nearest <Code>&lt;MyContext.Provider&gt;</Code> above it in the tree and returns its `value`.</li>
+              <li><strong><code>useRef(initialValue)</code>:</strong> Returns a mutable ref object (<Code>{'{'} current: initialValue {'}'}</Code>).
+                <ul className="list-disc ml-6 mt-2">
+                  <li>1. Accessing a DOM element (e.g., to focus an input).</li>
+                  <li>2. Storing a mutable value (like a timer ID) that <em>does not</em> cause a re-render when changed.</li>
                 </ul>
               </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Example using <Code>useRef</Code> to focus an input on mount and <Code>useEffect</Code> for data fetching logic (mocked).</p>
+          <h3 className="text-2xl font-bold mb-3">Example: `useEffect` (Data Fetch) & `useRef` (Focus)</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This component fetches data when it mounts (`useEffect`) and automatically focuses the input field (`useRef`).</p>
             <CodeBlock code={`
 import React, { useState, useEffect, useRef } from 'react';
 
-function UserDataFetcher({ userId }) {
-  const [data, setData] = useState(null);
-  const inputRef = useRef(null);
+function DataFetcher() {
+  const [data, setData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 1. useEffect for data fetching (runs only when userId changes)
+  // 1. Create a ref to attach to the input element
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 2. useEffect for data fetching
+  // The empty array [] means this runs ONCE on mount.
   useEffect(() => {
-    setData(null); // Clear data before new fetch (good practice)
+    fetch('https://api.quotable.io/random')
+      .then(res => res.json())
+      .then(quoteData => {
+        setData(quoteData);
+        setIsLoading(false);
+      });
     
-    // Simulate data fetch based on prop
-    const mockFetch = setTimeout(() => {
-      setData({ user: 'User ' + userId, details: 'Fetched at ' + Date.now() });
-    }, 500);
-
-    // 2. useEffect for focusing an input on initial mount (runs once)
+    // We can also focus the input on mount
+    // 'inputRef.current' holds the actual DOM node
     if (inputRef.current) {
-        inputRef.current.focus();
+      inputRef.current.focus();
     }
 
-    // 3. Cleanup function (runs when component unmounts or before effect reruns)
-    return () => {
-      clearTimeout(mockFetch); // Prevent memory leak/race condition
-    };
-  }, [userId]); // Dependency array: Effect runs on mount and whenever userId changes
+  }, []); // <-- Empty dependency array
+
+  if (isLoading) {
+    return <p>Loading data...</p>;
+  }
 
   return (
     <div>
-      <input ref={inputRef} type="text" placeholder="I gain focus on mount" />
-      <h3>User Data:</h3>
-      {data ? <p>{data.user}: {data.details}</p> : <p>Loading...</p>}
+      {/* 3. Attach the ref to the input's 'ref' prop */}
+      <input ref={inputRef} type="text" placeholder="I am focused!" />
+      
+      <p style={{ fontStyle: 'italic', marginTop: '20px' }}>
+        "{data.content}" - {data.author}
+      </p>
     </div>
   );
 }
 
-export default UserDataFetcher;
-            `} />
-          </NoteSection>
+export default DataFetcher;
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p className="font-semibold">Diagram: <Code>useEffect</Code> Dependency Control</p>
-            <div className="font-mono p-4 bg-gray-100 rounded">
-              <p>useEffect(callback, dependencies)</p>
-              <p>| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p>V &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</p>
-              <p>1. <Code>useEffect(() =&gt; {'{...}'}, [])</Code> &rarr; <strong className="text-gray-900">Mount Only</strong> (Init, one-time setup)</p>
-              <p>2. <Code>useEffect(() =&gt; {'{...}'}, [prop])</Code> &rarr; <strong className="text-gray-900">Mount & Update</strong> (Runs when <Code>prop</Code> changes)</p>
-              <p>3. <Code>useEffect(() =&gt; {'{...}'})</Code> &rarr; <strong className="text-red-600">Mount & Every Render</strong> (Usually a bug)</p>
-            </div>
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Companies:</strong> <strong className="text-gray-900">Amazon</strong>, <strong className="text-gray-900">TCS</strong>, <strong className="text-gray-900">Cognizant</strong>. Focus heavily on the rules and dependency array.</li>
-              <li><strong className="text-gray-900">Key Question:</strong> "Why are Hooks better than Class Components?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"Hooks eliminate class boilerplate, making components smaller and more readable. They allow logic related to a single effect (e.g., fetching, subscribing) to be grouped together, rather than being split across <Code>componentDidMount</Code> and <Code>componentDidUpdate</Code>."</li>
-                </ul>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's a "side effect" in React?</strong>
+                <p className="pl-4">A side effect is any code that affects something <em>outside</em> of the component itself. This includes: fetching data from an API, setting a `setInterval` or `setTimeout`, manually changing the DOM, or reading/writing to `localStorage`.</p>
               </li>
-              <li><strong className="text-gray-900">Key Question:</strong> "When would you use <Code>useRef</Code>?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"1. To directly manipulate the DOM (e.g., focusing an input). 2. To store a mutable value across renders (like a timer ID) that, when changed, should <strong className="text-red-600">not</strong> trigger the component to re-render."</li>
-                </ul>
+              <li>
+                <strong>What's a "memory leak" and how does the cleanup function stop it?</strong>
+                <p className="pl-4">A memory leak happens when a component unmounts, but a process it started (like a `setInterval` timer) keeps running forever, consuming memory. The `useEffect` cleanup function (the `return` function) is React's guarantee that it will run a piece of code <em>right before</em> the component is destroyed, giving you a chance to call `clearInterval` and prevent the leak.</p>
               </li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Omitting a variable from the <Code>useEffect</Code> dependency array when that variable is used inside the effect. This causes the effect to run with a <strong className="text-red-600">stale (outdated) value</strong>.</li>
+              <li>
+                <strong>What's the difference between `useRef` and `useState`?</strong>
+                <p className="pl-4">Updating <strong>state</strong> with its setter function (e.g., `setCount(1)`) **causes the component to re-render**. Updating a <strong>ref</strong>'s `.current` value (e.g., `myRef.current = 1`) **does not** cause a re-render. `useRef` is for values you want to "keep track of" without triggering a UI update.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What is the purpose of the dependency array in <Code>useEffect</Code>?</li>
-            <li>What does <Code>useRef</Code> return, and what is the primary use case for it?</li>
-            <li>What happens if you use an <Code>if</Code> statement to conditionally call a Hook inside a component?</li>
-            <li>How do you clean up an interval set inside <Code>useEffect</Code>?</li>
-          </QuizSection>
-
-          <div className="mt-8 pt-4 border-t-2 border-gray-900">
-            <h3 className="text-xl font-semibold mb-2">Quick Recap</h3>
-            <ul className="list-disc ml-6 space-y-1">
-              <li><strong className="text-gray-900">Hooks</strong> follow strict rules (top-level only).</li>
-              <li><strong className="text-gray-900"><Code>useEffect</Code></strong> manages side effects and component lifecycle.</li>
-              <li><strong className="text-gray-900"><Code>useContext</Code></strong> solves prop drilling for global data access.</li>
-              <li><strong className="text-gray-900"><Code>useRef</Code></strong> provides mutable storage that doesn't trigger re-renders.</li>
-              <li>Dependencies control when <Code>useEffect</Code> runs.</li>
-            </ul>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
         </div>
       );
     case 'react-router':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">6.9: React Router for Navigation</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">6.9: React Router for Navigation</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The "Fake" Hallway</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A traditional website is like a "village" of separate houses. To go from the "Home" house to the "About" house, you must go outside and walk down the street (a full page reload).</p>
+            <p>A <strong>Single Page Application (SPA)</strong> is a "mansion" with only <em>one</em> front door. <strong>React Router</strong> is the <em>internal hallway system</em>. When you click a <Code>&lt;Link&gt;</Code>, you don't go outside. The router just leads you to a different <em>room</em> (component) inside the same mansion and <em>fakes</em> the URL in your browser to make it look like you moved. This is called <strong>client-side routing</strong> and is much faster.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Concept">
-            <p><strong className="text-gray-900">React Router</strong> is the most popular library for managing navigation and routing in Single Page Applications (SPAs). It keeps the UI synchronized with the URL.</p>
-            <h4 className="text-lg font-semibold mt-2">Key Components (React Router v6+):</h4>
-            <ol className="list-decimal list-inside ml-4 space-y-2">
-              <li><strong className="text-gray-900"><Code>BrowserRouter</Code>:</strong> Must wrap your entire application. It uses the HTML5 History API to keep your UI in sync with the URL.</li>
-              <li><strong className="text-gray-900"><Code>Routes</Code>:</strong> A container component that looks through its children <Code>Route</Code> elements to find the best match for the current URL.</li>
-              <li><strong className="text-gray-900"><Code>Route</Code>:</strong> Maps a URL path to a React element.
-                <ul className="list-disc ml-6 mt-1">
-                  <li>Requires a <Code>path</Code> prop (e.g., <Code>/users</Code>).</li>
-                  <li>Requires an <Code>element</Code> prop (the component to render).</li>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>React Router</strong> is the standard library for handling navigation in a React SPA. It maps URL paths to your components.</p>
+            <p><strong>Core Components (v6):</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong><code>&lt;BrowserRouter&gt;</code>:</strong> The parent component that "enables" routing. You must wrap your <em>entire</em> app (usually in `index.tsx`) with it.</li>
+              <li><strong><code>&lt;Routes&gt;</code>:</strong> A container that holds all your individual routes.</li>
+              <li><strong><code>&lt;Route /&gt;</code>:</strong> The component that defines a single mapping. It has two main props:
+                <ul className="list-disc ml-6 mt-2">
+                  <li><code>path="/about"</code>: The URL path to match.</li>
+                  <li><code>element={'{'}&lt;AboutPage /&gt;{'}'}</code>: The component to render for that path.</li>
                 </ul>
               </li>
-              <li><strong className="text-gray-900"><Code>Link</Code>:</strong> Replaces the standard HTML <Code>&lt;a&gt;</Code> tag for navigation. It prevents a full page reload, ensuring the application remains a true SPA.
-                <ul className="list-disc ml-6 mt-1">
-                  <li>Use the <Code>to</Code> prop instead of <Code>href</Code>.</li>
+              <li><strong><code>&lt;Link&gt;</code>:</strong> Your navigation tool. It's a replacement for the `&lt;a&gt;` tag.
+                <ul className="list-disc ml-6 mt-2">
+                  <li>It uses <code>to="/about"</code> instead of `href`.</li>
+                  <li>It <strong>prevents the default page reload</strong> and just changes the URL, letting React Router handle the rest.</li>
                 </ul>
               </li>
-              <li><strong className="text-gray-900">Dynamic Routes:</strong> Uses colons to define path parameters (e.g., <Code>/users/:id</Code>). These parameters are retrieved using the <Code>useParams</Code> hook.</li>
-            </ol>
-          </NoteSection>
+            </ul>
+            <p><strong>Core Hooks:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong><code>useParams()</code>:</strong> Used to extract dynamic parameters from the URL (e.g., from a path like `/user/:id`).</li>
+              <li><strong><code>useNavigate()</code>:</strong> Gives you a function to programmatically navigate (e.g., after a form submission).</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Example showing the basic structure and navigation logic.</p>
+          <h3 className="text-2xl font-bold mb-3">Example: A Multi-Page App with a Dynamic Route</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>First, run <Code>npm install react-router-dom</Code>. This example shows a complete routing setup.</p>
             <CodeBlock code={`
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
 
-// 1. Define Page Components
+// 1. Define your "page" components
 const Home = () => <h2>Welcome Home!</h2>;
 const About = () => <h2>About Us Page</h2>;
-const NotFound = () => <h2 className="text-red-500">404 Page Not Found</h2>;
+const NotFound = () => <h2 style={{ color: 'red' }}>404 Page Not Found</h2>;
 
-// Dynamic Route Component
-const UserDetail = () => {
-  const { id } = useParams(); // Retrieves the dynamic part of the URL
-  return <h3>Viewing Details for User ID: {id}</h3>;
+// 2. A component for a dynamic route
+const UserProfile = () => {
+  // 3. Use the useParams hook to get the ':id' from the URL
+  const { id } = useParams();
+  return <p>Displaying profile for User ID: {id}</p>;
 };
 
 function App() {
   return (
-    // 2. BrowserRouter wraps the entire app
+    // 4. Wrap the *entire app* in <BrowserRouter>
     <BrowserRouter>
-      <nav className="p-4 space-x-4 bg-gray-100">
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/users/123">User 123</Link> {/* Link to a dynamic route */}
+      <nav style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
+        {/* 5. Use <Link> for navigation, not <a> */}
+        <Link to="/" style={{ marginRight: '10px' }}>Home</Link>
+        <Link to="/about" style={{ marginRight: '10px' }}>About</Link>
+        <Link to="/user/123">User 123</Link>
       </nav>
 
-      {/* 3. Routes container */}
-      <Routes>
-        {/* 4. Route elements map path to component */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        {/* Dynamic Route definition */}
-        <Route path="/users/:id" element={<UserDetail />} />
-        
-        {/* Wildcard Route (Must be last) */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <div style={{ padding: '20px' }}>
+        {/* 6. <Routes> holds all <Route> definitions */}
+        <Routes>
+          {/* 7. Define each route */}
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          
+          {/* 8. This is a dynamic route. ':id' is a parameter. */}
+          <Route path="/user/:id" element={<UserProfile />} />
+          
+          {/* 9. A "catch-all" route for 404s. Must be last. */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
 
+// In your index.tsx, you would just render <App />
 export default App;
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p className="font-semibold">Diagram: React Router Component Hierarchy</p>
-            <div className="font-mono p-4 bg-gray-100 rounded">
-              <p>&lt;App /&gt;</p>
-              <p>| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p>V &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</p>
-              <p>&lt;BrowserRouter&gt;</p>
-              <p>| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p>V &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</p>
-              <p>&lt;Link to="/home" /&gt; &nbsp;&nbsp;&nbsp; &lt;Routes&gt;</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Route path="/" element={'{<Home/>}'} /&gt;</p>
-            </div>
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Companies:</strong> <strong className="text-gray-900">Infosys</strong>, <strong className="text-gray-900">Amazon</strong>. Critical for any front-end role.</li>
-              <li><strong className="text-gray-900">Key Question:</strong> "What is the difference between an SPA and an MPA?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li><strong className="text-gray-900">SPA (Single Page Application):</strong> Only one HTML file is loaded (e.g., `index.html`). Subsequent navigation uses JavaScript to change the content without full page reloads. Faster user experience.</li>
-                  <li><strong className="text-gray-900">MPA (Multi Page Application):</strong> Every navigation (link click) requires the browser to request and load a new HTML page from the server. Slower, but simpler for search engines.</li>
-                </ul>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Why use <code>&lt;Link&gt;</code> instead of <code>&lt;a href...&gt;</code>?</strong>
+                <p className="pl-4">An <code>&lt;a href...&gt;</code> tag causes a <strong>full page reload</strong>. This is the default browser behavior. It re-downloads all HTML, CSS, and JS, and <em>destroys</em> your React application's state. The <code>&lt;Link&gt;</code> component intercepts the click, prevents the page reload, and just updates the URL in the address bar. This tells React Router to swap components, all on the client-side.</p>
               </li>
-              <li><strong className="text-gray-900">Key Question:</strong> "Why do we use <Code>&lt;Link&gt;</Code> instead of <Code>&lt;a&gt;</Code>?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"The native <Code>&lt;a&gt;</Code> tag forces a browser refresh. <Code>&lt;Link&gt;</Code> intercepts the click event, prevents the refresh, and uses the browser's History API to update the URL and trigger React Router to render the correct component."</li>
-                </ul>
+              <li>
+                <strong>How do I redirect a user after they log in?</strong>
+                <p className="pl-4">You use the <code>useNavigate</code> hook.
+                <br/>1. At the top of your component: <Code>const navigate = useNavigate();</Code>
+                <br/>2. In your login handler: <Code>navigate('/dashboard');</Code></p>
               </li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Forgetting to wrap the application in <Code>&lt;BrowserRouter&gt;</Code>, which prevents all routing components (like <Code>Link</Code> and <Code>useParams</Code>) from working.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What component must wrap the entire application when using React Router?</li>
-            <li>What Hook is used to extract dynamic parameters like <Code>:id</Code> from the URL?</li>
-            <li>What HTML tag does <Code>&lt;Link&gt;</Code> replace, and why?</li>
-            <li>In React Router v6+, what container component holds all the <Code>&lt;Route&gt;</Code> elements?</li>
-          </QuizSection>
-
-          <div className="mt-8 pt-4 border-t-2 border-gray-900">
-            <h3 className="text-xl font-semibold mb-2">Quick Recap</h3>
-            <ul className="list-disc ml-6 space-y-1">
-              <li>React Router enables client-side routing in <strong className="text-gray-900">SPAs</strong>.</li>
-              <li><strong className="text-gray-900"><Code>BrowserRouter</Code></strong>, <strong className="text-gray-900"><Code>Routes</Code></strong>, and <strong className="text-gray-900"><Code>Route</Code></strong> define the structure.</li>
-              <li>Use <strong className="text-gray-900"><Code>Link</Code></strong> for all internal navigation.</li>
-              <li>Dynamic segments use <strong className="text-gray-900"><Code>useParams</Code></strong> to extract data.</li>
-            </ul>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
         </div>
       );
     case 'forms-validation':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">6.10: Forms & Form Validation in React</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">6.10: Forms & Form Validation in React</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The "Controlled" Input</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A normal HTML input is "uncontrolled." It's like a public suggestion box—people can write anything, and you only check it <em>after</em> they submit.</p>
+            <p>A React <strong>Controlled Component</strong> is like a high-security input where every keystroke is monitored.
+            <br/>1. The user types a letter (`'a'`).
+            <br/>2. The `onChange` event fires and tells React, "The user <em>wants</em> to type 'a'."
+            <br/>3. React (your code) decides if that's "allowed."
+            <br/>4. React updates its `state` to `"a"`.
+            <br/>5. The component re-renders, and React tells the input, "Your value is now `'a'`."
+            <br/>The React <strong>state</strong> is the "single source of truth," not the DOM.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Concept">
-            <p>React primarily manages forms using the <strong className="text-gray-900">Controlled Component</strong> pattern. This means the form data is handled by the component's state, making the state the "single source of truth."</p>
-            <h4 className="text-lg font-semibold mt-2">Controlled Components (The Standard):</h4>
-            <ul className="list-disc ml-6 space-y-2">
-              <li>Every form input (<Code>&lt;input&gt;</Code>, <Code>&lt;textarea&gt;</Code>, <Code>&lt;select&gt;</Code>) must be bound to a piece of state.</li>
-              <li>This binding is done via two mandatory props:
-                <ul className="list-disc ml-6 mt-1">
-                  <li><strong className="text-gray-900"><Code>value</Code>:</strong> Sets the current display value from state.</li>
-                  <li><strong className="text-gray-900"><Code>onChange</Code>:</strong> Updates the state whenever the input value changes.</li>
-                </ul>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Controlled Components</strong> are the standard pattern for handling forms in React. The form input's value is "controlled" by React state.</p>
+            <p><strong>The Two-Way Data Binding:</strong></p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>State to Input:</strong> The input's `value` prop is set from a `useState` variable.
+                <br/><Code>{'<input value={name} ... />'}</Code>
               </li>
-              <li><strong className="text-gray-900">Manual Validation:</strong> Validation logic is run inside the <Code>onSubmit</Code> handler before updating state or submitting to an API.</li>
+              <li><strong>Input to State:</strong> The input's `onChange` prop calls the `useState` setter.
+                <br/><Code>{'onChange={e => setName(e.target.value)}'}</Code>
+              </li>
+            </ol>
+            <p><strong>Form Validation:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>You don't validate the DOM; you validate the <strong>state</strong>.</li>
+              <li>Create a <em>second</em> piece of state to hold error messages (e.g., `const [errors, setErrors] = useState({})`).</li>
+              <li>Run your validation logic inside the `onSubmit` handler (or `onChange` for instant feedback).</li>
+              <li>If there are errors, update the `errors` state.</li>
+              <li>Conditionally render the errors in your JSX: <Code>{'{'}errors.name &amp;&amp; <p>{'{'}errors.name{'}'}</p>{'}'}</Code></li>
             </ul>
-            <h4 className="text-lg font-semibold mt-4">Uncontrolled Components:</h4>
-            <p>Form data is handled by the DOM itself. You retrieve the value using a <strong className="text-gray-900"><Code>useRef</Code></strong> upon submission. This is simpler for basic, one-off elements but rarely used for complex forms.</p>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>A controlled form with required field validation logic.</p>
+          <h3 className="text-2xl font-bold mb-3">Example: Controlled Form with Validation</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This form validates for an empty name and an invalid email on submit.</p>
             <CodeBlock code={`
 import React, { useState } from 'react';
 
-function ControlledForm() {
-  const [formData, setFormData] = useState({ name: '', email: '' });
-  const [errors, setErrors] = useState({});
+// Type for our form data
+type FormData = {
+  name: string;
+  email: string;
+};
 
-  // Generic handler for all inputs
-  const handleChange = (e) => {
+// Type for our errors
+type FormErrors = {
+  name?: string;
+  email?: string;
+};
+
+function ControlledForm() {
+  const [formData, setFormData] = useState<FormData>({ name: '', email: '' });
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // A generic handler that updates the correct piece of state
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value, // Compute property name
+    }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // ALWAYS prevent default
+    const newErrors: FormErrors = {};
 
-    // Basic Validation Logic
+    // 1. Validation Logic
     if (!formData.name) {
       newErrors.name = 'Name is required.';
     }
     if (!formData.email.includes('@')) {
-      newErrors.email = 'Valid email required.';
+      newErrors.email = 'A valid email is required.';
     }
 
+    // 2. Update errors state
     setErrors(newErrors);
 
-    // Submission Logic (only if no errors)
+    // 3. Check if there are any errors
     if (Object.keys(newErrors).length === 0) {
       alert('Form Submitted: ' + JSON.stringify(formData));
-      // Reset form or redirect
+      // ... send to API
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '10px', maxWidth: '300px' }}>
       <div>
         <label>Name:</label>
         <input
           type="text"
           name="name"
-          value={formData.name} // BOUND TO STATE
-          onChange={handleChange} // UPDATES STATE
+          value={formData.name}    // 1. State -> Input
+          onChange={handleChange}  // 2. Input -> State
         />
-        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+        {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
       </div>
       
       <div>
@@ -521,10 +536,10 @@ function ControlledForm() {
         <input
           type="email"
           name="email"
-          value={formData.email} // BOUND TO STATE
-          onChange={handleChange} // UPDATES STATE
+          value={formData.email}
+          onChange={handleChange}
         />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+        {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
       </div>
       
       <button type="submit">Submit</button>
@@ -533,254 +548,280 @@ function ControlledForm() {
 }
 
 export default ControlledForm;
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p className="font-semibold">Diagram: Controlled Input Flow</p>
-            <div className="font-mono p-4 bg-gray-100 rounded">
-              <p>[1] User Types 'A' in Input</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&darr;</p>
-              <p>[2] <Code>onChange</Code> Event Fires</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&darr;</p>
-              <p>[3] <Code>setState</Code> Called (e.g., <Code>setName('A')</Code>)</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&darr;</p>
-              <p>[4] Component Re-renders</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&darr;</p>
-              <p>[5] Input <Code>value</Code> Prop is 'A' (Input displays 'A')</p>
-              <p className="mt-1 font-semibold text-green-600">The State always dictates the Input's visible value.</p>
-            </div>
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Companies:</strong> <strong className="text-gray-900">TCS</strong>, <strong className="text-gray-900">Wipro</strong>, <strong className="text-gray-900">Capgemini</strong>. They demand knowledge of controlled vs. uncontrolled forms.</li>
-              <li><strong className="text-gray-900">Key Question:</strong> "Explain the Controlled Component principle."
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"A controlled input's value is entirely driven by React state. Every keystroke triggers an <Code>onChange</Code> event, which updates state, which re-renders the component, which pushes the new value back to the input's <Code>value</Code> prop. This gives React full control over the form data."</li>
-                </ul>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's an "uncontrolled" component?</strong>
+                <p className="pl-4">It's the alternative, where you <em>don't</em> use state. You let the DOM store the value, and you use a `useRef` to "pull" the value from the input <em>only</em> when the form is submitted. It's simpler for very basic forms, but "controlled" is the standard pattern.</p>
               </li>
-              <li><strong className="text-gray-900">Key Question:</strong> "When might you use an Uncontrolled Component?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"For file inputs (<Code>type="file"</Code>) or when integrating with non-React libraries, it can be easier to let the DOM manage the value and access it only on submission using <Code>useRef</Code>."</li>
-                </ul>
+              <li>
+                <strong>This seems like a lot of work for a big form. Is there a better way?</strong>
+                <p className="pl-4">Yes. For any form with more than 2-3 fields, managing all the `useState` hooks and error objects is tedious. This is why developers use form libraries. The two most popular are <strong>React Hook Form</strong> and <strong>Formik</strong>. They handle all the state, validation, and submission logic for you.</p>
               </li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Setting an <Code>onChange</Code> handler but forgetting to set the <Code>value</Code> prop (or vice versa). This breaks the controlled flow.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What two props are mandatory for a standard controlled input?</li>
-            <li>What handles form data in an Uncontrolled Component?</li>
-            <li>Where should manual form validation logic typically be executed?</li>
-            <li>What Hook is used to retrieve data from an Uncontrolled Component upon submission?</li>
-          </QuizSection>
-
-          <div className="mt-8 pt-4 border-t-2 border-gray-900">
-            <h3 className="text-xl font-semibold mb-2">Quick Recap</h3>
-            <ul className="list-disc ml-6 space-y-1">
-              <li><strong className="text-gray-900">Controlled Components</strong> manage input values via React <strong className="text-gray-900">state</strong>.</li>
-              <li>Binding requires both <strong className="text-gray-900"><Code>value</Code></strong> and <strong className="text-gray-900"><Code>onChange</Code></strong>.</li>
-              <li><strong className="text-gray-900">Uncontrolled Components</strong> use <strong className="text-gray-900"><Code>useRef</Code></strong> to read values directly from the DOM.</li>
-              <li>Always call <strong className="text-gray-900"><Code>e.preventDefault()</Code></strong> in the submit handler.</li>
-            </ul>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
         </div>
       );
     case 'component-lifecycle':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">6.11: Component Lifecycle & Cleanup</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">6.11: Component Lifecycle & Cleanup</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Component's "Life"</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A React component has a "life" with three distinct phases, just like a person:</p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>Birth (Mounting):</strong> The component is created and inserted into the DOM for the first time.</li>
+              <li><strong>Life (Updating):</strong> The component "lives" on the page and re-renders whenever its `props` or `state` change.</li>
+              <li><strong>Death (Unmounting):</strong> The component is removed from the DOM (e.g., you navigate to a new page).</li>
+            </ol>
+            <p>The <code>useEffect</code> hook is your tool to run code <em>during</em> these specific life moments.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Concept">
-            <p>The <strong className="text-gray-900">Component Lifecycle</strong> describes the stages a component goes through: <strong className="text-gray-900">Mounting</strong> (being created and inserted into the DOM), <strong className="text-gray-900">Updating</strong> (being re-rendered due to prop/state changes), and <strong className="text-gray-900">Unmounting</strong> (being removed from the DOM).</p>
-            <p>In functional components, the <strong className="text-gray-900"><Code>useEffect</Code> Hook</strong> manages all three phases.</p>
-            <h4 className="text-lg font-semibold mt-2">Lifecycle Phases using <Code>useEffect</Code>:</h4>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>In modern functional components, the entire lifecycle is managed by the <strong><code>useEffect</code></strong> hook.</p>
+            <p><strong>Lifecycle Phases using <code>useEffect</code>:</strong></p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Mounting (Setup):</strong> The effect runs immediately after the *first* render.
-                <ul className="list-disc ml-6 mt-1">
-                  <li><Code>useEffect(() =&gt; {'{/* Setup logic */}'}, <strong className="text-gray-900">[]</strong>)</Code> (Empty dependency array)</li>
-                </ul>
+              <li><strong>1. Mounting (Birth):</strong>
+                <br/>This code runs <em>once</em> after the component first renders.
+                <br/><Code>useEffect(() ={'>'} {'{'} /* Run on mount */ {'}'}, <strong>[]</strong>)</Code> (The empty dependency array is key).
+                <br/><strong>Use Case:</strong> Initial data fetching, setting up timers.
               </li>
-              <li><strong className="text-gray-900">Updating (Re-run):</strong> The effect runs after the initial mount and after any subsequent render where one of the dependencies has changed.
-                <ul className="list-disc ml-6 mt-1">
-                  <li><Code>useEffect(() =&gt; {'{/* Re-run logic */}'}, <strong className="text-gray-900">[propName]</strong>)</Code></li>
-                </ul>
+              <li><strong>2. Updating (Life):</strong>
+                <br/>This code runs on mount <em>and</em> any time a variable in the dependency array changes.
+                <br/><Code>useEffect(() ={'>'} {'{'} /* Run when id changes */ {'}'}, <strong>[id]</strong>)</Code>
+                <br/><strong>Use Case:</strong> Re-fetching data when a `prop` (like `id`) changes.
               </li>
-              <li><strong className="text-gray-900">Unmounting (Cleanup):</strong> The effect's <strong className="text-gray-900">return function</strong> is called. It runs right before the component is destroyed (unmounts) OR right before the next effect runs (in the Update phase).
-                <ul className="list-disc ml-6 mt-1">
-                  <li><Code>return () =&gt; {'{/* Cleanup logic */}'};</Code></li>
-                </ul>
-              </li>
+              <li><strong>3. Unmounting (Death):</strong>
+                <br/>This is the <strong>cleanup function</strong>. You `return` it from your effect.
+                <br/><Code>useEffect(() ={'>'} {'{'} ...; return () ={'>'} {'{'} /* Cleanup */ {'}'} {'}'}, [])</Code>
+                <br/>React runs this function <em>just before</em> the component is destroyed.
+                <br/><strong>CRITICAL:</strong> You <em>must</em> use this to clean up any timers, listeners, or subscriptions to prevent <strong>memory leaks</strong>.</li>
             </ul>
-            <h4 className="text-lg font-semibold mt-4">Why Cleanup is Critical:</h4>
-            <p>The cleanup function prevents <strong className="text-gray-900">memory leaks</strong>. If you subscribe to an external service, set a timer, or add a listener, you must stop it when the component leaves the screen. Failure to clean up leads to performance degradation and runtime errors.</p>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Example demonstrating cleanup to prevent a memory leak by clearing a timer on unmount.</p>
+          <h3 className="text-2xl font-bold mb-3">Example: `useEffect` with a Timer & Cleanup</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This example shows a `Timer` component that uses `useEffect` to set up an interval (Mounting) and, crucially, clears that interval in a cleanup function (Unmounting) to prevent a memory leak.</p>
             <CodeBlock code={`
 import React, { useState, useEffect } from 'react';
 
+// --- Child Component ---
 function Timer() {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
-    // 1. Setup: This runs only once on MOUNT (due to []).
+    // 1. Setup (Mounting): This code runs ONCE
+    console.log('Timer mounted. Starting interval...');
+    
     const intervalId = setInterval(() => {
       setSeconds(prevSeconds => prevSeconds + 1);
-      console.log('Timer running...');
     }, 1000);
 
-    // 2. Cleanup: This runs on UNMOUNT.
-    // It is vital to stop the interval to prevent it from running 
-    // after the component is removed from the DOM.
+    // 2. Cleanup (Unmounting): This function is returned
+    // React will run this when the Timer component is removed.
     return () => {
-      clearInterval(intervalId);
-      console.log('Timer cleaned up.');
+      console.log('Timer unmounting. Clearing interval!');
+      clearInterval(intervalId); // <-- This prevents the memory leak!
     };
     
-  }, []); // Empty dependency array: Mount/Unmount only.
+  }, []); // <-- Empty array = "Run on Mount"
 
-  return (
-    <div>
-      <p>Time elapsed: {seconds}s</p>
-      <p className="text-sm text-gray-500">
-        (Try navigating away to see 'Timer cleaned up.' in console)
-      </p>
-    </div>
-  );
+  return <h2>Timer: {seconds}s</h2>;
 }
 
-// Main component to simulate mounting/unmounting
+// --- Parent Component ---
 function App() {
-  const [show, setShow] = useState(true);
+  const [showTimer, setShowTimer] = useState(true);
 
   return (
-    <div>
-      <button onClick={() => setShow(!show)}>
-        {show ? 'Hide Timer (Unmount)' : 'Show Timer (Mount)'}
+    <div style={{ padding: '20px' }}>
+      <button onClick={() => setShowTimer(!showTimer)}>
+        {showTimer ? 'Hide Timer (Unmount)' : 'Show Timer (Mount)'}
       </button>
-      {show && <Timer />}
+      
+      {/* When 'showTimer' is true, <Timer /> is MOUNTED.
+        When 'showTimer' is false, <Timer /> is UNMOUNTED.
+      */}
+      {showTimer && <Timer />}
     </div>
   );
 }
 
 export default App;
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p className="font-semibold">Diagram: Lifecycle Mapping to <Code>useEffect</Code></p>
-            <div className="font-mono p-4 bg-gray-100 rounded">
-              <p><strong className="text-gray-900">CLASS LIFECYCLE</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong className="text-gray-900">FUNCTIONAL EQUIVALENT</strong></p>
-              <p>| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p><strong className="text-green-600">componentDidMount()</strong> &nbsp;&nbsp;&nbsp; &harr; &nbsp;&nbsp;&nbsp; <Code>useEffect(() =&gt; {'{...}'}, <strong className="text-gray-900">[]</strong>)</Code></p>
-              <p><strong className="text-blue-600">componentDidUpdate()</strong> &nbsp;&nbsp;&nbsp; &harr; &nbsp;&nbsp;&nbsp; <Code>useEffect(() =&gt; {'{...}'}, <strong className="text-gray-900">[deps]</strong>)</Code></p>
-              <p><strong className="text-red-600">componentWillUnmount()</strong> &nbsp; &harr; &nbsp;&nbsp;&nbsp; <Code>return () =&gt; {'{ cleanup }'}</Code> inside <Code>useEffect</Code></p>
-            </div>
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Companies:</strong> <strong className="text-gray-900">Amazon</strong>, <strong className="text-gray-900">Infosys</strong>. They test conceptual knowledge of cleanup, even if you never use class components.</li>
-              <li><strong className="text-gray-900">Key Question:</strong> "When exactly does the cleanup function run?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"The cleanup function runs in two scenarios: 1) Immediately before the component is <strong className="text-gray-900">unmounted</strong>, and 2) Immediately before the effect is <strong className="text-gray-900">re-executed</strong> (if the dependencies have changed)."</li>
-                </ul>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's a "memory leak" in React?</strong>
+                <p className="pl-4">It's when a component *unmounts*, but a process it started (like a `setInterval` or a web socket subscription) *keeps running* in the background. This process might try to update state on a component that no longer exists, which causes an error and wastes system resources.</p>
               </li>
-              <li><strong className="text-gray-900">Key Question:</strong> "What is a memory leak in this context?"
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"A memory leak occurs when a component is destroyed, but its side effects (like intervals or subscriptions) continue to run in the background. They needlessly consume resources and can try to update state on a non-existent component."</li>
-                </ul>
+              <li>
+                <strong>When *exactly* does the cleanup function run?</strong>
+                <p className="pl-4">It runs in two scenarios: 1) when the component is about to be **unmounted** (destroyed), and 2) *before* the effect runs again on an **update** (if the dependencies have changed). This ensures the previous effect is always cleaned up before the new one is set.</p>
               </li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Setting up an event listener in <Code>useEffect</Code> but forgetting to call <Code>removeEventListener</Code> in the cleanup function.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>In functional components, what runs during the Unmounting phase?</li>
-            <li>What is the primary technical benefit of using a cleanup function?</li>
-            <li>Which class lifecycle method is equivalent to <Code>useEffect</Code> with an empty dependency array?</li>
-            <li>When does the cleanup function run during the "Update" phase?</li>
-          </QuizSection>
-
-          <div className="mt-8 pt-4 border-t-2 border-gray-900">
-            <h3 className="text-xl font-semibold mb-2">Quick Recap</h3>
-            <ul className="list-disc ml-6 space-y-1">
-              <li><strong className="text-gray-900">Lifecycle</strong> is managed by <strong className="text-gray-900"><Code>useEffect</Code></strong> and its dependency array.</li>
-              <li><strong className="text-gray-900">Cleanup</strong> is critical to prevent <strong className="text-gray-900">memory leaks</strong>.</li>
-              <li>The cleanup function is defined by <strong className="text-gray-900"><Code>return () =&gt; {'{...}'}</Code></strong> inside the effect.</li>
-              <li>Cleanup runs on unmount and before subsequent effect runs.</li>
-            </ul>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
         </div>
       );
     case 'react-mini-projects':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">6.12: React Mini Projects: Core Skill Application</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">6.12: React Mini Projects</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The "Final Exam"</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Learning `useState`, `props`, and `useEffect` individually is like learning grammar rules. Building a "To-Do List" is like writing your first full essay.</p>
+            <p>It's the "final exam" that forces you to *combine* all the individual concepts (state, props, events, lists, conditionals) to build a single, functional application. This is what separates a "student" from a "developer."</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Concept">
-            <p>Mini projects serve as the ultimate test of foundational React knowledge. They require the synthesis of <strong className="text-gray-900">Props, State, Events, and Conditional Rendering</strong> to solve a practical problem. Focusing on these projects proves you can move from theoretical knowledge to deployable code.</p>
-            <h4 className="text-lg font-semibold mt-2">Projects & Associated Skills:</h4>
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">To-Do List:</strong> Tests <Code>useState</Code> for array manipulation, list rendering with <Code>key</Code>, and event handling for adding/deleting items.</li>
-              <li><strong className="text-gray-900">Simple Calculator:</strong> Tests complex state management (storing numbers and operations) and controlled component input.</li>
-              <li><strong className="text-gray-900">Quiz/Survey App:</strong> Tests state management for user answers, conditional rendering for changing pages, and props for passing questions down.</li>
-              <li><strong className="text-gray-900">Weather App (API Fetch):</strong> Tests <Code>useEffect</Code> for data fetching and cleanup, and optional error state management.</li>
-            </ul>
-          </NoteSection>
-
-          {/* <NoteSection title="Diagram">
-            <p className="font-semibold">Diagram: Mini Project Skill Integration</p>
-            <div className="font-mono p-4 bg-gray-100 rounded">
-              <p>&lt;App /&gt;</p>
-              <p>| &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p>V &nbsp;&nbsp;&nbsp;&nbsp; V &nbsp;&nbsp;&nbsp;&nbsp; V &nbsp;&nbsp;&nbsp;&nbsp; V</p>
-              <p>State (useState) &harr; Event Handlers &harr; Component Logic &harr; Side Effects (useEffect)</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</p>
-              <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</p>
-              <p className="font-semibold text-blue-600">Conditional/List Rendering (JSX Output)</p>
-            </div>
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Companies:</strong> <strong className="text-gray-900">Amazon</strong>, <strong className="text-gray-900">Wipro</strong>, <strong className="text-gray-900">TCS (Technical Round)</strong>. Projects move you past the screening stage.</li>
-              <li><strong className="text-gray-900">Key Question:</strong> "Walk me through the state and logic for your To-Do List app."
-                <ul className="list-disc ml-6 mt-1">
-                  <li>"I store the todos as an <strong className="text-gray-900">array of objects</strong> in state. To add a new item, I <strong className="text-gray-900">spread the existing array</strong> and add the new object using <Code>setTodos([...prev, newItem])</Code>, ensuring <strong className="text-red-600">immutability</strong>."</li>
-                </ul>
-              </li>
-              <li><strong className="text-gray-900">Focus on Immutability:</strong> The most crucial concept tested in project discussions is the ability to update state immutably (never use <Code>push()</Code> or direct assignment).</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Candidates can explain Hooks but fail to structure a real-world app (e.g., keeping all logic in one massive component instead of splitting it into smaller components).</li>
-            </ul>
-          </NoteSection>
-
-          <QuizSection>
-            <li>What React concept is most important when deleting an item from a state array?</li>
-            <li>What Hook is required to perform data fetching for a Weather App?</li>
-            <li>What is the name for the pattern where you store the input value in state?</li>
-            <li>What is the purpose of the key prop in the <Code>map()</Code> function for a To-Do list?</li>
-          </QuizSection>
-
-          <div className="mt-8 pt-4 border-t-2 border-gray-900">
-            <h3 className="text-xl font-semibold mb-2">Quick Recap</h3>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Mini-projects are where you prove you can *synthesize* React's core concepts into a working product. The most important skill they test is your understanding of <strong>state management and data flow</strong>.</p>
+            <p><strong>Key Skills to Demonstrate:</strong></p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>Component Structure:</strong> Can you break a UI down into small, reusable components? (e.g., `TodoList`, `TodoItem`, `AddTodoForm`).</li>
+              <li><strong>State Colocation:</strong> Do you know *where* state should live? (e.g., The `todos` array must live in the *parent* component, `TodoList`, so it can be passed down).</li>
+              <li><strong>Props & Callbacks:</strong> Can you pass data (like a single `todo`) *down* as props, and pass functions (like `handleDelete`) *down* as props to let a child communicate with its parent?</li>
+              <li><strong>Immutability:</strong> Can you *safely* update state? When adding/deleting a todo, you must create a *new* array.</li>
+            </ol>
+            <p><strong>The Golden Rule: Update State Immutably</strong></p>
             <ul className="list-disc ml-6 space-y-1">
-              <li>Mini projects prove <strong className="text-gray-900">integration skills</strong>.</li>
-              <li>Always update state <strong className="text-gray-900">immutably</strong> (use spread operator <Code>...</Code>).</li>
-              <li>Split project features into small, reusable <strong className="text-gray-900">components</strong>.</li>
-              <li>Required skills: <strong className="text-gray-900"><Code>useState</Code></strong>, <strong className="text-gray-900"><Code>useEffect</Code></strong>, List rendering, and Controlled Forms.</li>
+              <li><strong>Wrong (Mutation):</strong> <Code>todos.push(newTodo); setTodos(todos);</Code></li>
+              <li><strong>Right (New Array):</strong> <Code>setTodos([...todos, newTodo]);</Code></li>
+              <li><strong>Wrong (Mutation):</strong> <Code>const index = ...; todos.splice(index, 1);</Code></li>
+              <li><strong>Right (New Array):</strong> <Code>setTodos(todos.filter(t {'=>'} t.id !== id));</Code></li>
             </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: To-Do List Core Logic</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This shows the *core logic* for a to-do list, demonstrating state, immutability, and event handling in one component.</p>
+            <CodeBlock code={`
+import React, { useState } from 'react';
+
+// Define the type for a single todo item
+type Todo = {
+  id: number;
+  text: string;
+};
+
+function TodoList() {
+  // State for the list of all todos
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: 'Learn React' },
+    { id: 2, text: 'Build a project' },
+  ]);
+  
+  // State for the *controlled input*
+  const [newTodoText, setNewTodoText] = useState('');
+
+  // Add a new todo (immutable update)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTodoText.trim() === '') return; // Don't add empty todos
+
+    const newTodo: Todo = {
+      id: Date.now(), // Simple unique ID
+      text: newTodoText,
+    };
+    
+    // Create a new array using the spread operator
+    setTodos([...todos, newTodo]);
+    setNewTodoText(''); // Clear the input
+  };
+
+  // Delete a todo (immutable update)
+  const handleDelete = (idToDelete: number) => {
+    // .filter() creates a new array, which is immutable
+    setTodos(todos.filter(todo => todo.id !== idToDelete));
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input 
+          type="text" 
+          value={newTodoText}
+          onChange={e => setNewTodoText(e.target.value)}
+          placeholder="Add a new task"
+        />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul>
+        {todos.map(todo => (
+          <li key={todo.id}>
+            {todo.text}
+            <button onClick={() => handleDelete(todo.id)} style={{ marginLeft: '10px' }}>
+              X
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Why is immutability so important in React?</strong>
+                <p className="pl-4">React decides when to re-render by comparing the *reference* of the old state and the new state. If you *mutate* an array (like with `.push()`), the *reference* to the array in memory doesn't change. React compares the old and new array, sees the same reference, and *incorrectly assumes nothing changed*, so it <strong>skips the re-render</strong>. Creating a new array (with `[...todos]` or `.filter()`) gives React a new reference, which signals it to update the UI.</p>
+              </li>
+              <li>
+                <strong>How would I split this To-Do list into components?</strong>
+                <p className="pl-4">You would create a <Code>&lt;TodoItem /&gt;</Code> component. The <Code>&lt;TodoList /&gt;</Code> component would map over the `todos` array and render a <Code>&lt;TodoItem /&t;</Code> for each one, passing the `todo` object and the `handleDelete` function down as <em>props</em>.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
         </div>
       );
     default:
       return (
-        <div className="p-8">
-          <h2 className="text-2xl font-semibold">Note Not Found</h2>
-          <p>Please select a topic from the sidebar.</p>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h1 className="text-3xl font-bold mb-4">Select a Subchapter</h1>
+          <div className="space-y-4">
+            <p className="text-lg text-gray-700">Please select a topic from the sidebar to view the notes.</p>
+          </div>
         </div>
       );
   }

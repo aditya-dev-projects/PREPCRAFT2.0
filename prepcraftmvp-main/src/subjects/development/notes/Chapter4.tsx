@@ -1,7 +1,56 @@
 import React, { useState } from 'react';
 
-// --- Mini Project Preview Component ---
-// We define this separately so we can use state and keep the logic clean.
+// --- Reusable Helper Components (Light Theme) ---
+
+const CodeBlock = ({ code, language = 'javascript' }: { code: string, language?: string }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = code.trim();
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      navigator.clipboard.writeText(code.trim()).then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }).catch(navErr => {
+        console.error('Clipboard API also failed: ', navErr);
+      });
+    }
+  };
+
+  return (
+    <div className="relative my-4">
+      <pre className={`bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm language-${language}`}>
+        <code>{code.trim()}</code>
+      </pre>
+      <button
+        onClick={handleCopy}
+        className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-semibold py-1 px-2 rounded-md transition-all duration-200"
+      >
+        {isCopied ? 'Copied!' : 'Copy'}
+      </button>
+    </div>
+  );
+};
+
+const Code = ({ children }: { children: React.ReactNode }) => (
+  <code className="bg-gray-200 text-red-700 font-mono px-1.5 py-0.5 rounded-md text-sm">
+    {children}
+  </code>
+);
+
+// --- Mini Project Preview Component (Light Theme) ---
 const MiniProjectPreview: React.FC = () => {
   const [userScore, setUserScore] = useState(0);
   const [computerScore, setComputerScore] = useState(0);
@@ -45,41 +94,41 @@ const MiniProjectPreview: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-      <h1 className="text-3xl font-bold mb-4">4.11: Mini Project Preview</h1>
-        <div className="space-y-4">
-            <p className="text-lg opacity-90">
-                Here is a live, functional preview of the Stone, Paper, Scissors game built using the concepts from this chapter (React state and event handlers).
-            </p>
-            <div className="p-4 sm:p-6 mt-4 bg-gray-700 rounded-lg border border-gray-600 shadow-lg">
-                <div className="flex justify-around text-center mb-6">
-                <div>
-                    <h2 className="text-xl font-bold">User Score</h2>
-                    <p className="text-4xl font-mono text-blue-300 mt-2">{userScore}</p>
-                </div>
-                <div>
-                    <h2 className="text-xl font-bold">Computer Score</h2>
-                    <p className="text-4xl font-mono text-blue-300 mt-2">{computerScore}</p>
-                </div>
-                </div>
-                
-                <div className="text-center my-8">
-                    <h3 className="text-lg font-semibold">Your Choice: <span className="text-yellow-300 font-bold capitalize">{userChoice || '-'}</span></h3>
-                    <h3 className="text-lg font-semibold">Computer's Choice: <span className="text-yellow-300 font-bold capitalize">{computerChoice || '-'}</span></h3>
-                </div>
-
-                <div className="text-center min-h-[50px] flex items-center justify-center">
-                <p className="font-semibold text-lg text-yellow-300">{resultMessage}</p>
-                </div>
-
-                <div className="choices text-center mt-6">
-                <h3 className="text-lg font-semibold mb-4">Choose your weapon:</h3>
-                <button onClick={() => playRound('stone')} className="py-2 px-4 m-2 text-lg bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200">Stone</button>
-                <button onClick={() => playRound('paper')} className="py-2 px-4 m-2 text-lg bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200">Paper</button>
-                <button onClick={() => playRound('scissors')} className="py-2 px-4 m-2 text-lg bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200">Scissors</button>
-                </div>
+    <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+      <h2 className="text-3xl font-bold mb-4">4.11: Mini Project Preview</h2>
+      <div className="space-y-4">
+        <p className="text-lg text-gray-700">
+          Here is a live, functional preview of the Stone, Paper, Scissors game built using the concepts from this chapter.
+        </p>
+        <div className="p-4 sm:p-6 mt-4 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+          <div className="flex justify-around text-center mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">User Score</h2>
+              <p className="text-4xl font-mono text-blue-600 mt-2">{userScore}</p>
             </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Computer Score</h2>
+              <p className="text-4xl font-mono text-red-600 mt-2">{computerScore}</p>
+            </div>
+          </div>
+          
+          <div className="text-center my-8">
+            <h3 className="text-lg font-semibold">Your Choice: <span className="text-gray-700 font-bold capitalize">{userChoice || '-'}</span></h3>
+            <h3 className="text-lg font-semibold">Computer's Choice: <span className="text-gray-700 font-bold capitalize">{computerChoice || '-'}</span></h3>
+          </div>
+
+          <div className="text-center min-h-[50px] flex items-center justify-center">
+            <p className="font-semibold text-lg text-gray-800">{resultMessage}</p>
+          </div>
+
+          <div className="choices text-center mt-6">
+            <h3 className="text-lg font-semibold mb-4">Choose your weapon:</h3>
+            <button onClick={() => playRound('stone')} className="py-2 px-4 m-2 text-lg bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">Stone</button>
+            <button onClick={() => playRound('paper')} className="py-2 px-4 m-2 text-lg bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">Paper</button>
+            <button onClick={() => playRound('scissors')} className="py-2 px-4 m-2 text-lg bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200">Scissors</button>
+          </div>
         </div>
+      </div>
     </div>
   );
 };
@@ -87,1333 +136,1064 @@ const MiniProjectPreview: React.FC = () => {
 // --- Main Chapter Component ---
 
 const Chapter4 = ({ noteId }: { noteId: string }) => {
-  switch (noteId) {
-    case 'javascript-basics':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.1: JavaScript Basics (Variables, Data Types, Operators)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              JavaScript (JS) is the programming language that brings websites to life. While HTML provides the structure and CSS provides the style, JavaScript adds <strong>interactivity and dynamic functionality</strong>. This chapter covers the absolute fundamentals: how to store information, the different types of data, and how to perform operations on that data.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: The Brain of the Webpage</h2>
-            <p className="opacity-90">
-              If HTML is the skeleton and CSS is the appearance, JavaScript is the brain and nervous system. It's a scripting language that allows you to manipulate the content and styles of a webpage in response to user actions. It runs directly in the user's web browser, which is why it's known as a "client-side" language.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">2. How to Add JavaScript to a Webpage</h2>
-            <p className="opacity-90">
-              You add JavaScript to an HTML file using the `&lt;script&gt;` tag. There are two primary ways to do this.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-bold">Internal JavaScript</h3>
-                <p className="text-sm opacity-90 mt-1">You can write your JS code directly inside `&lt;script&gt;` tags, usually placed right before the closing `&lt;/body&gt;` tag.</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'<body>\n  <!-- ... html content ... -->\n  <script>\n    alert("Hello, World!");\n  </script>\n</body>'}</code></pre>
-              </div>
-              <div>
-                <h3 className="font-bold">External JavaScript (Best Practice)</h3>
-                <p className="text-sm opacity-90 mt-1">For cleaner code, you write your JS in a separate `.js` file and link to it using the `src` attribute.</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'<!-- In your HTML file -->\n<script src="myscripts.js"></script>'}</code></pre>
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">3. Variables: `let`, `const`, and `var`</h2>
-            <p className="opacity-90">
-              A variable is a container for storing a piece of data. In modern JavaScript, we have three keywords to declare them.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-3 opacity-90">
-                <li>
-                    <strong>`let`</strong>: Used for variables whose value might change later.
-                    <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'let userAge = 25;\nuserAge = 26; // This is allowed'}</code></pre>
-                </li>
-                <li>
-                    <strong>`const`</strong>: Used for variables whose value will **not** change (a constant). This is the preferred way to declare variables.
-                    <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'const birthYear = 1998;\n// birthYear = 1999; // This would cause an error'}</code></pre>
-                </li>
-                <li>
-                    <strong>`var`</strong>: The old way of declaring variables. It has quirky behavior (related to scope) and is generally avoided in modern JavaScript.
-                </li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">4. Primitive Data Types</h2>
-            <p className="opacity-90">
-              These are the most basic data types in JavaScript.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-3 opacity-90 mt-2">
-                <li><strong>String:</strong> A sequence of characters used for text. You can use single quotes (`'...'`), double quotes (`"..."`), or backticks (`` `...` ``).</li>
-                <li><strong>Number:</strong> Represents both integers (e.g., 100) and floating-point numbers (e.g., 99.99).</li>
-                <li><strong>Boolean:</strong> Can only have two values: `true` or `false`. Used for making decisions.</li>
-                <li><strong>`null`:</strong> Represents the intentional absence of any object value.</li>
-                <li><strong>`undefined`:</strong> A variable that has been declared but has not yet been assigned a value.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Non-Primitive Data Types</h2>
-            <p className="opacity-90">
-              These are more complex data structures used to store collections of data.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-3 opacity-90 mt-2">
-                <li><strong>Object:</strong> A collection of key-value pairs used to group related data.
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                      {`const person = {\n  firstName: "John",\n  age: 30,\n  isStudent: false\n};`}
-                  </code></pre>
-                </li>
-                <li><strong>Array:</strong> A special type of object used to store an ordered list of values.
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{`const colors = ["red", "green", "blue"];`}</code></pre>
-                </li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">6. Arithmetic & Assignment Operators</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">Arithmetic Operators</h3>
-              <ul className="list-disc ml-6 space-y-2 mt-2 opacity-90">
-                <li>`+` (Addition), `-` (Subtraction), `*` (Multiplication), `/` (Division)</li>
-                <li>`%` (Modulo): Returns the remainder of a division. `10 % 3` is `1`.</li>
-                <li>`**` (Exponentiation): `2 ** 3` is `8`.</li>
-              </ul>
-              <h3 className="font-bold mt-4">Assignment Operators</h3>
-              <ul className="list-disc ml-6 space-y-2 mt-2 opacity-90">
-                <li>`=` (Assignment): `let x = 10;`</li>
-                <li>`+=` (Add and assign): `x += 5;` is the same as `x = x + 5;`.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">7. Comparison & Logical Operators</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">Comparison Operators</h3>
-              <ul className="list-disc ml-6 space-y-2 mt-2 opacity-90">
-                <li>`==` (Loose Equality): Checks value only. (`5 == "5"` is `true`). Avoid this.</li>
-                <li>`===` (Strict Equality): Checks value AND type. (**Best practice.** `5 === "5"` is `false`).</li>
-                <li>`!=` (Not equal) and `!==` (Strictly not equal).</li>
-                <li>`&gt;` (Greater than), `&lt;` (Less than), `&gt;=` (Greater than or equal to), `&lt;=` (Less than or equal to).</li>
-              </ul>
-              <h3 className="font-bold mt-4">Logical Operators</h3>
-              <ul className="list-disc ml-6 space-y-2 mt-2 opacity-90">
-                <li>`&&` (AND): Returns `true` only if both conditions are true.</li>
-                <li>`||` (OR): Returns `true` if at least one condition is true.</li>
-                <li>`!` (NOT): Inverts a boolean value (`!true` becomes `false`).</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">8. `typeof` Operator</h2>
-            <p className="opacity-90">
-              The `typeof` operator returns a string indicating the type of a variable. It's very useful for debugging.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {`typeof "Hello"; // "string"`}<br/>
-                {`typeof 100;    // "number"`}<br/>
-                {`typeof true;   // "boolean"`}<br/>
-                {`typeof {};    // "object"`}<br/>
-                {`typeof [];    // "object" (Arrays are a type of object)`}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary for Beginners</h2>
-            <p className="opacity-90">
-              Starting with JavaScript basics sets a strong foundation for everything else.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-3 opacity-90">
-                <li><strong>Use `const` by Default:</strong> Always declare your variables with `const`. If you realize later that you need to reassign it, change it to `let`. Avoid `var`.</li>
-                <li><strong>Use Strict Equality (`===`):</strong> Always use `===` for comparisons to avoid bugs from type coercion.</li>
-                <li><strong>Use the Console:</strong> `console.log()` is your best friend for debugging. Use it constantly to check the values of your variables.</li>
-                <li><strong>Naming Conventions:</strong> Use `camelCase` for variable names (e.g., `firstName`, `userIsLoggedIn`).</li>
-              </ol>
-            </div>
+  switch (noteId) {
+    case 'javascript-basics':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.1: JavaScript Basics (Variables, Data Types, Operators)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Digital Brain</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>If HTML is the "skeleton" of a webpage and CSS is the "skin," then JavaScript (JS) is the "brain." It's a programming language that brings the webpage to life, allowing it to react to user clicks, handle data, and make decisions. It runs directly in the user's browser, which is why it's called a <strong>client-side</strong> language.</p>
           </div>
-        </div>
-      );
-    case 'control-structures':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.2: Control Structures (Conditionals, Loops)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Control Structures are the decision-making parts of a programming language. They allow your code to take different paths and perform repetitive tasks based on specific conditions. If variables are the nouns, control structures are the verbs and conjunctions that create intelligent, dynamic behavior.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: Giving Your Code a Brain</h2>
-            <p className="opacity-90">
-              By default, code runs from top to bottom, one line at a time. Control structures break this linear flow, allowing your program to think and act.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">The Two Main Abilities:</h3>
-              <ul className="list-disc ml-6 mt-2 space-y-2 opacity-90">
-                <li><strong>Making Decisions (Conditionals):</strong> Choose a path based on a `true` or `false` condition. (e.g., "<strong>If</strong> the user is logged in, show the dashboard. <strong>Else</strong>, show the login page.")</li>
-                <li><strong>Repeating Actions (Loops):</strong> Execute a block of code multiple times. (e.g., "<strong>For</strong> each item in a shopping cart, display its price.")</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Conditional: The `if...else` Statement</h2>
-            <p className="opacity-90">
-              This is the primary tool for decision-making. It executes a block of code if a specified condition is true, and another block if it is false.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-3 opacity-90">
-                <li><strong>`if`</strong>: Runs the code block only if its condition is `true`.</li>
-                <li><strong>`else if`</strong>: If the first `if` is `false`, this checks a new condition.</li>
-                <li><strong>`else`</strong>: If all preceding conditions are `false`, this code block will run.</li>
-              </ul>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {`const hour = 14;`}<br/><br/>
-                {`if (hour < 12) {`}<br/>
-                {'  console.log("Good morning!");'}<br/>
-                {`} else if (hour < 18) {`}<br/>
-                {'  console.log("Good afternoon!"); // This block will run'}<br/>
-                {`} else {`}<br/>
-                {'  console.log("Good evening!");'}<br/>
-                {'}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Truthy and Falsy Values</h2>
-            <p className="opacity-90">In JavaScript, conditions don't have to be strictly `true` or `false`. All values have an inherent "truthiness". It's crucial to know which values are "falsy".</p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-                <h3 className="font-bold">There are only a few falsy values in JavaScript:</h3>
-                <ul className="list-disc ml-6 mt-2 opacity-90">
-                  <li>`false`</li>
-                  <li>`0` (the number zero)</li>
-                  <li>`""` (an empty string)</li>
-                  <li>`null`</li>
-                  <li>`undefined`</li>
-                  <li>`NaN` (Not a Number)</li>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>JavaScript is a <strong>dynamically-typed</strong>, high-level programming language. The fundamentals involve storing data in variables, understanding the different types of data, and performing operations on them.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Variables:</strong> Containers for storing data values.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>const</Code>: Used for "constants," or variables that **will not be reassigned**. This is the modern default.</li>
+                  <li><Code>let</Code>: Used for variables whose values **can be reassigned**.</li>
+                  <li><Code>var</Code>: The old, function-scoped way. **Avoid using `var`** in modern JS.</li>
                 </ul>
-                <p className="mt-2 opacity-90"><strong>Everything else is truthy</strong> (e.g., `"hello"`, `-1`, `[]`, `{'{...}'}`).</p>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">4. Conditional: The `switch` Statement</h2>
-            <p className="opacity-90">The `switch` statement is a cleaner alternative to a long `if...else if...else` chain when you are checking a single variable against multiple possible values.</p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                  {`const day = new Date().getDay(); // 0 (Sun) to 6 (Sat)`}<br/><br/>
-                  {`switch (day) {`}<br/>
-                  {'  case 0:'}<br/>
-                  {'    console.log("It is Sunday!");'}<br/>
-                  {'    break; // The \'break\' keyword exits the switch'}<br/>
-                  {'  case 6:'}<br/>
-                  {'    console.log("It is Saturday!");'}<br/>
-                  {'    break;'}<br/>
-                  {'  default: // Runs if no other case matches'}<br/>
-                  {'    console.log("It is a weekday.");'}<br/>
-                  {'}'}
-                </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">5. Conditional: The Ternary Operator</h2>
-            <p className="opacity-90">
-              The ternary operator is a clean, one-line shortcut for a simple `if...else` statement. It's often used for assigning a value to a variable.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-                <h3 className="font-bold">Syntax: `condition ? valueIfTrue : valueIfFalse;`</h3>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                    {`const age = 20;`}<br/>
-                    {`const canVote = age >= 18 ? "Yes" : "No";`}<br/>
-                    {'console.log(canVote); // "Yes"'}
-                </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">6. Loop: The `for` Loop</h2>
-            <p className="opacity-90">
-              The `for` loop is ideal when you know exactly **how many times** you want the loop to run. It has three parts: <strong>initialization</strong>, <strong>condition</strong>, and <strong>increment</strong>.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                  {`for (let i = 0; i < 5; i++) {`}<br/>
-                  {'  console.log("The number is " + i);'}<br/>
-                  {'}'}<br/>
-                  {'// Prints numbers 0, 1, 2, 3, 4'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Loop: The `while` Loop</h2>
-            <p className="opacity-90">
-              The `while` loop is best when you want a loop to run as long as a condition is `true`, but you don't know the exact number of iterations.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                  {`let i = 0;`}<br/>
-                  {`while (i < 5) {`}<br/>
-                  {'  console.log("The number is " + i);'}<br/>
-                  {'  i++;'}<br/>
-                  {'}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Loop Control: `break` and `continue`</h2>
-            <p className="opacity-90">You can alter the flow of a loop from within the loop itself.</p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                  <h3 className="font-bold">The `break` Statement</h3>
-                  <p className="text-sm opacity-90 mt-1">**Exits the loop immediately**, regardless of the loop's condition.</p>
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{`for (let i = 0; i < 10; i++) {\n  if (i === 5) { break; }\n}\n// Loop stops at 5`}</code></pre>
-              </div>
-              <div>
-                  <h3 className="font-bold">The `continue` Statement</h3>
-                  <p className="text-sm opacity-90 mt-1">**Skips the current iteration** and proceeds to the next one.</p>
-                  <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{`for (let i = 0; i < 5; i++) {\n  if (i === 2) { continue; }\n}\n// Skips 2, prints 0, 1, 3, 4`}</code></pre>
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Using control structures effectively is the key to writing functional programs.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Choose the Right Conditional:</strong> Use `if...else` for complex logic, `switch` for checking a single variable against many values, and the ternary operator for simple assignments.</li>
-                <li><strong>Avoid Infinite Loops:</strong> When using a `while` loop, always make sure there is a condition inside the loop that will eventually make the loop condition `false`.</li>
-                <li><strong>Know Truthy/Falsy:</strong> Understand what values JavaScript considers `true` or `false` to write more concise and robust conditions.</li>
-              </ol>
-            </div>
+              </li>
+              <li><strong>Primitive Data Types:</strong> The most basic data.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>String:</strong> Text, wrapped in quotes (e.g., `"Hello"`, `'world'`).</li>
+                  <li><strong>Number:</strong> Both integers (e.g., `100`) and floating-point (e.g., `10.5`).</li>
+                  <li><strong>Boolean:</strong> A logical value, either `true` or `false`.</li>
+                  <li><strong><Code>null</Code>:</strong> Represents the intentional absence of a value.</li>
+                  <li><strong><Code>undefined</Code>:</strong> Represents a variable that has been declared but not assigned.</li>
+                </ul>
+              </li>
+              <li><strong>Complex Data Types:</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>Object:</strong> A collection of key-value pairs (e.g., <Code>{'{'} name: "Alex", age: 30 {'}'}</Code>).</li>
+                  <li><strong>Array:</strong> A list-like object (e.g., `[1, "hello", true]`).</li>
+                </ul>
+              </li>
+              <li><strong>Operators:</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>Arithmetic:</strong> `+`, `-`, `*`, `/`, `%` (remainder).</li>
+                  <li><strong>Assignment:</strong> `=`, `+=`, `-=`.</li>
+                  <li><strong>Comparison:</strong> `===` (strict equality, checks type & value), `!==` (strict inequality). **Always use strict equality.**</li>
+                  <li><strong>Logical:</strong> `&&` (AND), `||` (OR), `!` (NOT).</li>
+                </ul>
+              </li>
+            </ul>
           </div>
-        </div>
-      );
-    case 'functions-scope':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.3: Functions & Scope</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Functions are one of the most fundamental building blocks in JavaScript. They are reusable blocks of code that you can define once and run many times. **Scope** is the concept that determines the accessibility (visibility) of variables. Understanding how functions and scope work together is essential for writing clean, organized, and bug-free code.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Reusable Recipe</h2>
-            <p className="opacity-90">
-              Think of a function like a recipe for baking a cake.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Defining the function</strong> is like writing down the recipe.</li>
-                <li><strong>Calling the function</strong> is like actually following the recipe to bake a cake.</li>
-                <li><strong>Parameters (or arguments)</strong> are the ingredients you provide (e.g., `flour: 2`, `eggs: 3`).</li>
-                <li>The <strong>`return` value</strong> is the finished cake.</li>
-              </ul>
-              <p className="mt-2 opacity-90">This allows you to bake a cake whenever you want without re-writing the steps, promoting **reusability**.</p>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">Example: Variables and Operators</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This code demonstrates declaring variables, using different data types, and performing operations. You can run this in your browser's console.</p>
+            <CodeBlock code={`
+// 1. Declaring variables with const and let
+const basePrice = 100;
+let userAge = 25;
+let discountPercent = 0;
 
-            <h2 className="text-2xl font-semibold pt-4">2. Function Declaration</h2>
-            <p className="opacity-90">
-              This is the classic way to define a named function. Function declarations are **hoisted**, meaning they are loaded into memory at the start, so you can call them *before* they are defined in the code.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'// Defining the function with two parameters: num1 and num2'}<br/>
-                {'function add(num1, num2) {'}<br/>
-                {'  return num1 + num2;'}<br/>
-                {'}'}<br/><br/>
-                {'// Calling the function with two arguments: 5 and 10'}<br/>
-                {'const result = add(5, 10); // result is 15'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Function Expression</h2>
-            <p className="opacity-90">
-              Here, the function is created and assigned to a variable. The function itself can be anonymous (it doesn't have a name). Function expressions are **not** hoisted.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const multiply = function(num1, num2) {'}<br/>
-                {'  return num1 * num2;'}<br/>
-                {'};'}<br/><br/>
-                {'const product = multiply(4, 7); // product is 28'}
-              </code></pre>
-            </div>
+// 2. Using operators (logical &&, comparison >=)
+if (userAge >= 65) {
+  discountPercent = 0.2; // 20% discount for seniors
+}
 
-            <h2 className="text-2xl font-semibold pt-4">4. Arrow Functions (ES6+)</h2>
-            <p className="opacity-90">
-              ES6 introduced arrow functions (`=&gt;`), which provide a shorter syntax and are now the most common way to write functions in modern JavaScript.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'// The same multiply function as an arrow function'}<br/>
-                {'const multiply = (num1, num2) => {'}<br/>
-                {'  return num1 * num2;'}<br/>
-                {'};'}<br/><br/>
-                {'// For single-line functions, it gets even shorter:'}<br/>
-                {'const subtract = (num1, num2) => num1 - num2;'}<br/><br/>
-                {'const difference = subtract(10, 3); // difference is 7'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. The `return` Keyword</h2>
-            <p className="opacity-90">
-              The `return` statement ends the function's execution and specifies a value to be sent back. A function without a `return` statement implicitly returns `undefined`.
-            </p>
+// 3. Reassigning a 'let' variable
+userAge = userAge + 1; 
 
-            <h2 className="text-2xl font-semibold pt-4">6. Understanding Scope</h2>
-            <p className="opacity-90">
-              Scope determines the accessibility of variables. JavaScript has three main types of scope.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Global Scope:</strong> Variables declared outside of any function. They can be accessed from anywhere. (Avoid this as much as possible!)</li>
-                <li><strong>Function Scope:</strong> Variables declared inside a function. They can only be accessed within that function.</li>
-                <li><strong>Block Scope:</strong> Variables declared with `let` and `const` inside a block (`{'{...}'}`), like in an `if` statement, are only accessible within that block.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Scope Example in Practice</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const globalVar = "I am global"; // Global Scope'}<br/><br/>
-                {'function myFunction() {'}<br/>
-                {'  const functionVar = "I am in a function"; // Function Scope'}<br/>
-                {'  console.log(globalVar); // "I am global"'}<br/><br/>
-                {'  if (true) {'}<br/>
-                {'    let blockVar = "I am in a block"; // Block Scope'}<br/>
-                {'    console.log(blockVar); // "I am in a block"'}<br/>
-                {'  }'}<br/><br/>
-                {'  // console.log(blockVar); // ERROR! blockVar is not defined here'}<br/>
-                {'}'}<br/><br/>
-                {'myFunction();'}<br/>
-                {'// console.log(functionVar); // ERROR! functionVar is not defined here'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Default Parameters (ES6+)</h2>
-            <p className="opacity-90">
-              You can provide default values for function parameters, which will be used if the argument is not provided.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function greet(name = "Guest") {'}<br/>
-                {'  console.log(`Hello, ${name}!`);'}<br/>
-                {'}'}<br/><br/>
-                {'greet("Alice"); // Hello, Alice!'}<br/>
-                {'greet();      // Hello, Guest!'}
-              </code></pre>
-            </div>
+// 4. Arithmetic operators
+const discountAmount = basePrice * discountPercent;
+const finalPrice = basePrice - discountAmount;
 
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Functions are the workhorses of JavaScript.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Write Small, Single-Purpose Functions:</strong> A good function does one thing and does it well.</li>
-                <li><strong>Prefer Arrow Functions:</strong> Use the modern `=&gt;` syntax for its conciseness.</li>
-                <li><strong>Use `const` and `let`:</strong> Always declare variables within the smallest scope they are needed (Block or Function scope). Avoid `var`.</li>
-                <li><strong>Minimize Global Variables:</strong> Keep your global scope clean to prevent bugs.</li>
-              </ol>
-            </div>
+// 5. String concatenation (old way)
+console.log("Your final price is: " + finalPrice);
+
+// 6. Template Literals (modern way)
+console.log(\`You are \${userAge} and your price is \${finalPrice}\`);
+            `} language="javascript" />
           </div>
-        </div>
-      );
-    case 'arrays-methods':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.4: Arrays & Array Methods</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Arrays are a fundamental data structure in JavaScript. They are a special type of object used to store an ordered list of values. Mastering how to create, access, and manipulate arrays is a critical skill, especially with the powerful "array methods" that allow you to loop, transform, and filter data.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Labeled Shelf</h2>
-            <p className="opacity-90">
-              Think of an array as a numbered shelf. You can store different items (values) on this shelf, and each position on the shelf has a specific number, called an <strong>index</strong>.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Arrays can hold any data type: strings, numbers, booleans, objects, or even other arrays.</li>
-                <li>They are <strong>zero-indexed</strong>: the first item is at index 0, the second at index 1, and so on.</li>
-                <li>The `length` of an array is the total number of items it contains.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Creating and Accessing Array Elements</h2>
-            <p className="opacity-90">
-              You create an array using square brackets `[]`.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'// Creating an array of strings'}<br/>
-                {'const fruits = ["Apple", "Banana", "Cherry"];'}<br/><br/>
-                {'// Accessing elements using their index'}<br/>
-                {'console.log(fruits[0]); // "Apple"'}<br/>
-                {'console.log(fruits[1]); // "Banana"'}<br/><br/>
-                {'// Getting the total number of items'}<br/>
-                {'console.log(fruits.length); // 3'}<br/><br/>
-                {'// Modifying an element'}<br/>
-                {'fruits[1] = "Blueberry";'}<br/>
-                {'console.log(fruits); // ["Apple", "Blueberry", "Cherry"]'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Basic Mutating Methods</h2>
-            <p className="opacity-90">
-              These common methods **modify the original array** directly.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-bold">`push()` - Add to End</h3>
-                <p className="text-sm opacity-90 mt-1">Adds one or more elements to the **end** of an array.</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'fruits.push("Mango");'}</code></pre>
-              </div>
-              <div>
-                <h3 className="font-bold">`pop()` - Remove from End</h3>
-                <p className="text-sm opacity-90 mt-1">Removes the **last** element from an array.</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'fruits.pop();'}</code></pre>
-              </div>
-              <div>
-                <h3 className="font-bold">`unshift()` - Add to Start</h3>
-                <p className="text-sm opacity-90 mt-1">Adds elements to the **beginning** of an array.</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'fruits.unshift("Strawberry");'}</code></pre>
-              </div>
-              <div>
-                <h3 className="font-bold">`shift()` - Remove from Start</h3>
-                <p className="text-sm opacity-90 mt-1">Removes the **first** element from an array.</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'fruits.shift();'}</code></pre>
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. The `forEach` Method (Looping)</h2>
-            <p className="opacity-90">
-              Executes a provided function once for each array element. It's a simple way to loop.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const numbers = [1, 2, 3];'}<br/>
-                {'numbers.forEach((number, index) => {'}<br/>
-                {'  console.log(`Item at index ${index} is ${number}`);'}<br/>
-                {'});'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">5. Immutable Methods: The "Big Three"</h2>
-            <p className="opacity-90">
-              These are the most powerful array methods. They **do not mutate** the original array; instead, they return a **new array**. This is a core concept in modern frameworks like React.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">6. `map()` - To Transform</h2>
-            <p className="opacity-90">
-              The `map()` method creates a new array by applying a function to **every element** of the original array. It's perfect for transforming data.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const numbers = [1, 2, 3];'}<br/>
-                {'const doubled = numbers.map(num => num * 2);'}<br/>
-                {'// doubled is [2, 4, 6]'}<br/>
-                {'// numbers is still [1, 2, 3]'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. `filter()` - To Select</h2>
-            <p className="opacity-90">
-              The `filter()` method creates a new array with all elements that **pass a test** (return `true`) from a given function. It's used to filter out items you don't need.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const numbers = [1, 2, 3, 4, 5];'}<br/>
-                {'const evens = numbers.filter(num => num % 2 === 0);'}<br/>
-                {'// evens is [2, 4]'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. `reduce()` - To Aggregate</h2>
-            <p className="opacity-90">
-              The `reduce()` method executes a "reducer" function on each element, resulting in a **single output value**. It's perfect for summing up numbers, or grouping data.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const numbers = [1, 2, 3, 4, 5];'}<br/>
-                {'// The 0 is the initial value for the accumulator'}<br/>
-                {'const sum = numbers.reduce((accumulator, current) => accumulator + current, 0);'}<br/>
-                {'// sum is 15'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Other Useful Methods</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`find()`:</strong> Returns the **first element** that satisfies a test.</li>
-                <li><strong>`findIndex()`:</strong> Returns the **index** of the first element that satisfies a test.</li>
-                <li><strong>`includes()`:</strong> Returns `true` or `false` if an array contains a certain value.</li>
-                <li><strong>`slice()`:</strong> Returns a shallow copy of a portion of an array. (Immutable)</li>
-                <li><strong>`splice()`:</strong> Changes the contents of an array by removing or replacing existing elements. (Mutates the original array!)</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">10. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Modern JavaScript development relies heavily on functional, immutable array methods.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Prefer Immutable Methods:</strong> Favor `map`, `filter`, and `reduce` over methods that mutate the original array (like `push` or `splice`), especially in React.</li>
-                <li><strong>Chain Methods:</strong> You can chain these methods together for clean, powerful operations.</li>
-                <li><strong>Use `forEach` for Side Effects:</strong> If you just need to do something (like `console.log`) for each element, `forEach` is perfect.</li>
-              </ol>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the real difference between `const` and `let`? When do I use them?</strong>
+                <p className="pl-4">Use <Code>const</Code> by default for everything (variables, arrays, objects). This prevents you from accidentally reassigning a variable. Use <Code>let</Code> *only* when you know a variable's value needs to change, such as a counter in a loop (`let i = 0`) or a value that gets updated (`let score = 0`).</p>
+              </li>
+              <li>
+                <strong>Why should I use `===` instead of `==`?</strong>
+                <p className="pl-4">The double-equals (`==`) performs <strong>type coercion</strong>, meaning it tries to convert the values before comparing them. This leads to unpredictable bugs (e.g., `0 == false` is `true`). The triple-equals (`===`) is <strong>strict</strong>: it checks both the value *and* the type. `0 === false` is `false`. Always use `===` to prevent bugs.</p>
+              </li>
+            </ul>
           </div>
-        </div>
-      );
-    case 'objects-methods':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.5: Objects & Object Methods</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              Objects are the most fundamental and versatile data structure in JavaScript. While primitive types store a single value (like a number), objects are complex data types used to store a collection of related data and functionality. Almost everything in JavaScript is an object, so understanding them deeply is crucial.
-            </p>
+          <hr className="mb-6 border-gray-200" />
 
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Real-World Entity</h2>
-            <p className="opacity-90">
-              Think of an object in JavaScript just like an object in the real world—a car, a person, a dog. A real-world object has **properties** (like a car's color) and **methods** (actions it can perform, like `start()`).
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <p className="opacity-90">In JavaScript, an object is a collection of **key-value pairs**.</p>
-              <ul className="list-disc ml-6 mt-2 space-y-2 opacity-90">
-                <li><strong>Keys (or Properties):</strong> These are strings that act as the name or label for a piece of data.</li>
-                <li><strong>Values:</strong> These can be any data type—a string, number, boolean, array, or even another object or a function.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Creating an Object (Object Literal)</h2>
-            <p className="opacity-90">
-              The most common way to create an object is using object literal syntax: curly braces `{}`.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const person = {'}<br/>
-                {'  firstName: "John",'}<br/>
-                {'  lastName: "Doe",'}<br/>
-                {'  age: 30,'}<br/>
-                {'  isStudent: false'}<br/>
-                {'};'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">3. Accessing Properties</h2>
-            <p className="opacity-90">
-              There are two ways to access the value of a property.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-bold">Dot Notation (Preferred)</h3>
-                <p className="text-sm opacity-90 mt-1">Clean and easy to read. `object.key`</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'console.log(person.firstName); // "John"'}</code></pre>
-              </div>
-              <div>
-                <h3 className="font-bold">Bracket Notation</h3>
-                <p className="text-sm opacity-90 mt-1">Useful when the key is a variable or contains spaces. `object['key']`</p>
-                <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">{'console.log(person["age"]); // 30'}</code></pre>
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">4. Object Methods</h2>
-            <p className="opacity-90">
-              When the value of a property is a function, it is called a <strong>method</strong>. Methods define the actions that an object can perform.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const person = {'}<br/>
-                {'  name: "Alice",'}<br/>
-                {'  greet: function() {'}<br/>
-                {'    console.log("Hello, my name is " + this.name);'}<br/>
-                {'  }'}<br/>
-                {'};'}<br/><br/>
-                {'// Calling the method'}<br/>
-                {'person.greet(); // Outputs: "Hello, my name is Alice"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. The `this` Keyword</h2>
-            <p className="opacity-90">
-              The `this` keyword is a special identifier that refers to the **object that is currently executing the code**. Inside an object method, `this` gives you access to the other properties of that same object. In the example above, `this.name` refers to the `name` property of the `person` object.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">6. Modifying Objects</h2>
-            <p className="opacity-90">
-              Even if an object is declared with `const`, you can still change, add, or delete its properties. `const` only prevents reassigning the variable itself.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const user = { name: "Bob" };'}<br/><br/>
-                {'// Modifying a property'}<br/>
-                {'user.name = "Charlie";'}<br/><br/>
-                {'// Adding a new property'}<br/>
-                {'user.age = 40;'}<br/><br/>
-                {'// Deleting a property'}<br/>
-                {'delete user.age;'}<br/><br/>
-                {'console.log(user); // { name: "Charlie" }'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Built-in Object Methods: `keys`, `values`, `entries`</h2>
-            <p className="opacity-90">
-              The global `Object` constructor provides useful methods for working with objects.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`Object.keys(obj)`:</strong> Returns an array of an object's keys.</li>
-                <li><strong>`Object.values(obj)`:</strong> Returns an array of an object's values.</li>
-                <li><strong>`Object.entries(obj)`:</strong> Returns an array of an object's `[key, value]` pairs.</li>
-              </ul>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const car = { make: "Ford", model: "Mustang" };'}<br/>
-                {'Object.keys(car);   // ["make", "model"]'}<br/>
-                {'Object.values(car); // ["Ford", "Mustang"]'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Objects vs. Arrays: When to Use Which?</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg grid md:grid-cols-2 gap-4">
-              <div>
-                  <h3 className="font-bold">Use an Array when:</h3>
-                  <p className="text-sm opacity-90 mt-1">The **order** of the items matters, and the items are a simple, ordered list (e.g., a list of users, a list of posts).</p>
-              </div>
-              <div>
-                  <h3 className="font-bold">Use an Object when:</h3>
-                  <p className="text-sm opacity-90 mt-1">You need to store unordered, labeled pieces of data that describe a single entity (e.g., the properties of a user, like `firstName`, `email`).</p>
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Objects are the primary way to structure data in JavaScript.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Use Dot Notation by Default.</strong> Only use bracket notation when the key is a variable.</li>
-                <li><strong>Declare with `const`.</strong> This prevents accidental reassignment.</li>
-                <li><strong>Understand `this`.</strong> `this` refers to the object that the method is *called on*.</li>
-                <li><strong>Use `Object.keys()`</strong> to get an array of keys, which you can then loop over.</li>
-              </ol>
-            </div>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
           </div>
-        </div>
-      );
-    case 'dom-manipulation-events':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.6: DOM Manipulation & Events</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              This is where JavaScript connects with the webpage. **DOM Manipulation** is the process of using JavaScript to dynamically change the content, structure, and style of an HTML document. **Events** are the actions that a user performs on a webpage. Learning to manipulate the DOM in response to events is the core skill required to build any interactive website.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: The Live Blueprint</h2>
-            <p className="opacity-90">
-              When a browser loads an HTML document, it creates a "model" of that page in memory. This model is called the **Document Object Model (DOM)**. It's not the static HTML file; it's a live, dynamic representation that JavaScript can interact with.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">Analogy: A Marionette Puppet</h3>
-              <p className="mt-2 opacity-90">
-                Think of your HTML structure as a marionette puppet. JavaScript is the puppeteer. By pulling and manipulating the strings (interacting with the DOM), JavaScript can make the puppet (the webpage) move, change, and react.
-              </p>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. What is the DOM? A Tree of Nodes</h2>
-            <p className="opacity-90">
-              The DOM represents the HTML document as a tree-like structure of **nodes**. Every element, attribute, and piece of text in your HTML is a node in this tree. The top-level node is the `document` object, which is the entry point for all DOM manipulation.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Selecting Elements: Grabbing the Strings</h2>
-            <p className="opacity-90">
-              Before you can change an element, you first need to select it from the DOM.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`document.getElementById('id')`</strong>: Selects a single element by its unique ID. Very fast.</li>
-                <li><strong>`document.querySelector('selector')`</strong>: The modern, all-purpose selector. It selects the **first** element that matches a given CSS selector (e.g., `#myId`, `.myClass`, `p`).</li>
-                <li><strong>`document.querySelectorAll('selector')`</strong>: Selects **all** elements that match a CSS selector and returns them in a collection.</li>
-              </ul>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const title = document.getElementById("main-title");'}<br/>
-                {'const heading = document.querySelector(".heading");'}<br/>
-                {'const allParagraphs = document.querySelectorAll("p");'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">4. Manipulating Element Content</h2>
-            <p className="opacity-90">
-              Once you have selected an element, you can change what's inside it.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`.textContent`</strong>: Changes only the text. This is safer as it ignores any HTML tags.</li>
-                <li><strong>`.innerHTML`</strong>: Sets the HTML content *inside* the element. Use this if you need to add tags like `<strong>&lt;em&gt;</strong>`.</li>
-              </ul>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const heading = document.querySelector("h1");'}<br/>
-                {'heading.textContent = "Hello World!"; // Safe for text'}<br/>
-                {'heading.innerHTML = "<em>Hello</em> World!"; // Renders italic text'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Manipulating Element Styles</h2>
-            <p className="opacity-90">
-              You can change an element's CSS by accessing its `.style` property. Note that CSS properties with hyphens (e.g., `background-color`) become camelCase (e.g., `backgroundColor`).
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const heading = document.querySelector("h1");'}<br/>
-                {'heading.style.color = "red";'}<br/>
-                {'heading.style.backgroundColor = "#333";'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. Manipulating Element Attributes & Classes</h2>
-            <p className="opacity-90">
-              You can also change an element's attributes. The `classList` property is a special, easy way to manage classes.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`element.setAttribute('href', '...')`</strong>: Sets any attribute.</li>
-                <li><strong>`element.classList.add('my-class')`</strong>: Adds a new CSS class.</li>
-                <li><strong>`element.classList.remove('my-class')`</strong>: Removes a CSS class.</li>
-                <li><strong>`element.classList.toggle('my-class')`</strong>: Adds the class if it's not there, removes it if it is.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Creating and Adding New Elements</h2>
-            <p className="opacity-90">
-              You can create new HTML elements from scratch and add them to the page.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>`document.createElement('tagName')`</strong>: Creates a new element in memory.</li>
-                <li><strong>`element.append(child)`</strong>: Adds the new element as a child of an existing element.</li>
-              </ol>
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const newParagraph = document.createElement("p");'}<br/>
-                {'newParagraph.textContent = "This was added by JavaScript!";'}<br/>
-                {'document.body.append(newParagraph);'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Events and Event Listeners</h2>
-            <p className="opacity-90">
-              An **event** is an action (like a "click"). An **event listener** is a function that "listens" for that action and runs code in response.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const button = document.querySelector("#my-button");'}<br/><br/>
-                {'function onButtonClick() {'}<br/>
-                {'  alert("Button was clicked!");'}<br/>
-                {'}'}<br/><br/>
-                {'button.addEventListener("click", onButtonClick);'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. The Event Object</h2>
-            <p className="opacity-90">
-              The event listener function automatically receives an **event object** with details about the event.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`event.target`</strong>: A reference to the element that the event occurred on.</li>
-                <li><strong>`event.preventDefault()`</strong>: A method that stops the browser's default behavior (e.g., preventing a form from submitting).</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">10. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              This is the core of all frontend interactivity.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Select First, Then Manipulate:</strong> Store your selected elements in `const` variables.</li>
-                <li><strong>Listen for Events:</strong> Use `addEventListener` to react to user actions.</li>
-                <li><strong>Update the DOM:</strong> Inside the event listener, change the `.textContent`, `.style`, or `.classList` of your selected elements.</li>
-                <li><strong>Use `classList` for Styling:</strong> It's better to add/remove a CSS class than to change many individual `.style` properties.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      );
-    case 'es6-features':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.7: ES6+ Features (Modern JavaScript)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              ECMAScript is the official standard that JavaScript is based on. In 2015, a major update called **ECMAScript 2015 (or ES6)** was released, and it fundamentally changed how we write modern JavaScript. ES6 and subsequent yearly updates introduced new features that make the language more powerful, readable, and efficient. Mastering these features is essential for working with modern frameworks like React.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: A Language Upgrade</h2>
-            <p className="opacity-90">
-              Think of ES6 as a major software upgrade for JavaScript. It didn't remove old features, but it added better, safer, and more concise ways to accomplish common tasks. The goal is to help developers write cleaner, more maintainable code.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">2. `let` and `const` (Block Scope)</h2>
-            <p className="opacity-90">
-              Before ES6, `var` was the only way to declare variables. `var` is function-scoped, which can lead to bugs. ES6 introduced `let` and `const`, which are **block-scoped** (they only exist within the closest set of `{}`).
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`let`</strong>: For variables that will be reassigned.</li>
-                <li><strong>`const`</strong>: For variables that will not be reassigned. **Always use `const` unless you know you need to change the value.**</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Arrow Functions</h2>
-            <p className="opacity-90">
-              Arrow functions (`=&gt;`) provide a more concise syntax for writing function expressions.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'// Traditional Function'}<br/>
-                {'const add = function(a, b) {\n  return a + b;\n};'}<br/><br/>
-                {'// Arrow Function (with implicit return)'}<br/>
-                {'const addArrow = (a, b) => a + b;'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. Template Literals (Template Strings)</h2>
-            <p className="opacity-90">
-              Template literals provide an easier way to create strings, especially strings that contain variables. They use backticks (`` ` ``) instead of quotes.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const name = "Alice";'}<br/>
-                {'// Old way\nconst messageOld = "Hello, " + name + "!";'}<br/><br/>
-                {'// New way with template literals\nconst messageNew = `Hello, ${name}!`;'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Destructuring Assignment (Objects)</h2>
-            <p className="opacity-90">
-              Destructuring is a powerful syntax that allows you to "unpack" properties from objects into distinct variables.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const person = { firstName: "John", age: 30 };'}<br/><br/>
-                {'// Old way\nconst name = person.firstName;\nconst age = person.age;'}<br/><br/>
-                {'// New way with destructuring\nconst { firstName, age } = person;'}<br/>
-                {'console.log(firstName); // "John"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. Destructuring Assignment (Arrays)</h2>
-            <p className="opacity-90">
-              You can also destructure arrays to get elements by their position.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const fruits = ["Apple", "Banana", "Cherry"];'}<br/><br/>
-                {'const [first, second] = fruits;'}<br/>
-                {'console.log(first); // "Apple"'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. The Spread Operator (`...`)</h2>
-            <p className="opacity-90">
-              The spread operator "spreads" the elements of an array or object into a new array or object. It's perfect for making copies or combining arrays.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const arr1 = [1, 2, 3];'}<br/>
-                {'const arr2 = [...arr1, 4, 5]; // arr2 is [1, 2, 3, 4, 5]'}<br/><br/>
-                {'const obj1 = { a: 1, b: 2 };'}<br/>
-                {'const obj2 = { ...obj1, c: 3 }; // obj2 is { a: 1, b: 2, c: 3 }'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. The Rest Parameter (`...`)</h2>
-            <p className="opacity-90">
-              The rest parameter has the same syntax (`...`) but is used inside a function definition to collect multiple arguments into a single array.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function sum(...numbers) {'}<br/>
-                {'  return numbers.reduce((acc, curr) => acc + curr, 0);'}<br/>
-                {'}'}<br/><br/>
-                {'sum(1, 2, 3, 4); // returns 10'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Modules (`import` and `export`)</h2>
-            <p className="opacity-90">
-              Modules allow you to split your code into separate, reusable files. You `export` functions or variables from one file and `import` them into another. This is the foundation of all modern JavaScript frameworks.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'// 📁 utils.js'}<br/>
-                {'export const PI = 3.14;'}<br/>
-                {'export const add = (a, b) => a + b;'}<br/><br/>
-                {'// 📁 main.js'}<br/>
-                {'import { PI, add } from "./utils.js";'}<br/>
-                {'console.log(add(5, 10)); // 15'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">10. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Embrace these modern features to write cleaner, more professional code.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Use `let` and `const` exclusively; avoid `var`.</li>
-                <li>Use arrow functions (`=&gt;`) and template literals (`` `...` ``) to write more concise code.</li>
-                <li>Use destructuring (`{ }`) and the spread operator (`...`) to work with objects and arrays cleanly.</li>
-                <li>Organize your code into modules with `import` and `export`.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      );
-    case 'asynchronous-javascript':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.8: Asynchronous JavaScript (Promises, Async/Await)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              By default, JavaScript is a **synchronous**, single-threaded language, meaning it executes one line of code at a time, in order. However, many web operations, like fetching data from a server or waiting for a timer, can take time. **Asynchronous JavaScript** is the mechanism that allows the browser to perform these long-running tasks without freezing the entire webpage.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: The Restaurant Kitchen</h2>
-            <p className="opacity-90">
-              Imagine a chef in a kitchen.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Synchronous Work:</strong> The chef takes one order, cooks it, serves it, and *only then* takes the next order. The entire kitchen (and all other customers) must wait.</li>
-                <li><strong>Asynchronous Work:</strong> The chef takes an order, puts a steak on the grill (a long-running task), and while it's cooking, they can chop vegetables for the next order. They are notified when the steak is done. This is how asynchronous JavaScript works.</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. The Problem: Synchronous Code is Blocking</h2>
-            <p className="opacity-90">
-              If JavaScript ran tasks synchronously, a single request to a server that takes 5 seconds would freeze the entire browser tab. The user wouldn't be able to click buttons, scroll, or do anything.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">3. The Old Way: Callbacks</h2>
-            <p className="opacity-90">
-              The original way to handle async code was with **callback functions**. A callback is a function you pass as an argument to another function, which is then executed once the main task is complete.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <p className="opacity-90">Nesting multiple callbacks leads to a messy, hard-to-read structure known as "Callback Hell" or the "Pyramid of Doom."</p>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. The Solution: Promises</h2>
-            <p className="opacity-90">
-              A **Promise** is an object that represents the eventual completion (or failure) of an asynchronous operation. It's a placeholder for a future value.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <h3 className="font-bold">A Promise has three states:</h3>
-              <ul className="list-disc ml-6 mt-2 space-y-2 opacity-90">
-                <li><strong>Pending:</strong> The initial state; the operation has not yet completed.</li>
-                <li><strong>Fulfilled (or Resolved):</strong> The operation completed successfully.</li>
-                <li><strong>Rejected:</strong> The operation failed.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Consuming Promises: `.then()` and `.catch()`</h2>
-            <p className="opacity-90">
-              Once you have a promise, you can attach callbacks to it to handle the outcome.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`.then(onFulfilled)`:</strong> Takes a function that will run if the promise is fulfilled.</li>
-                <li><strong>`.catch(onRejected)`:</strong> Takes a function that will run if the promise is rejected.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. `fetch`: The Modern Way to Make Requests</h2>
-            <p className="opacity-90">
-              The `fetch` API is a modern, built-in function that makes network requests and returns a Promise.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'fetch("https://api.example.com/data")'}<br/>
-                {'  .then(response => response.json())'}<br/>
-                {'  .then(data => {'}<br/>
-                {'    console.log(data); // The actual data'}<br/>
-                {'  })'}<br/>
-                {'  .catch(error => {'}<br/>
-                {'    console.error("Fetch failed:", error);'}<br/>
-                {'  });'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. `async/await`: The Cleanest Syntax</h2>
-            <p className="opacity-90">
-              ES2017 introduced `async` and `await` keywords, which provide a much cleaner syntax for working with promises. It makes your asynchronous code look synchronous.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>`async` function:</strong> The `async` keyword before a function makes it automatically return a promise.</li>
-                <li><strong>`await` operator:</strong> Can only be used inside an `async` function. It pauses the function's execution and waits for a promise to resolve before continuing.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">8. Error Handling with `try...catch`</h2>
-            <p className="opacity-90">
-              When using `async/await`, you don't use `.catch()`. Instead, you use a standard `try...catch` block to handle any errors.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const fetchUser = async () => {'}<br/>
-                {'  try {'}<br/>
-                {'    const response = await fetch("https://api.example.com/user/1");'}<br/>
-                {'    const user = await response.json();'}<br/>
-                {'    console.log(user.name);'}<br/>
-                {'  } catch (error) {'}<br/>
-                {'    console.error("Failed to fetch user:", error);'}<br/>
-                {'  }'}<br/>
-                {'};'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              `async/await` is the modern standard for handling asynchronous operations.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Prefer `async/await`</strong> for readability.</li>
-                <li><strong>Always Handle Errors.</strong> Use `try...catch` with `async/await`, or `.catch()` with promises.</li>
-                <li><strong>Understand it's still Asynchronous.</strong> `await` is non-blocking; it just pauses *your function*, not the entire browser.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      );
-    case 'error-handling-debugging':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.9: Error Handling & Debugging</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              No developer, no matter how experienced, writes perfect code all the time. Errors (or "bugs") are a natural and unavoidable part of software development. **Error Handling** is the practice of anticipating and managing errors gracefully so they don't crash your application. **Debugging** is the art of systematically finding and fixing the root cause of these errors.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">1. The Core Concept: Being a Code Detective</h2>
-            <p className="opacity-90">
-              Think of an error as a clue. Your application is behaving unexpectedly, and it's your job as a detective to follow the clues to find the culprit. A good developer doesn't just fix the immediate problem; they understand *why* it happened and put measures in place to prevent it.
-            </p>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Types of Errors in JavaScript</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li><strong>Syntax Errors:</strong> "Grammar" mistakes in your code. The browser cannot parse the code. These are often caught by your code editor. (e.g., a missing `)` or `{'}'}`).</li>
-                <li><strong>Runtime Errors (Exceptions):</strong> Errors that occur *while* the code is running. The syntax is correct, but the program encounters an impossible situation. (e.g., `user.name` when `user` is `null`).</li>
-                <li><strong>Logical Errors:</strong> The trickiest bugs. The code runs without crashing, but it produces the wrong result (e.g., `total = price - tax` instead of `price + tax`).</li>
-              </ul>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">3. Tool 1: The Browser Console</h2>
-            <p className="opacity-90">
-              The **Console** (in your Browser DevTools) is your primary debugging tool. It is where all JavaScript errors, warnings, and log messages appear. **Always have your console open when you are developing.**
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. Tool 2: `console.log()`</h2>
-            <p className="opacity-90">
-              This is the most fundamental debugging technique. By printing the values of variables at different stages, you can trace the flow of data and find where things go wrong.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function calculateTotal(price, quantity) {'}<br/>
-                {'  console.log("Price is:", price);'}<br/>
-                {'  console.log("Quantity is:", quantity);'}<br/>
-                {'  const total = price * quantity;'}<br/>
-                {'  console.log("Total is:", total);'}<br/>
-                {'  return total;'}<br/>
-                {'}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Tool 3: The Debugger</h2>
-            <p className="opacity-90">
-              The browser's **Debugger** (in the "Sources" tab of DevTools) is a powerful tool. It allows you to set **breakpoints** in your code. A breakpoint is a point where the browser will pause the execution of your JavaScript, allowing you to:
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ul className="list-disc ml-6 space-y-2 opacity-90">
-                <li>Inspect the values of all variables at that exact moment.</li>
-                <li>"Step through" your code line by line to watch how it executes.</li>
-                <li>See the "call stack" to understand how your functions are being called.</li>
-              </ul>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. Error Handling: The `try...catch` Statement</h2>
-            <p className="opacity-90">
-              The `try...catch` statement is JavaScript's primary mechanism for handling runtime errors. It allows you to "try" a block of code that might fail, and "catch" any errors that occur without crashing the app.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'try {'}<br/>
-                {'  const user = null;'}<br/>
-                {'  console.log(user.name); // This will throw a TypeError'}<br/>
-                {'} catch (error) {'}<br/>
-                {'  console.error("An error occurred:", error.message);'}<br/>
-                {'}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. The `finally` Block</h2>
-            <p className="opacity-90">
-              An optional `finally` block can be added. The code inside `finally` will execute **regardless** of whether an error was thrown or not. It's used for cleanup tasks.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'try { ... } catch (error) { ... } finally {\n  console.log("This will always run.");\n}'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">8. The `throw` Statement</h2>
-            <p className="opacity-90">
-              The `throw` statement allows you to create your own custom errors. This is useful for enforcing rules in your functions.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function divide(a, b) {'}<br/>
-                {'  if (b === 0) {'}<br/>
-                {'    throw new Error("Cannot divide by zero!");'}<br/>
-                {'  }'}<br/>
-                {'  return a / b;'}<br/>
-                {'}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              Errors are inevitable. Good developers are good debuggers.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>Read the Error Message.</strong> This is the most important clue.</li>
-                <li><strong>Use `console.log()`</strong> to trace your variables.</li>
-                <li><strong>Use the Debugger</strong> to step through complex logic.</li>
-                <li><strong>Use `try...catch`</strong> to handle errors from external sources, like API calls (`async/await`) or user input.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      );
-    case 'js-miniproject':
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl font-bold mb-4">4.10: Js-MiniProject (Stone, Paper, Scissor)</h1>
-          <div className="space-y-4">
-            <p className="text-lg opacity-90">
-              This chapter will walk you through building a classic Stone, Paper, Scissors game from scratch, explaining the logic behind the code step-by-step. This project combines all the concepts from this chapter.
-            </p>
-            
-            <h2 className="text-2xl font-semibold pt-4">1. The Project Workflow</h2>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>HTML Structure:</strong> Build the UI skeleton with elements for scores, buttons, and results, giving them unique IDs.</li>
-                <li><strong>CSS Styling:</strong> Add basic styling to make the game usable.</li>
-                <li><strong>JavaScript Logic:</strong>
-                  <ul className="list-circle ml-6 space-y-1">
-                    <li>Select all necessary DOM elements.</li>
-                    <li>Write a function to get the computer's random choice.</li>
-                    <li>Write a function to determine the winner.</li>
-                    <li>Write a function to update the score and result message on the UI.</li>
-                    <li>Add `click` event listeners to the buttons to start the game.</li>
-                  </ul>
-                </li>
-              </ol>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">2. Step 1: The HTML (`index.html`)</h2>
-            <p className="opacity-90">
-              Create an `index.html` file. We give specific `id`s to the elements we need to manipulate with JavaScript (like the scores and buttons).
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'<h2>User Score: <span id="user-score">0</span></h2>\n<h2>Computer Score: <span id="computer-score">0</span></h2>\n\n<div class="choices">\n  <button id="stone">Stone</button>\n  <button id="paper">Paper</button>\n  <button id="scissors">Scissors</button>\n</div>\n\n<div id="result-display">\n  <p>Make your move!</p>\n</div>'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">3. Step 2: The CSS (`styles.css`)</h2>
-            <p className="opacity-90">
-              Create a `styles.css` file. The `cursor: pointer` rule is important for usability as it indicates the buttons are clickable.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'.choices button {\n  padding: 10px 20px;\n  margin: 5px;\n  cursor: pointer;\n  font-size: 1rem;\n}\n\n#result-display {\n  margin-top: 20px;\n  font-weight: bold;\n}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">4. Step 3 (JS): Selecting Elements</h2>
-            <p className="opacity-90">
-              Create a `script.js` file. First, get references to all your HTML elements.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'const userScoreDisplay = document.getElementById("user-score");\nconst computerScoreDisplay = document.getElementById("computer-score");\nconst resultDisplay = document.querySelector("#result-display p");\nconst choiceButtons = document.querySelectorAll(".choices button");\n\nlet userScore = 0;\nlet computerScore = 0;'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">5. Step 4 (JS): Handling Clicks</h2>
-            <p className="opacity-90">
-              Loop through each button and attach a `click` event listener. When a button is clicked, grab its `id` and pass it to your main game function.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'choiceButtons.forEach(button => {\n  button.addEventListener("click", (e) => {\n    const userChoice = e.target.id;\n    playRound(userChoice);\n  });\n});'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">6. Step 5 (JS): Computer's Choice</h2>
-            <p className="opacity-90">
-              Create a function to get a random choice for the computer using `Math.random()`.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function getComputerChoice() {\n  const choices = ["stone", "paper", "scissors"];\n  const randomIndex = Math.floor(Math.random() * 3);\n  return choices[randomIndex];\n}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">7. Step 6 (JS): The Core Game Logic</h2>
-            <p className="opacity-90">
-              This function takes both choices, compares them, and determines the winner.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function playRound(userChoice) {\n  const computerChoice = getComputerChoice();\n  if (userChoice === computerChoice) {\n    updateUI("draw", userChoice, computerChoice);\n  } else if (\n    (userChoice === "stone" && computerChoice === "scissors") ||\n    (userChoice === "paper" && computerChoice === "stone") ||\n    (userChoice === "scissors" && computerChoice === "paper")\n  ) {\n    userScore++;\n    updateUI("win", userChoice, computerChoice);\n  } else {\n    computerScore++;\n    updateUI("lose", userChoice, computerChoice);\n  }\n}'}
-              </code></pre>
-            </div>
-
-            <h2 className="text-2xl font-semibold pt-4">8. Step 7 (JS): Updating the UI</h2>
-            <p className="opacity-90">
-              This function's only job is to update the HTML to show the new scores and the result message.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <pre className="mt-2 p-3 sm:p-4 bg-black rounded text-xs sm:text-sm text-gray-300 overflow-x-auto"><code className="whitespace-pre break-words">
-                {'function updateUI(result, userChoice, computerChoice) {\n  userScoreDisplay.textContent = userScore;\n  computerScoreDisplay.textContent = computerScore;\n\n  let message = `You chose ${userChoice}, computer chose ${computerChoice}. `;\n\n  if (result === "win") {\n    message += "You win!";\n  } else if (result === "lose") {\n    message += "You lose!";\n  } else {\n    message += "It\'s a draw!";\n  }\n\n  resultDisplay.textContent = message;\n}'}
-              </code></pre>
-            </div>
-            
-            <h2 className="text-2xl font-semibold pt-4">9. Key Strategy Summary</h2>
-            <p className="opacity-90">
-              This project demonstrates the complete frontend workflow.
-            </p>
-            <div className="p-4 sm:p-5 bg-gray-700 rounded-lg">
-              <ol className="list-decimal ml-6 space-y-2 opacity-90">
-                <li><strong>DOM Selection:</strong> You grab all the elements you need to interact with.</li>
-                <li><strong>Event Handling:</strong> You use `addEventListener` to run code when the user does something.</li>
-                <li><strong>State Management:</strong> You use variables (`userScore`, `computerScore`) to keep track of the game's state.</li>
-                <li><strong>DOM Manipulation:</strong> You use `.textContent` to update the page with the new state.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      );
-    case 'mini-project-preview':
-      return (
-        <MiniProjectPreview />
-      );
-    default:
-      return (
-        <div className="w-full px-4 sm:px-6 py-6 bg-gray-800 text-white">
-            <h1 className="text-3xl font-bold mb-4">Select a Subchapter</h1>
-            <div className="space-y-4">
-              <p className="text-lg opacity-90">Please select a topic from the sidebar to view the notes.</p>
-            </div>
         </div>
       );
-  }
+    case 'control-structures':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.2: Control Structures (Conditionals, Loops)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: A "Choose Your Own Adventure" Book</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>By default, code runs from top to bottom. Control structures change this. Think of them as the "choices" in a story:</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Conditionals (`if`):</strong> "If you open the door, turn to page 45. Otherwise (else), turn to page 52." Your code takes one path or the other based on a condition.</li>
+              <li><strong>Loops (`for`):</strong> "Attack the dragon 10 times." This is a set of instructions that you repeat a specific number of times.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Control structures allow you to direct the flow of your program using logic.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Conditionals (Decision Making):</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>`if / else if / else`:</strong> The standard way to run code blocks based on a condition. An `if` block runs if its condition is <strong>truthy</strong>.</li>
+                  <li><strong>Truthy/Falsy:</strong> In JS, all values are "truthy" except for 6 "falsy" values: `false`, `0`, `""` (empty string), `null`, `undefined`, and `NaN`. This is a powerful shortcut.</li>
+                  <li><strong>Ternary Operator:</strong> A one-line shortcut for `if/else`. Syntax: <Code>condition ? expressionIfTrue : expressionIfFalse</Code>.</li>
+                  <li><strong>`switch` Statement:</strong> A clean way to compare one value against many possible "cases."</li>
+                </ul>
+              </li>
+              <li><strong>Loops (Repetition):</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>`for` Loop:</strong> The classic loop. Used when you know how many times you want to iterate (e.g., 10 times, or once for every item in an array).</li>
+                  <li><strong>`while` Loop:</strong> Used when you *don't* know how many times, but you know the *condition* to stop (e.g., "keep looping *while* the user hasn't guessed the number").</li>
+                  <li><strong>Array Methods:</strong> In modern JS, we often use <Code>.forEach()</Code>, <Code>.map()</Code>, and <Code>.filter()</Code> instead of `for` loops to interact with arrays.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: `if`, `for`, and `while`</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This example shows how `if` statements make decisions and `for` loops perform repetition.</p>
+            <CodeBlock code={`
+// 1. Conditional (if/else)
+const temperature = 25;
+let action = '';
+
+if (temperature > 30) {
+  action = 'Go swimming';
+} else if (temperature > 20) {
+  action = 'Go for a walk';
+} else {
+  action = 'Read a book';
+}
+console.log(action); // "Go for a walk"
+
+// 2. Loop (for)
+// This loop will run 5 times (i = 0, 1, 2, 3, 4)
+for (let i = 0; i < 5; i++) {
+  console.log(\`Iteration number \${i}\`);
+}
+
+// 3. Loop (while)
+let counter = 0;
+while (counter < 3) {
+  console.log(\`While loop count: \${counter}\`);
+  counter++;
+}
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between a `for` loop and a `while` loop?</strong>
+                <p className="pl-4">Use a <Code>for</Code> loop when you know *how many times* you need to loop (e.g., "for all 50 items in this array..."). Use a <Code>while</Code> loop when you *don't* know how many times, but you know the *condition* to stop (e.g., "while the game is not over...").</p>
+              </li>
+              <li>
+                <strong>What does "truthy" mean? Why is `if (userName)` a valid check?</strong>
+                <p className="pl-4">It's a common shortcut. If `userName` is an empty string (`""`), it's "falsy," and the `if` block won't run. If it has any text (e.g., `"Alex"`), it's "truthy," and the block *will* run. This makes `if (userName)` a quick way to check if the variable exists and is not empty.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'functions-scope':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.3: Functions & Scope</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Reusable Recipe</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A <strong>function</strong> is a reusable "recipe" for code. You <strong>define</strong> it once (write the recipe) and then <strong>call</strong> it many times (cook the meal).</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Parameters:</strong> The ingredients the recipe needs (e.g., `num1`, `num2`).</li>
+              <li><strong>Function Body:</strong> The steps to follow (e.g., `return num1 + num2;`).</li>
+              <li><strong>Return Value:</strong> The finished dish (e.g., the resulting sum).</li>
+            </ul>
+            <p><strong>Scope</strong> is like "kitchen rules." Variables created inside the kitchen (Function Scope) are not visible or usable *outside* the kitchen. This prevents conflicts and keeps your code organized.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Functions</strong> are a core building block in JS. They are "first-class citizens," meaning they can be passed around just like any other variable.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Function Declaration:</strong> The classic named function. These are <strong>hoisted</strong>, meaning they are "lifted" to the top of their scope and can be called before they are defined.</li>
+              <li><strong>Function Expression:</strong> An anonymous (unnamed) function assigned to a variable. These are **not** hoisted.</li>
+              <li><strong>Arrow Functions (ES6+):</strong> The modern, concise syntax (`=&gt;`). They are always anonymous and are not hoisted. They also have a different behavior with the `this` keyword (which you'll see in object methods).</li>
+            </ul>
+            <p><strong>Scope</strong> determines the visibility of variables.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Global Scope:</strong> Variables declared outside any function. Accessible *everywhere*. **Avoid this** as it leads to bugs.</li>
+              <li><strong>Function Scope:</strong> Variables declared with `var` inside a function. Accessible *anywhere* within that function.</li>
+              <li><strong>Block Scope:</strong> Variables declared with <Code>let</Code> and <Code>const</Code>. Accessible *only* within the <Code>{"{ ... }"}</Code> block they are defined in (e.g., inside an `if` statement or `for` loop). This is the most predictable and preferred scope.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: Declarations, Expressions, and Scope</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <CodeBlock code={`
+// 1. Function Declaration (Hoisted)
+const result1 = add(5, 10);
+console.log(result1); // 15 (Works, even though 'add' is defined below)
+
+function add(a, b) {
+  return a + b;
+}
+
+// 2. Arrow Function (ES6+, not hoisted)
+const multiply = (a, b) => {
+  return a * b;
+};
+const result2 = multiply(5, 10);
+console.log(result2); // 50
+
+// 3. Scope Example
+const globalVar = "I'm global";
+
+function testScope() {
+  const functionVar = "I'm local to the function";
+  console.log(globalVar); // Can access global
+  
+  if (true) {
+    let blockVar = "I'm local to this block";
+    console.log(blockVar); // "I'm local to this block"
+  }
+  
+  // console.log(blockVar); // This would cause an Error!
+}
+
+testScope();
+// console.log(functionVar); // This would also cause an Error!
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the main difference between a Function Declaration and an Arrow Function?</strong>
+                <p className="pl-4">Two key differences: 1) **Syntax:** Arrow functions (`=&gt;`) are shorter. 2) **Hoisting:** Declarations (`function add()`) are hoisted, so you can call them *before* they are written. Arrow functions are not hoisted. In modern React, you will almost exclusively use arrow functions.</p>
+              </li>
+              <li>
+                <strong>What does "hoisting" mean in simple terms?</strong>
+                <p className="pl-4">It means the JavaScript engine "lifts" all function declarations and `var` variables to the top of their scope *before* it runs the code. This is why you can call a function declaration before it appears. It's often confusing, which is why <Code>let</Code> and <Code>const</Code> (which are *not* hoisted) are preferred.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'arrays-methods':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.4: Arrays & Array Methods</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: A Library Shelf</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>An <strong>Array</strong> is like a library shelf that holds an ordered list of items (books). Each item has a specific position, or <strong>index</strong>, which starts at `0`.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Accessing:</strong> `myShelf[0]` (gets the first book).</li>
+              <li><strong>Looping:</strong> "Go through *every book* on the shelf" (<Code>.forEach()</Code>).</li>
+              <li><strong>Transforming:</strong> "Give me a *new list* of just the *titles* of every book" (<Code>.map()</Code>).</li>
+              <li><strong>Filtering:</strong> "Give me a *new list* of only the *non-fiction* books" (<Code>.filter()</Code>).</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>An <strong>Array</strong> is a data structure for storing an ordered collection of items. In modern JavaScript, we avoid *mutating* (changing) arrays directly. Instead, we use **immutable methods** that return a *new* array, which is a core principle of functional programming and React.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Basic Methods (Mutating):</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>push(item)</Code>: Adds to the end.</li>
+                  <li><Code>pop()</Code>: Removes from the end.</li>
+                  <li><Code>shift()</Code> / <Code>unshift(item)</Code>: Add/remove from the start.</li>
+                </ul>
+              </li>
+              <li><strong>Looping Method:</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>forEach(item {'=>'} {'{ ... }'})</Code>: Runs a function for each item. Does not return anything.</li>
+                </ul>
+              </li>
+              <li><strong>Immutable "Big Three" (Essential):</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong><Code>map(item {'=>'} ...)</Code>:</strong> **Transforms** each item and returns a **new array** of the *same length*.</li>
+                  <li><strong><Code>filter(item {'=>'} ...)</Code>:</strong> **Selects** items that pass a test (return `true`) and returns a **new array** of the *same or shorter length*.</li>
+                  <li><strong><Code>reduce((acc, item) {'=>'} ...)</Code>:</strong> **Aggregates** an array into a *single value* (e.g., a sum, an object).</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The "Big Three" Methods</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is the most common pattern in modern JS. Notice how the original `users` array is never changed.</p>
+            <CodeBlock code={`
+const users = [
+  { id: 1, name: "Alex", role: "admin" },
+  { id: 2, name: "Priya", role: "user" },
+  { id: 3, name: "Leo", role: "user" }
+];
+
+// 1. .map() - To transform data
+// Get an array of just the users' names.
+const userNames = users.map(user => user.name);
+// userNames is ["Alex", "Priya", "Leo"]
+
+// 2. .filter() - To select data
+// Get an array of only the users with the 'user' role.
+const standardUsers = users.filter(user => user.role === 'user');
+// standardUsers is [{ id: 2, ... }, { id: 3, ... }]
+
+// 3. .reduce() - To aggregate data
+// Get the total number of 'user' roles.
+const userRoleCount = users.reduce((count, user) => {
+  if (user.role === 'user') {
+    return count + 1;
+  }
+  return count;
+}, 0); // 0 is the starting value for 'count'
+// userRoleCount is 2
+
+// You can also chain them!
+// Get the names of the users who are not admins.
+const userNamesOnly = users
+  .filter(user => user.role !== 'admin')
+  .map(user => user.name);
+// userNamesOnly is ["Priya", "Leo"]
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between `forEach` and `map`? They seem to do the same thing.</strong>
+                <p className="pl-4">This is a critical difference. <Code>forEach</Code> just *runs a loop* and doesn't return anything (it returns `undefined`). It's for causing *side effects*, like printing to the console. <Code>map</Code> *transforms data* and **returns a new array**. If you want to change data, use <Code>map</Code>. If you just want to *do* something, use <Code>forEach</Code>.</p>
+              </li>
+              <li>
+                <strong>Why is "immutability" (not changing the original array) so important?</strong>
+                <p className="pl-4">In frameworks like React, state is immutable. React only knows to re-render a component if the *reference* to an array or object changes. If you just <Code>.push()</Code> to the original array, React won't see the change. By using <Code>.map()</Code> or <Code>.filter()</Code>, you create a *brand new array*, which triggers React to update the UI.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'objects-methods':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.5: Objects & Object Methods</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Real-World Object</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>An <strong>Object</strong> in JavaScript is exactly what it sounds like: a representation of a "thing" (like a person, a car, or a user). This "thing" has attributes (<strong>properties</strong>) and can perform actions (<strong>methods</strong>).</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Object:</strong> A Car</li>
+              <li><strong>Properties:</strong> <Code>color: "red"</Code>, <Code>make: "Tesla"</Code>, <Code>year: 2024</Code></li>
+              <li><strong>Methods:</strong> <Code>start()</Code>, <Code>drive()</Code>, <Code>brake()</Code></li>
+            </ul>
+            <p>Objects are collections of <strong>key-value pairs</strong> that group related data and functionality together.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Objects are the most fundamental data structure in JS. They are collections of properties, where each property is a key-value pair.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Object Literal:</strong> The simplest way to create an object, using curly braces `{}`.</li>
+              <li><strong>Accessing Properties:</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>Dot Notation:</strong> <Code>person.name</Code>. This is the preferred, cleaner method.</li>
+                  <li><strong>Bracket Notation:</strong> <Code>person['name']</Code>. This is *required* when the key is a variable or contains spaces (e.g., `person[myVar]`).</li>
+                </ul>
+              </li>
+              <li><strong>Methods:</strong> A property whose value is a function.</li>
+              <li><strong>The `this` Keyword:</strong> Inside a method, `this` refers to the *object the method was called on*. It lets an object's methods access its own properties (e.g., `this.name`).</li>
+              <li><strong>`const` and Objects:</strong> Declaring an object with <Code>const</Code> is standard. It means the *variable* cannot be reassigned, but the *properties* inside the object can still be changed.</li>
+              <li><strong>Object Methods:</strong> Static methods on the `Object` constructor:
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>Object.keys(obj)</Code>: Returns an array of the object's keys.</li>
+                  <li><Code>Object.values(obj)</Code>: Returns an array of the object's values.</li>
+                  <li><Code>Object.entries(obj)</Code>: Returns an array of `[key, value]` pairs.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: Creating and Using an Object</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <CodeBlock code={`
+const user = {
+  // Properties
+  username: "alex123",
+  email: "alex@example.com",
+  friends: ["Priya", "Leo"],
+
+  // Method (a function as a property)
+  greet() {
+    // 'this' refers to the 'user' object
+    console.log(\`Hello, my username is \${this.username}\`);
+  },
+
+  // Method that uses another property
+  addFriend(friendName) {
+    this.friends.push(friendName);
+    console.log(\`\${friendName} was added to \${this.username}'s friend list.\`);
+  }
+};
+
+// 1. Accessing properties (Dot Notation)
+console.log(user.email); // "alex@example.com"
+
+// 2. Calling methods
+user.greet(); // "Hello, my username is alex123"
+user.addFriend("Maria");
+
+// 3. Modifying a property (allowed even with const)
+user.email = "new_email@example.com";
+
+// 4. Using static Object methods
+console.log(Object.keys(user)); // ["username", "email", "friends", "greet", "addFriend"]
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between Dot and Bracket notation?</strong>
+                <p className="pl-4">Use **Dot notation** (`user.name`) 99% of the time. You *must* use **Bracket notation** (`user['name']`) only when the property key is dynamic (held in a variable) or contains special characters (like spaces, which you should avoid anyway). Example: `let key = 'name'; console.log(user[key]);`</p>
+              </li>
+              <li>
+                <strong>What's the difference between an Object and an Array?</strong>
+                <p className="pl-4">Use an **Array** for an *ordered list* of items (e.g., a list of friends, a list of posts). Use an **Object** to describe a *single thing* with named properties (e.g., a *user* who has a `name`, `email`, and `age`).</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'dom-manipulation-events':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.6: DOM Manipulation & Events</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Digital Puppet Master</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Think of your HTML page as a marionette puppet. The <strong>DOM (Document Object Model)</strong> is the set of strings attached to the puppet's limbs. <strong>JavaScript</strong> is the puppet master. By pulling the strings (manipulating the DOM), your script can make the puppet (webpage) dance, change, and react.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Selecting an Element:</strong> Grabbing the "head" string. (`document.querySelector()`)</li>
+              <li><strong>Events:</strong> A signal for the puppet master to do something (e.g., a "click" event).</li>
+              <li><strong>Event Listener:</strong> The puppet master's ear, *listening* for that signal. (`.addEventListener()`)</li>
+              <li><strong>Manipulation:</strong> The action the puppet master takes (e.g., changing the puppet's text, or making its arm wave). (`.textContent = ...`)</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>The <strong>DOM</strong> is a live, in-memory tree of objects representing your HTML. JavaScript can interact with this tree to change the page *after* it has loaded. This is the core of all dynamic websites.</p>
+            <p><strong>The "Holy Trinity" of DOM Manipulation:</strong></p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>1. Select an Element:</strong> Get a reference to the DOM node you want to change.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>document.getElementById('id')</Code>: Gets one element by its ID.</li>
+                  <li><Code>document.querySelector('css-selector')</Code>: Gets the *first* element matching a CSS selector (e.g., `.my-class`, `h1`). **This is the modern standard.**</li>
+                  <li><Code>document.querySelectorAll('css-selector')</Code>: Gets *all* matching elements as a NodeList (similar to an array).</li>
+                </ul>
+              </li>
+              <li><strong>2. Listen for an Event:</strong> Attach an **Event Listener** to the element to wait for a user action.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>element.addEventListener('event-name', functionToRun)</Code></li>
+                  <li>Common events: <Code>'click'</Code>, <Code>'submit'</Code>, <Code>'mouseover'</Code>, <Code>'keydown'</Code>.</li>
+                </ul>
+              </li>
+              <li><strong>3. Manipulate the Element:</strong> Inside the event listener's function, make your changes.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>element.textContent = "..."</Code>: Changes the text inside an element (safe).</li>
+                  <li><Code>element.innerHTML = "..."</Code>: Changes the HTML inside an element (less safe).</li>
+                  <li><Code>element.style.property = "..."</Code>: Changes CSS (e.g., `element.style.color = 'red'`).</li>
+                  <li><Code>element.classList.add('class')</Code>: Adds/removes a CSS class (preferred way to change styles).</li>
+                  <li><Code>element.setAttribute('attr', 'val')</Code>: Changes an HTML attribute (e.g., `img.setAttribute('src', 'new.png')`).</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: An Interactive Counter</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is a complete, runnable HTML file that uses all three steps to create a simple counter.</p>
+            <CodeBlock code={`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>DOM Counter</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding-top: 50px; color: #333; }
+    #counter-display { font-size: 3rem; font-weight: bold; }
+    button { font-size: 1.5rem; padding: 10px 20px; margin: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>Simple DOM Counter</h1>
+  <p id="counter-display">0</p>
+  <button id="increment-btn">+</button>
+  <button id="decrement-btn">-</button>
+
+  <script>
+    // 1. SELECT the elements
+    const display = document.querySelector('#counter-display');
+    const incrementBtn = document.querySelector('#increment-btn');
+    const decrementBtn = document.querySelector('#decrement-btn');
+
+    // Keep track of the count in a variable
+    let count = 0;
+
+    // 2. LISTEN for 'click' events
+    incrementBtn.addEventListener('click', () => {
+      // 3. MANIPULATE the DOM
+      count++;
+      display.textContent = count;
+    });
+
+    decrementBtn.addEventListener('click', () => {
+      // 3. MANIPULATE the DOM
+      count--;
+      display.textContent = count;
+    });
+  </script>
+</body>
+</html>
+            `} language="html" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between `textContent` and `innerHTML`?</strong>
+                <p className="pl-4"><Code>textContent</Code> sets only the raw text. It's safe and fast. <Code>innerHTML</Code> parses the string as HTML. Use `innerHTML` *only* if you trust the source and *need* to render HTML (e.g., `<strong>Warning!</strong>`). Using it with user-provided text can expose you to security risks (XSS attacks).</p>
+              </li>
+              <li>
+                <strong>Why is it better to use `classList.add()` instead of `element.style`?</strong>
+                <p className="pl-4">It's about **Separation of Concerns**. JavaScript should handle *logic* (what to change), and CSS should handle *style* (how it looks). Changing `.style` mixes JS and CSS. The better way: define a class in your CSS (e.g., `.is-active {'{'} color: blue; {'}'}`) and just use JS to *toggle* that class: `element.classList.toggle('is-active')`.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'es6-features':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.7: ES6+ Features (Modern JavaScript)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: A Language "Upgrade Pack"</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Think of JavaScript as a popular video game. **ES6** (ECMAScript 2015) was a massive "Version 2.0" upgrade pack. It didn't change the core game, but it added amazing new features, fixed old bugs, and gave players powerful new tools and shortcuts that are now standard. Using modern JS (ES6+) is like playing the upgraded game; going back to the old way feels clumsy and outdated.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>ES6+ refers to the modern features added to JavaScript since 2015. These features are essential for writing clean, efficient, and maintainable code, and they are the foundation for frameworks like React.</p>
+            <p><strong>Key Features:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`let` and `const`:</strong> Replaced `var`. They are **block-scoped** (live only in the <Code>{"{ ... }"}</Code> they're defined in), which prevents many common bugs.</li>
+              <li><strong>Arrow Functions (`=&gt;`):</strong> A concise syntax for writing functions. (e.g., <Code>(a, b) {'=>'} a + b</Code>).</li>
+              <li><strong>Template Literals (`` ` ``):</strong> Multi-line strings with embedded variables (e.g., `` `Hello, \${}!` ``).</li>
+              <li><strong>Default Parameters:</strong> Give parameters a default value (e.g., `function greet(name = "Guest")`).</li>
+              <li><strong>Destructuring (Object & Array):</strong> A shortcut to "unpack" values from data structures into variables (e.g., `const {'{'} name, age {'}'} = user;`).</li>
+              <li><strong>Spread/Rest Operator (`...`):</strong>
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>Spread:</strong> "Spreads" an array/object into a new one, perfect for making copies (e.g., `const newArr = [...oldArr, 5];`).</li>
+                  <li><strong>Rest:</strong> Collects multiple function arguments into one array (e.g., `function sum(...nums)`).</li>
+                </ul>
+              </li>
+              <li><strong>Modules (`import`/`export`):</strong> The standard, native way to split code into reusable files.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: ES6 Features in Action</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This code block shows a "before" (ES5) and "after" (ES6+) comparison.</p>
+            <CodeBlock code={`
+// --- "Before" (Old ES5 JavaScript) ---
+var person = { name: "Alex", age: 30 };
+function greet(name) {
+  name = name || "Guest";
+  return "Hello, " + name + "! You are " + person.age;
+}
+console.log(greet(person.name));
+
+
+// --- "After" (Modern ES6+ JavaScript) ---
+const person = { name: "Alex", age: 30 };
+
+// 1. Arrow Function with 2. Default Parameters
+const greet = (name = "Guest") => {
+  // 3. Destructuring
+  const { age } = person; 
+  
+  // 4. Template Literals
+  return \`Hello, \${name}! You are \${age}\`;
+};
+console.log(greet(person.name));
+
+// 5. Spread Operator (Copying)
+const updatedPerson = { ...person, age: 31 };
+console.log(updatedPerson.age); // 31
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What does "destructuring" really do for me?</strong>
+                <p className="pl-4">It saves you from writing repetitive code. In React, it's how you use props: instead of writing `props.name`, `props.age`, `props.email` all the time, you just write `const {'{'} name, age, email {'}'} = props;` at the top of your component. It's cleaner and easier to read.</p>
+              </li>
+              <li>
+                <strong>What is the difference between Spread (`...`) and Rest (`...`)?</strong>
+                <p className="pl-4">They use the same syntax (`...`) but have opposite jobs. **Spread** *expands* an existing array or object into a new one (e.g., `[...arr]`). **Rest** *collects* multiple separate items into a new array (e.g., in a function `sum(...numbers)`).</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'asynchronous-javascript':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.8: Asynchronous JavaScript (Promises, Async/Await)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: Ordering at a Restaurant</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>JavaScript is <strong>synchronous</strong> (single-threaded) by default. Imagine a waiter who takes your order, goes to the kitchen, *waits* for it to be cooked, serves it, and *only then* takes the next table's order. The whole restaurant (your webpage) would freeze.</p>
+            <p><strong>Asynchronous</strong> code is a better waiter. He takes your order, gives it to the kitchen, and *immediately* goes to the next table. When the food is ready, the kitchen gives him a <strong>Promise</strong> (a "pager"). When the pager buzzes, he picks up the food and serves it. Your code can continue running while the long task (cooking/data fetching) happens in the background.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Asynchronous (or "async") code is essential for tasks that take time, like fetching data from an API, reading a file, or setting a timer. It prevents these tasks from "blocking" the main thread and freezing the UI.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Callbacks (The Old Way):</strong> Functions passed as arguments to *other functions*, to be run *after* the main task is complete. This leads to "Callback Hell" (deep, unreadable nesting).</li>
+              <li><strong>Promises (The Modern Way):</strong> An object that represents the *eventual* result of an async operation. A Promise is a placeholder for a future value. It can be in one of three states:
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>Pending:</strong> The operation hasn't finished yet.</li>
+                  <li><strong>Fulfilled:</strong> The operation completed successfully (the pager buzzed).</li>
+                  <li><strong>Rejected:</strong> The operation failed (the kitchen dropped your food).</li>
+                </ul>
+              </li>
+              <li><strong>Consuming Promises:</strong> You handle these states with <Code>.then()</Code> and <Code>.catch()</Code>.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>.then(data {'=>'} {'{ ... }'})</Code>: Runs when the promise is *fulfilled*.</li>
+                  <li><Code>.catch(error {'=>'} {'{ ... }'})</Code>: Runs when the promise is *rejected*.</li>
+                </ul>
+              </li>
+              <li><strong>`async/await` (The Best Way):</strong> ES2017 syntactic sugar that makes promise-based code look clean and synchronous.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>`async` function:</strong> Declaring a function with `async` makes it automatically return a promise.</li>
+                  <li><strong>`await`:</strong> Used *inside* an `async` function. It "pauses" the function's execution and waits for a promise to resolve before moving to the next line.</li>
+                  <li><strong>Error Handling:</strong> You use a standard <Code>try...catch</Code> block to handle rejections.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: `fetch` with Async/Await</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is the standard, modern way to fetch data from an API. Notice how clean it is compared to `.then().catch()` chains. (Run this in a browser console).</p>
+            <CodeBlock code={`
+// 1. Define an 'async' function
+const fetchUserData = async () => {
+  // 2. Use a 'try...catch' block for error handling
+  try {
+    // 3. 'await' pauses the function until fetch() resolves
+    const response = await fetch('https://jsonplaceholder.typicode.com/users/1');
+    
+    // This code won't run until 'response' is back
+    
+    if (!response.ok) {
+      throw new Error(\`HTTP error! status: \${response.status}\`);
+    }
+
+    // 4. 'await' pauses again until .json() resolves
+    const user = await response.json();
+    
+    // This code won't run until 'user' is parsed
+    console.log(user.name); // "Leanne Graham"
+
+  } catch (error) {
+    // This block runs if 'fetch' fails or 'response.ok' is false
+    console.error("Could not fetch user:", error);
+  }
+};
+
+// 5. Call the async function to start it
+fetchUserData();
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What is "Callback Hell"?</strong>
+                <p className="pl-4">It's a common problem with the old callback pattern. When you have multiple async tasks that depend on each other, you end up nesting callbacks inside callbacks, creating a "pyramid of doom" that is extremely difficult to read and debug. Promises and `async/await` were invented to solve this.</p>
+              </li>
+              <li>
+                <strong>What's the difference between `async/await` and `.then()`?</strong>
+                <p className="pl-4">They are two ways of doing the same thing: handling promises. <Code>async/await</Code> is just "syntactic sugar" for `.then()`. It lets you write code that *looks* synchronous (top-to-bottom), which is much easier to read and reason about. You should prefer `async/await` in all modern code.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'error-handling-debugging':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.9: Error Handling & Debugging</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Code Detective</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Bugs are a normal part of coding. **Debugging** is the process of being a detective: you find clues (error messages), follow the evidence (trace the code), and find the culprit (the bug). **Error Handling** is being proactive: it's the safety net (<Code>try...catch</Code>) you put in place *before* a bug happens to prevent your whole app from crashing.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Debugging is a systematic process, not guesswork. Error handling is a structural part of your code.</p>
+            <p><strong>Debugging Tools & Techniques:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Read the Error Message:</strong> This is the #1 clue. The error tells you *what* went wrong (e.g., `TypeError`) and *where* it went wrong (the line number).</li>
+              <li><strong>`console.log()`:</strong> The simplest debugging tool. Use it to print the values of variables at different points in your code to see where your logic fails.</li>
+              <li><strong>Browser Debugger:</strong> A powerful tool in your browser's DevTools ("Sources" tab). You can set a **breakpoint** to *pause* your code on a specific line. This lets you inspect all variable values at that exact moment and "step through" your code line-by-line.</li>
+            </ul>
+            <p><strong>Error Handling (Synchronous):</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`try...catch` Block:</strong> The standard way to handle code that *might* fail.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><Code>try {'{ ... }'}</Code>: You put your "risky" code inside this block.</li>
+                  <li><Code>catch (error) {'{ ... }'}</Code>: This block *only* runs if the `try` block throws an error. The `error` object contains the error message.</li>
+                </ul>
+              </li>
+              <li><strong>`throw`:</strong> Lets you create your *own* errors (e.g., `throw new Error("Invalid input!")`).</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: `try...catch` and Debugging</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This example shows how to use `console.log` to find a logical bug and `try...catch` to handle a runtime error.</p>
+            <CodeBlock code={`
+// --- Debugging with console.log ---
+const calculateTotal = (items: any[]) => {
+  let total = 0;
+  for (let i = 0; i < items.length; i++) {
+    // Bug: We are adding the index, not the item price!
+    // total += i; 
+    
+    // Fix:
+    total += items[i].price;
+    console.log(\`Running total: \${total}\`); // Our clue!
+  }
+  return total;
+};
+calculateTotal([{ price: 10 }, { price: 20 }]);
+
+
+// --- Error Handling with try...catch ---
+const getUserName = (user: any) => {
+  try {
+    // This is risky code. 'user' might be null.
+    const name = user.profile.name;
+    console.log(name);
+  } catch (error) {
+    // This block runs if 'user' is null or undefined
+    console.error("Could not get user name:", (error as Error).message);
+    // (error as Error).message would be "Cannot read properties of null (reading 'profile')"
+  }
+};
+
+getUserName(null); // This will not crash the app. It will log an error.
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>My code isn't crashing, but it's not working. What's the first thing I should do?</strong>
+                <p className="pl-4">This is a **logical error**. The first step is to use `console.log()` at key points. Find the function that's failing and log the *inputs* it receives and the *output* it returns. You will almost always find that either the data coming in is not what you expected, or the data going out is wrong. This isolates the problem.</p>
+              </li>
+              <li>
+                <strong>What's the difference between `try...catch` and `.catch()` on a promise?</strong>
+                <p className="pl-4">They solve the same problem for different syntaxes. You use <Code>.catch()</Code> when you are using the `.then()` syntax for promises. You use <Code>try...catch</Code> when you are using the `async/await` syntax. `try...catch` is also used for regular, non-async (synchronous) code that might throw an error.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'js-miniproject':
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">4.10: Js-MiniProject (Stone, Paper, Scissor)</h2>
+          
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Project Blueprint</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This project is our "final exam" for basic JavaScript. We will act as a full developer:
+            <br/>1. Be the **Architect** (plan the logic).
+            <br/>2. Be the **Builder** (write the HTML structure).
+            <br/>3. Be the **Puppet Master** (use JS to connect the logic to the HTML).
+            <br/>The goal is to combine DOM Manipulation and JS logic into a complete, interactive application.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This project will be built by following the "Holy Trinity" of DOM Manipulation for *each* interactive element (the three buttons).</p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>State Management:</strong> We will use simple variables (e.g., `let userScore = 0`) to hold the "state" of our application.</li>
+              <li><strong>DOM Selection:</strong> We will use <Code>document.querySelector</Code> to get references to our buttons and display areas at the *start* of our script.</li>
+              <li><strong>Event Listening:</strong> We will attach a <Code>'click'</Code> event listener to each button.</li>
+              <li><strong>Core Logic:</strong> The listeners will call a main `playRound` function. This function will:
+                <ul className="list-disc ml-6 mt-2">
+                  <li>Get the user's choice from the button that was clicked.</li>
+                  <li>Call a separate `getComputerChoice()` function that uses `Math.random()` to pick a random choice.</li>
+                  <li>Compare the two choices to determine a winner.</li>
+                  <li>Update the state variables (`userScore` or `computerScore`).</li>
+                </ul>
+              </li>
+              <li><strong>DOM Manipulation:</strong> After the logic is run, we will update the <Code>.textContent</Code> of our score and result displays to show the user what happened.</li>
+            </ol>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The Complete Game Code</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This is a complete, runnable HTML file. Save it as <Code>game.html</Code> and open it in your browser. Read the comments in the <Code>&lt;script&gt;</Code> tag to see the workflow in action.</p>
+            <CodeBlock code={`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stone Paper Scissors</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding-top: 30px; color: #333; }
+    .scoreboard { display: flex; justify-content: center; gap: 40px; }
+    .score { padding: 10px 20px; border: 1px solid #ccc; border-radius: 8px; }
+    .choices { margin-top: 30px; }
+    .choice-btn { font-size: 1.5rem; padding: 10px 20px; margin: 0 10px; cursor: pointer; }
+    #result-message { margin-top: 20px; font-size: 1.2rem; font-weight: bold; min-height: 1.5rem; }
+  </style>
+</head>
+<body>
+
+  <h1>Stone, Paper, Scissors</h1>
+
+  <div class="scoreboard">
+    <div class="score">
+      <h2>User Score</h2>
+      <p id="user-score">0</p>
+    </div>
+    <div class="score">
+      <h2>Computer Score</h2>
+      <p id="computer-score">0</p>
+    </div>
+  </div>
+
+  <div class="choices">
+    <button class="choice-btn" id="stone">Stone</button>
+    <button class="choice-btn" id="paper">Paper</button>
+    <button class="choice-btn" id="scissors">Scissors</button>
+  </div>
+  
+  <p id="result-message">Make your move!</p>
+
+  <script>
+    // --- 1. STATE ---
+    let userScore = 0;
+    let computerScore = 0;
+    const choices = ['stone', 'paper', 'scissors'];
+
+    // --- 2. SELECT DOM ELEMENTS ---
+    const userScoreDisplay = document.querySelector('#user-score');
+    const computerScoreDisplay = document.querySelector('#computer-score');
+    const resultDisplay = document.querySelector('#result-message');
+    
+    // Select all buttons at once
+    const choiceButtons = document.querySelectorAll('.choice-btn');
+
+    // --- 3. ATTACH EVENT LISTENERS ---
+    choiceButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        // 'e.target.id' will be 'stone', 'paper', or 'scissors'
+        playRound(e.target.id);
+      });
+    });
+
+    // --- 4. CORE LOGIC ---
+    function playRound(userChoice) {
+      const computerChoice = getComputerChoice();
+      let resultMessage = \`You chose \${userChoice}, computer chose \${computerChoice}. \`;
+      
+      if (userChoice === computerChoice) {
+        // Draw
+        resultMessage += "It's a draw!";
+      } else if (
+        (userChoice === 'stone' && computerChoice === 'scissors') ||
+        (userChoice === 'paper' && computerChoice === 'stone') ||
+        (userChoice === 'scissors' && computerChoice === 'paper')
+      ) {
+        // User wins
+        userScore++;
+        resultMessage += 'You win!';
+      } else {
+        // Computer wins
+        computerScore++;
+        resultMessage += 'You lose!';
+      }
+      
+      // --- 5. MANIPULATE DOM (Update UI) ---
+      userScoreDisplay.textContent = userScore;
+      computerScoreDisplay.textContent = computerScore;
+      resultDisplay.textContent = resultMessage;
+    }
+
+    function getComputerChoice() {
+      const randomIndex = Math.floor(Math.random() * 3);
+      return choices[randomIndex];
+    }
+  </script>
+</body>
+</html>
+            `} language="html" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Why did we select the elements *outside* the event listener?</strong>
+                <p className="pl-4">For performance. Selecting a DOM element (`querySelector`) is an operation that takes time. By selecting them all *once* when the script loads and storing them in variables, our `playRound` function can access them instantly without having to re-select them every single time the user clicks a button.</p>
+              </li>
+              <li>
+                <strong>This is a lot of DOM manipulation. Is this how React works?</strong>
+                <p className="pl-4">No, and this project perfectly shows *why* React was invented. In "Vanilla JS," you have to *manually* write the code to update the DOM (e.g., `userScoreDisplay.textContent = userScore`). In React, you just update the *state* (`setUserScore(userScore + 1)`), and React *automatically* handles all the DOM manipulation for you. This is called **declarative** programming and is much easier to manage.</p>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
+        </div>
+      );
+    case 'mini-project-preview':
+      return (
+        <MiniProjectPreview />
+      );
+    default:
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h1 className="text-3xl font-bold mb-4">Select a Subchapter</h1>
+          <div className="space-y-4">
+            <p className="text-lg text-gray-700">Please select a topic from the sidebar to view the notes.</p>
+          </div>
+        </div>
+      );
+  }
 };
 
 export default Chapter4;

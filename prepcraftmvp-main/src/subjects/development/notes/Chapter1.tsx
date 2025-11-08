@@ -161,7 +161,7 @@ const Chapter1 = ({ noteId }: { noteId: string }) => {
                 <p className="pl-4">Start with the Frontend. The "Three Pillars" (HTML, CSS, JS) are the non-negotiable foundation for *all* web development. You get instant visual feedback in your browser, which makes learning more engaging. You can then move to a library like React, followed by backend technologies like Node.js.</p>
               </li>
               <li>
-                <strong>What's the real difference between a web *designer* and a web *developer*?</strong>
+                <strong>What's the real difference between a web designer and a web *developer*?</strong>
                 <p className="pl-4">A <strong>designer</strong> (or UI/UX designer) is like the architect. They focus on the *look and feel* of the site—the user's journey, the color schemes, the typography, and the layout. They typically produce visual mockups in tools like Figma. A <strong>developer</strong> is the builder. They take those designs and write the actual code (HTML, CSS, JS) to make them functional and interactive.</p>
               </li>
             </ul>

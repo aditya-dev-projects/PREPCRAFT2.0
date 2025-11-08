@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Chapter6Part1 from './Chapter6Part1';
 import Chapter6Part2 from './Chapter6Part2';

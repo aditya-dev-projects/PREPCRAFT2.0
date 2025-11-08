@@ -1,37 +1,42 @@
 import React, { useState } from 'react';
 
-// --- Reusable Helper Components (Required for self-contained file) ---
+// --- Reusable Helper Components (Light Theme) ---
 
-// Reusable component for styling code blocks (with Copy button)
-const CodeBlock = ({ code }: { code: string }) => {
+const CodeBlock = ({ code, language = 'javascript' }: { code: string, language?: string }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = () => {
-    const textArea = document.createElement('textarea');
-    textArea.value = code.trim();
-    textArea.style.position = 'absolute';
-    textArea.style.left = '-9999px';
-    textArea.style.opacity = '0';
-    document.body.appendChild(textArea);
-    textArea.select();
     try {
+      const textArea = document.createElement('textarea');
+      textArea.value = code.trim();
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
       document.execCommand('copy');
+      document.body.removeChild(textArea);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
+      navigator.clipboard.writeText(code.trim()).then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }).catch(navErr => {
+        console.error('Clipboard API also failed: ', navErr);
+      });
     }
-    document.body.removeChild(textArea);
   };
 
   return (
-    <div className="relative">
-      <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto text-sm my-4">
+    <div className="relative my-4">
+      <pre className={`bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm language-${language}`}>
         <code>{code.trim()}</code>
       </pre>
       <button
         onClick={handleCopy}
-        className="absolute top-2 right-2 bg-gray-600 hover:bg-gray-500 text-white text-xs font-semibold py-1 px-2 rounded-md transition-all duration-200"
+        className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-semibold py-1 px-2 rounded-md transition-all duration-200"
       >
         {isCopied ? 'Copied!' : 'Copy'}
       </button>
@@ -39,70 +44,44 @@ const CodeBlock = ({ code }: { code: string }) => {
   );
 };
 
-// Reusable component for inline code
 const Code = ({ children }: { children: React.ReactNode }) => (
-  <code className="bg-gray-200 text-red-700 font-mono text-sm rounded px-1 py-0.5">
+  <code className="bg-gray-200 text-red-700 font-mono px-1.5 py-0.5 rounded-md text-sm">
     {children}
   </code>
 );
 
-// Reusable component for note sections
-const NoteSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
-  <section className="mb-6">
-    <h3 className="text-2xl font-semibold border-b-2 border-gray-300 pb-2 mb-3">{title}</h3>
-    <div className="text-gray-700 space-y-3">{children}</div>
-  </section>
-);
-
-// Reusable component for quiz sections
-const QuizSection = ({ children }: { children: React.ReactNode }) => (
-  <section className="mt-8">
-    <h3 className="text-2xl font-semibold border-b-2 border-gray-300 pb-2 mb-3">Test Your Knowledge</h3>
-    <ol className="list-decimal list-inside space-y-2 text-gray-700">
-      {children}
-    </ol>
-  </section>
-);
-
-// --- NEW Image Diagram Component (Replaces SVG) ---
-const ImageDiagram = ({ src, alt }: { src: string, alt: string }) => (
-  <div className="bg-gray-100 p-4 rounded-md shadow-inner mt-4 overflow-x-auto flex justify-center">
-    <img 
-      src={src} 
-      alt={alt} 
-      className="max-w-full h-auto rounded-md border-2 border-gray-300"
-      onError={(e) => {
-        const target = e.target as HTMLImageElement;
-        // target.src = 'https://placehold.co/700x300/FEEBC8/F6AD55?text=Image+Not+Found';
-        target.alt = 'Image loading error. Placeholder shown.';
-      }}
-    />
-  </div>
-);
-
-
-// --- Main Chapter Component ---
+// --- Main Chapter 7 Component ---
 
 const Chapter7 = ({ noteId }: { noteId: string }) => {
   switch (noteId) {
     // --- 7.1: Introduction to Node.js & Runtime Environment ---
     case 'introduction-to-node':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">7.1: Introduction to Node.js & Runtime Environment (TCS/Infosys Core)</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">7.1: Introduction to Node.js & Runtime Environment</h2>
           
-          <NoteSection title="Concept">
-            <p><strong className="text-gray-900">Node.js</strong> is not a language; it is a <strong className="text-gray-900">JavaScript runtime environment</strong> built on Google's V8 JavaScript engine. It allows developers to run JavaScript code on the <strong className="text-gray-900">server</strong> (backend), outside of a web browser.</p>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Server-Side Engine</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>For decades, JavaScript was a language that could <em>only</em> run inside a web browser. Think of the browser as a special "sandbox" where JavaScript could operate.</p>
+            <p><strong>Node.js</strong> is an "engine" (a runtime environment) that was created by taking Google's high-performance V8 JavaScript engine <em>out</em> of the browser. This allows you to run JavaScript on a server (or any computer) to build backends, command-line tools, and more.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+          
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Node.js</strong> is not a language; it is a <strong>JavaScript runtime environment</strong> built on Google's V8 JavaScript engine. It allows developers to run JavaScript code on the <strong>server</strong> (backend), outside of a web browser.</p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">V8 Engine:</strong> Compiles JavaScript directly into native machine code, making it very fast.</li>
-              <li><strong className="text-gray-900">Event-Driven, Non-Blocking I/O:</strong> This is the core architectural advantage. Node.js uses a single thread (the "Event Loop") to handle many connections concurrently.</li>
-              <li>Instead of waiting for a task (like reading a file or a database query) to finish (which is "blocking"), Node.js gives the task to its <strong className="text-gray-900">Libuv</strong> library (which uses a C++ thread pool).</li>
-              <li>The single-threaded <strong className="text-gray-900">Event Loop</strong> is free to handle other user requests. When the task is done, Libuv places a callback function into a queue, which the Event Loop executes.</li>
+              <li><strong>V8 Engine:</strong> Compiles JavaScript directly into native machine code, making it very fast.</li>
+              <li><strong>Event-Driven, Non-Blocking I/O:</strong> This is the core architectural advantage. Node.js uses a single thread (the "Event Loop") to handle many connections concurrently.</li>
+              <li>Instead of waiting for a task (like reading a file or a database query) to finish (which is "blocking"), Node.js gives the task to its <strong>Libuv</strong> library (which uses a C++ thread pool).</li>
+              <li>The single-threaded <strong>Event Loop</strong> is free to handle other user requests. When the task is done, Libuv places a callback function into a queue, which the Event Loop executes.</li>
               <li>This model is extremely efficient for I/O-heavy applications (like chat apps, streaming services, and REST APIs) but less ideal for CPU-intensive tasks (like complex calculations).</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
+          <h3 className="text-2xl font-bold mb-3">Example: A Basic Node.js HTTP Server</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
             <p>This is the classic "Hello World" server in Node.js, using the built-in <Code>http</Code> module. Save this as <Code>server.js</Code> and run <Code>node server.js</Code> in your terminal.</p>
             <CodeBlock code={`
 // 1. Import the built-in http module
@@ -128,72 +107,87 @@ const server = http.createServer((req, res) => {
 server.listen(port, hostname, () => {
   console.log(\`Server running at http://\${hostname}:\${port}/\`);
 });
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p>This diagram shows the Node.js architecture. The Event Loop handles fast, non-blocking tasks, while offloading slow, blocking I/O tasks (like database queries) to the Libuv Thread Pool.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/v1b0f9H.png" 
-              alt="Node.js Event Loop and Thread Pool Architecture" 
-            />
-            You can replace the src above with your own hosted image URL
-            { <ImageDiagram 
-              src="htt" 
-              alt="Node.js Architecture Diagram" 
-            /> }
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Core Interview Question (All Companies):</strong> "What is Node.js? Is it single-threaded? How does it handle concurrency?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "Node.js is a JS runtime. It *is* single-threaded via its <strong className="text-gray-900">Event Loop</strong>, but it achieves concurrency using a <strong className="text-gray-900">Non-Blocking I/O</strong> model. It offloads expensive I/O operations to the <strong className="text-gray-900">Libuv thread pool</strong>, allowing the main thread to remain responsive."</li>
-              <li><strong className="text-gray-900">TCS/Infosys/Wipro:</strong> Often ask you to differentiate between Node.js and other backends (like Java/Spring or Python/Django), focusing on the non-blocking I/O model.</li>
-              <li><strong className="text-gray-900">Amazon/Startups:</strong> Will dig deeper into the Event Loop, asking about the callback queue, microtasks (like Promises), and macrotasks (like <Code>setTimeout</Code>).</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Saying "Node.js is a language" or "Node.js is multi-threaded." Both are incorrect.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Core Question: "What is Node.js? Is it single-threaded? How does it handle concurrency?"</strong>
+                <p className="pl-4"><strong>Answer:</strong> "Node.js is a JS runtime. It <em>is</em> single-threaded via its <strong>Event Loop</strong>, but it achieves concurrency using a <strong>Non-Blocking I/O</strong> model. It offloads expensive I/O operations (like database queries) to the <strong>Libuv thread pool</strong>, allowing the main Event Loop to remain responsive and handle other requests."</p>
+              </li>
+              <li>
+                <strong>Common Question: "What's the difference between Node.js and browser JavaScript?"</strong>
+                <p className="pl-4"><strong>Answer:</strong> "Browser JS runs in a sandbox and has access to browser-specific APIs like the <strong>DOM</strong> (<code>document</code>) and <strong>Window</strong> (<code>window</code>). Node.js runs on a server and has access to server-specific APIs, like the <strong>File System</strong> (<code>fs</code>), <strong>HTTP Server</strong> (<code>http</code>), and the <strong>operating system</strong> (<code>os</code>)."</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What is Node.js? (A. A JavaScript library, B. A JavaScript runtime, C. A new programming language)</li>
-            <li>What is the name of the C++ library that handles asynchronous I/O in Node.js?</li>
-            <li>True or False: Node.js is ideal for CPU-intensive tasks because it is single-threaded.</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.2: Node.js Core Modules ---
     case 'node-core-modules':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
           <h2 className="text-3xl font-bold mb-4">7.2: Node.js Core Modules (fs, path, http, url)</h2>
           
-          <NoteSection title="Concept">
-            <p>Node.js has a set of built-in modules (libraries) that you can use without installing anything from <Code>npm</Code>. You load them using the <Code>require()</Code> function.</p>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Built-in Toolbox</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>When you get Node.js, it comes with a "toolbox" of <strong>Core Modules</strong>. You don't need to `npm install` them; they are built-in. You just have to ask for them with `require()`.</p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">`fs` (File System):</strong> Used for all file operations: reading files (<Code>fs.readFile</Code>), writing files (<Code>fs.writeFile</Code>), checking if a file exists (<Code>fs.existsSync</Code>), etc. It has both synchronous (blocking) and asynchronous (non-blocking) versions for most methods.</li>
-              <li><strong className="text-gray-900">`path` (Path):</strong> A utility module for handling and normalizing file and directory paths. Essential for creating cross-platform compatible paths (Windows uses `\` vs. Mac/Linux using `/`). Use <Code>path.join()</Code> to safely combine path segments.</li>
-              <li><strong className="text-gray-900">`http`:</strong> The module used to create HTTP servers and make HTTP requests. (See 7.1 Example).</li>
-              <li><strong className="text-gray-900">`url`:</strong> A utility module for parsing URL strings. You can use it to easily extract parts of a URL, like the query parameters (<Code>?user=123</Code>), pathname (<Code>/api/users</Code>), or host.</li>
+              <li><strong>`http` Module:</strong> The "Telephone" tool. Lets you create a server to listen for and answer HTTP calls.</li>
+              <li><strong>`fs` Module:</strong> The "File Cabinet" tool. Lets you read, write, and delete files.</li>
+              <li><strong>`path` Module:</strong> The "GPS" tool. Helps you build file paths that work on any computer (Windows, Mac, or Linux).</li>
+              <li><strong>`url` Module:</strong> The "Address Parser" tool. Helps you read and understand complex URL strings.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>This example uses <Code>fs</Code> to read a file and <Code>path</Code> to build the file path safely. Create a file named <Code>welcome.txt</Code> in the same directory with the text "Hello from the file!".</p>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Node.js provides a set of built-in modules for common operations. You import them using the <Code>require()</Code> function.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong><code>fs</code> (File System):</strong> The most important core module. Used for all file operations. It has two "flavors":
+                <ul>
+                  <li><strong>Asynchronous (Recommended):</strong> `fs.readFile(path, cb)`. Does not block the event loop.</li>
+                  <li><strong>Synchronous (Blocking):</strong> `fs.readFileSync(path)`. <strong>Blocks the entire event loop</strong> until the file is read. Never use this inside a server request.</li>
+                </ul>
+              </li>
+              <li><strong><code>path</code> (Path):</strong> A utility for working with file and directory paths.
+                <ul>
+                  <li>Its main method is <strong>`path.join()`</strong>, which joins path segments using the correct separator (`/` or `\`) for the host OS.</li>
+                  <li><code>__dirname</code> is a global Node.js variable that gives you the absolute path of the directory the <em>current file</em> is in.</li>
+                </ul>
+              </li>
+              <li><strong><code>http</code>:</strong> The low-level module used to create HTTP servers (as seen in 7.1).</li>
+              <li><strong><code>url</code>:</strong> A utility for parsing URL strings to get components like the pathname, host, or query parameters.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: Reading a File with `fs` and `path`</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This example uses `fs` (async) to read a file and `path` to build the file path safely. Create a file named <Code>welcome.txt</Code> in the same directory with the text "Hello from the file!".</p>
             <CodeBlock code={`
 const fs = require('fs');
 const path = require('path');
 
 // 1. Build a safe, cross-platform path
-// __dirname is a global Node variable: the path of the current directory
+// '__dirname' is the path of the current directory (e.g., /users/me/project)
 const filePath = path.join(__dirname, 'welcome.txt');
 
 console.log('Reading file from:', filePath);
 
 // 2. Read the file asynchronously (non-blocking)
-// It takes a path, encoding, and a callback function
 fs.readFile(filePath, 'utf8', (err, data) => {
-  // 3. The callback runs when the file is read
+  // 3. This callback runs when the file is read
   if (err) {
     console.error('Error reading the file:', err);
     return;
@@ -206,64 +200,70 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 
 console.log('This message logs FIRST, before the file content!');
 // Why? Because fs.readFile is asynchronous.
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p>This diagram shows how your <Code>server.js</Code> uses <Code>require()</Code> to import Node.js Core Modules, which are built into the Node.js runtime.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/G5gJgXQ.png" 
-              alt="Node.js Core Modules Diagram" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/700x200/EBF8FF/4299E1?text=Your+App.js+--%3E+require('fs')++--%3E+Node.js+Runtime" 
-              alt="Node.js Core Modules Diagram" 
-            />
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (Infosys/Wipro):</strong> "What is the difference between <Code>fs.readFileSync</Code> and <Code>fs.readFile</Code>?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "<Code>readFileSync</Code> is synchronous or 'blocking'. The server will stop and wait for the file to be read. <Code>readFile</Code> is asynchronous or 'non-blocking'. It offloads the task and executes a callback when done, allowing the server to handle other requests."</li>
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "Why should you use <Code>path.join()</Code> instead of string concatenation (e.g., <Code>__dirname + '/myfile.txt'</Code>)?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "<Code>path.join()</Code> automatically handles path separators (`/` vs. `\`) for different operating systems (like Linux and Windows), making the code cross-platform compatible and preventing bugs."</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Using synchronous methods like <Code>fs.readFileSync</Code> inside a server request handler. This is a major performance bottleneck and interviewers look for this mistake.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between `fs.readFileSync` and `fs.readFile`?</strong>
+                <p className="pl-4">`readFileSync` is <strong>synchronous</strong> (blocking). The entire server and event loop *stops* and waits for the file to be read. `readFile` is <strong>asynchronous</strong> (non-blocking). It gives the task to the Libuv thread pool and continues running. The callback function is executed when the file is ready. You should <em>always</em> use the async version inside a server.</p>
+              </li>
+              <li>
+                <strong>Why use `path.join()` instead of just `myPath + '/file.txt'`?</strong>
+                <p className="pl-4">Because that code will <em>break</em> on Windows, which uses `\` as a path separator. `path.join(__dirname, 'file.txt')` will correctly create `/my/path/file.txt` on a Mac/Linux and `C:\my\path\file.txt` on Windows, making your code cross-platform.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>Which core module is used for working with file and directory paths?</li>
-            <li>Which <Code>fs</Code> method is "non-blocking"? (<Code>fs.readFile</Code> or <Code>fs.readFileSync</Code>)</li>
-            <li>What global variable gives you the path of the current file's directory?</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.3: npm & Package Management ---
     case 'npm-package-management':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">7.3: npm & Package Management (Essential Skill)</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">7.3: npm & Package Management</h2>
           
-          <NoteSection title="Concept">
-            <p><strong className="text-gray-900">npm (Node Package Manager)</strong> is the world's largest software registry (repository) and a command-line tool for managing your project's dependencies.</p>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Project's Shopping List</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>`npm`</strong> is the "package warehouse" (the world's largest) and the "delivery service" (the command line tool) for code.</p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">`npm init` or `npm init -y`:</strong> Initializes a new Node.js project by creating a <Code>package.json</Code> file. The <Code>-y</Code> flag accepts all defaults.</li>
-              <li><strong className="text-gray-900">`package.json`:</strong> The manifest file for your project. It lists project metadata, <strong className="text-gray-900">dependencies</strong>, and <strong className="text-gray-900">scripts</strong> (like <Code>npm start</Code>).</li>
-              <li><strong className="text-gray-900">`npm install &lt;packageName&gt;`:</strong> Installs a package (e.g., <Code>npm install express</Code>). It adds the package to <Code>node_modules</Code> and lists it as a dependency in <Code>package.json</Code>.</li>
-              <li><strong className="text-gray-900">`node_modules`:</strong> The local directory where all your project's dependencies are downloaded and stored. You should <strong className="text-gray-900">never</strong> commit this folder to Git (add it to <Code>.gitignore</Code>).</li>
-              <li><strong className="text-gray-900">`dependencies` vs. `devDependencies`:</strong>
-                <ul className="list-disc ml-6 mt-1">
-                  <li><strong className="text-gray-900">`dependencies` (e.g., `express`):</strong> Required for the application to run in production. Installed with <Code>npm install &lt;pkg&gt;</Code>.</li>
-                  <li><strong className="text-gray-900">`devDependencies` (e.g., `nodemon`):</strong> Only needed for development (like testing or auto-restarting). Installed with <Code>npm install &lt;pkg&gt; --save-dev</Code> (or <Code>-D</Code>).</li>
+              <li><strong>`package.json` file:</strong> Your project's "shopping list." It tells `npm` exactly what to buy.</li>
+              <li><strong>`npm install express`:</strong> "Add 'Express' to my shopping list and deliver it."</li>
+              <li><strong>`node_modules` folder:</strong> The "delivery box" that arrives at your door, containing all the packages you ordered (and all the packages *they* ordered).</li>
+              <li><strong>`package-lock.json` file:</strong> A hyper-detailed "invoice" that lists the *exact* version of every single item, ensuring you get the same delivery every time.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>npm (Node Package Manager)</strong> is the command-line tool and registry for managing your project's <strong>dependencies</strong> (third-party code).</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>`npm init -y`:</strong> Initializes a new project by creating a <Code>package.json</Code> file.</li>
+              <li><strong>`package.json`:</strong> The project's manifest file. It lists:
+                <ul>
+                  <li><strong>`dependencies`</strong>: Packages required for the app to run in *production* (e.g., `express`, `react`). Installed with `npm install express`.</li>
+                  <li><strong>`devDependencies`</strong>: Packages only used for *development* (e.g., `nodemon`, `eslint`). Installed with `npm install nodemon --save-dev` (or `-D`).</li>
+                  <li><strong>`scripts`</strong>: Shortcuts for terminal commands (e.g., `npm start`, `npm test`).</li>
                 </ul>
               </li>
-              <li><strong className="text-gray-900">`package-lock.json`:</strong> An auto-generated file that "locks" the exact versions of all dependencies. This ensures that every developer on the team (and the production server) installs the <strong className="text-gray-900">exact same versions</strong>, preventing "it works on my machine" bugs. You <strong className="text-gray-900">should</strong> commit this file to Git.</li>
+              <li><strong>`node_modules/`:</strong> The folder where `npm` downloads and stores all the packages. You **must** add this to your `.gitignore` file.</li>
+              <li><strong>`package-lock.json`:</strong> An auto-generated file that "locks" the *exact* versions of all dependencies. This guarantees **deterministic builds**, meaning every developer on the team (and the server) gets the exact same code. You **must** commit this file to Git.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>A typical <Code>package.json</Code> file. Note the <Code>scripts</Code>, <Code>dependencies</Code>, and <Code>devDependencies</Code> sections.</p>
+          <h3 className="text-2xl font-bold mb-3">Example: A Standard `package.json`</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A typical `package.json` for an Express server. You would run `npm install` to get the dependencies, `npm run dev` to start, and `npm start` in production.</p>
             <CodeBlock code={`
 {
   "name": "my-cool-server",
@@ -271,9 +271,9 @@ console.log('This message logs FIRST, before the file content!');
   "description": "A demo server for my project",
   "main": "server.js",
   "scripts": {
-    "test": "echo \\"Error: no test specified\\" && exit 1",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "echo \\"Error: no test specified\\" && exit 1"
   },
   "author": "Your Name",
   "license": "ISC",
@@ -281,275 +281,275 @@ console.log('This message logs FIRST, before the file content!');
     "express": "^4.18.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.0.1"
   }
 }
-            `} />
-          </NoteSection>
+            `} language="json" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p>This shows the <Code>npm</Code> workflow. <Code>npm install</Code> reads <Code>package.json</Code>, downloads packages from the npm Registry, and puts them in <Code>node_modules</Code>.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/39mN1q0.png" 
-              alt="NPM Install Workflow" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/800x200/EBF8FF/4299E1?text=package.json+--%3E+npm+install+--%3E+npm+Registry+--%3E+node_modules" 
-              alt="NPM Workflow" 
-            />
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "What is the difference between <Code>package.json</Code> and <Code>package-lock.json</Code>? Which one should you commit to Git?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "<Code>package.json</Code> lists the *semantic versions* (e.g., `^4.18.2`), which allows for minor updates. <Code>package-lock.json</Code> locks the *exact installed versions* and their sub-dependencies. You must commit <Code>package-lock.json</Code> to ensure consistent builds across all environments."</li>
-              <li><strong className="text-gray-900">Key Question (TCS/Infosys):</strong> "What is the purpose of <Code>nodemon</Code> and why is it a <Code>devDependency</Code>?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "<Code>nodemon</Code> is a tool that automatically restarts the Node.js server when file changes are detected. It's a <Code>devDependency</Code> because it's only used during development and not needed for the server to run in production."</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Committing the <Code>node_modules</Code> folder to Git. This is a huge red flag. Always add it to <Code>.gitignore</Code>.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between `dependencies` and `devDependencies`?</strong>
+                <p className="pl-4"><strong>`dependencies`</strong> (like `express`) are essential for the app to *run*. <strong>`devDependencies`</strong> (like `nodemon`) are only used for *developing* the app (e.g., auto-reload, testing). When you deploy to production, you typically only install the `dependencies` to keep the build size small.</p>
+              </li>
+              <li>
+                <strong>What's the difference between `package.json` and `package-lock.json`?</strong>
+                <p className="pl-4">`package.json` lists the versions you *want* (e.g., `^4.18.2`, which means "4.18.2 or any newer patch"). `package-lock.json` lists the *exact* version that was *actually* installed (e.g., `4.18.5`). You **must** commit `package-lock.json` to ensure everyone on your team and your server builds use the *identical* set of dependencies, preventing "it works on my machine" bugs.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What command creates a new <Code>package.json</Code> file?</li>
-            <li>What file should you add to <Code>.gitignore</Code> to avoid committing dependencies?</li>
-            <li>What file ensures all developers use the exact same package versions?</li>
-            <li>What flag do you use to install a package as a <Code>devDependency</Code>?</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.4: Creating Your First Node.js Server ---
     case 'creating-node-server':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">7.4: Creating Your First Node.js Server (http vs. Express)</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">7.4: Creating Your First Node.js Server (Express)</h2>
           
-          <NoteSection title="Concept">
-            <p>You can create a web server in Node.js using the built-in <Code>http</Code> module, but it is very low-level. Most companies use <strong className="text-gray-900">Express.js</strong>, a fast and minimalist web framework for Node.js.</p>
-            <p><strong className="text-gray-900">Why Express.js?</strong> The <Code>http</Code> module (see 7.1) requires you to manually parse URLs, handle request methods (GET, POST), and set headers. Express simplifies all of this with:</p>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The "Server Framework"</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Using Node's built-in `http` module is like building a car from raw steel and parts. It's possible, but incredibly low-level and difficult.</p>
+            <p><strong>Express.js</strong> is a <strong>framework</strong> for Node.js. It's like a pre-built "car chassis." It gives you the frame, wheels, and engine block, so you can stop worrying about the low-level plumbing and start focusing on the important parts, like *where the car should go* (routing).</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Express.js</strong> is the de-facto standard, minimalist framework for building web servers and APIs in Node.js. It simplifies the `http` module by providing easy-to-use tools for:</p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Routing:</strong> Easily define endpoints like <Code>app.get('/users', ...)</Code> or <Code>app.post('/login', ...)</Code>.</li>
-              <li><strong className="text-gray-900">Middleware:</strong> Functions that run between the request and the response. Used for logging, authentication (checking if a user is logged in), and parsing request bodies.</li>
-              <li><strong className="text-gray-900">Request/Response Objects:</strong> Provides simple objects (<Code>req</Code>, <Code>res</Code>) to get request data (e.g., <Code>req.body</Code>, <Code>req.params</Code>) and send responses (e.g., <Code>res.json()</Code>, <Code>res.send()</Code>).</li>
+              <li><strong>Routing:</strong> This is its main feature. It lets you map HTTP methods (GET, POST, PUT, DELETE) and URL paths (e.g., `/users`, `/products`) to specific handler functions.</li>
+              <li><strong>Middleware:</strong> Functions that run in the "middle" of the request-response cycle. They are used for tasks like logging, authentication, error handling, and parsing request bodies.</li>
+              <li><strong>Request/Response Objects:</strong> It provides simple, powerful `req` (request) and `res` (response) objects.
+                <ul>
+                  <li>`req.params`: To get URL parameters (e.g., `:id`).</li>
+                  <li>`req.query`: To get query strings (e.g., `?search=...`).</li>
+                  <li>`res.json()`: To send a JSON response (auto-sets headers).</li>
+                  <li>`res.send()`: To send a plain text/HTML response.</li>
+                  <li>`res.status(404)`: To set the HTTP status code.</li>
+                </ul>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Here is the same "Hello World" server, but built with <strong className="text-gray-900">Express.js</strong>. Notice how much cleaner it is. First, run <Code>npm install express</Code>.</p>
+          <h3 className="text-2xl font-bold mb-3">Example: A Simple Express.js Server</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Notice how much cleaner this is than the `http` example.
+            <br/>1. Run `npm install express`.
+            <br/>2. Save this as `server.js` and run `node server.js`.</p>
             <CodeBlock code={`
-const express = require('express');
-
-// 1. Initialize the Express app
+import express from 'express'; // Using ES Module syntax
 const app = express();
 const port = 3000;
 
-// 2. Define a "route" for the root URL ('/')
-// This handles GET requests to http://localhost:3000/
+// 1. Define a "GET" route for the root URL ('/')
 app.get('/', (req, res) => {
-  // 3. 'res.send()' is much simpler than http module
+  // 2. 'res.send()' is much simpler
   res.send('Hello, World from Express.js!');
 });
 
-// Example of another route
+// 2. Define another route for '/api/user'
 app.get('/api/user', (req, res) => {
-  // 4. 'res.json()' automatically sets Content-Type to application/json
+  // 3. 'res.json()' automatically sets content-type to application/json
   res.json({ id: 1, name: 'Alex' });
 });
 
-// 5. Start the server
-// Express handles 404s automatically
-
+// 3. Start the server
+// Express handles 404s and errors automatically
 app.listen(port, () => {
-  console.log(\`Server (Express.js) running on port \${port\}\`);
+  console.log(\`Express server running on http://localhost:\${port}\`);
 });
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p>This diagram shows how Express.js acts as a "middleware" layer on top of the built-in Node.js <Code>http</Code> module to make server creation easier.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/r6A49J9.png" 
-              alt="Express.js on top of Node.js HTTP" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/800x200/EBF8FF/4299E1?text=HTTP+Request+--%3E+Express.js+(Routing,+Middleware)+--%3E+Node.js+HTTP+Server" 
-              alt="Express.js on top of Node.js" 
-            />
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "Why do we use Express.js instead of the <Code>http</Code> module?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "The <Code>http</Code> module is very basic. Express provides a robust framework for <strong className="text-gray-900">routing</strong> (handling different URLs and methods), <strong className="text-gray-900">middleware</strong> (like authentication and logging), and simple response methods like <Code>res.json()</Code>, which drastically speeds up development."</li>
-              <li><strong className="text-gray-900">TCS/Infosys/Wipro:</strong> You will almost certainly be asked to write a simple Express server that has a <Code>GET</Code> route and a <Code>POST</Code> route. Practice the example above.</li>
-              <li><strong className="text-gray-900">Amazon/Startups:</strong> Will ask "What is middleware? Give an example." Your answer: "Middleware is a function that has access to the <Code>req</Code>, <Code>res</Code>, and <Code>next</Code> objects. It can execute code, modify <Code>req</Code> or <Code>res</Code>, or end the request. A common example is an authentication middleware that checks for a valid token before calling <Code>next()</Code> to proceed to the route handler."</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>Why do we use Express.js instead of the `http` module?</strong>
+                <p className="pl-4">The `http` module is very low-level. You have to manually parse the URL (e.g., `if (req.url === '/users')`) and HTTP method (`if (req.method === 'POST')`). Express provides a robust **router** (`app.post('/users', ...)`), a **middleware** system, and simple response methods (`res.json()`) that handle all of that complexity for you.</p>
+              </li>
+              <li>
+                <strong>What is "middleware" in Express?</strong>
+                <p className="pl-4">Middleware is a function that runs *between* the request and the final route handler. It has access to the `req`, `res`, and a special function `next()`. It's used for logging, checking if a user is authenticated, or parsing the body of a request. Calling `next()` passes control to the *next* middleware or to the route handler.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What is Express.js? (A. A Node.js runtime, B. A web framework, C. A database)</li>
-            <li>What function in Express is used to send a JSON response?</li>
-            <li>What command installs Express.js?</li>
-            <li>What Express function is used to handle a GET request to the <Code>/profile</Code> URL?</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.5: Understanding Modules & Module.exports ---
     case 'understanding-modules':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">7.5: Understanding Modules & Module.exports (CommonJS)</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">7.5: Understanding Modules (CommonJS vs. ES Modules)</h2>
           
-          <NoteSection title="Concept">
-            <p>To keep code organized, Node.js uses a module system. By default, it uses the <strong className="text-gray-900">CommonJS</strong> module system. (Note: Modern JavaScript now uses <strong className="text-gray-900">ES Modules</strong>: <Code>import</Code>/<Code>export</Code>).</p>
-            <p>In CommonJS:</p>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Private Office</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Think of every JavaScript file as a "private office." By default, all the work (variables, functions) you do in your office is **private**. No one else can see it.</p>
             <ul className="list-disc ml-6 space-y-2">
-              <li>Each file is a separate <strong className="text-gray-900">module</strong>. Variables and functions defined in one file are <strong className="text-gray-900">private</strong> to that file by default.</li>
-              <li><strong className="text-gray-900">`require()`:</strong> The global function used to <strong className="text-gray-900">import</strong> (load) a module (e.g., <Code>const fs = require('fs');</Code>).</li>
-              <li><strong className="text-gray-900">`module.exports`:</strong> A special object in every module. Anything you assign to <Code>module.exports</Code> becomes <strong className="text-gray-900">public</strong> and can be imported by other files.</li>
-              <li><strong className="text-gray-900">`exports`:</strong> A shorthand variable that points to <Code>module.exports</Code>. You can use <Code>exports.myFunction = ...</Code> as a shortcut, but <strong className="text-gray-900">be careful:</strong> you cannot reassign it (e.g., <Code>exports = ...</Code> will not work; use <Code>module.exports = ...</Code> for that).</li>
+              <li><strong>Exporting (CommonJS):</strong> You have a special "outbox" on your desk called `module.exports`. Anything you put in this box becomes **public**.</li>
+              <li><strong>Importing (CommonJS):</strong> Another file (`server.js`) can "look at" your outbox by using `require('./my-office')`.</li>
             </ul>
-          </NoteSection>
+            <p>This system, called **CommonJS**, is how Node.js traditionally organized code. The new system is **ES Modules**.</p>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Here, we create a utility module <Code>utils.js</Code> and import it into <Code>server.js</Code>.</p>
-            
-            <h4 className="font-semibold mt-2">File: `utils.js`</h4>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Node.js has two module systems for splitting code across files:</p>
+            <p><strong>1. CommonJS (CJS) - The "Classic" Way:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>This is the traditional Node.js system. It's synchronous.</li>
+              <li><strong>Exporting:</strong> You assign what you want to export to the `module.exports` object.
+                <br/><Code>module.exports = {'{'} myFunc {'}'};</Code>
+              </li>
+              <li><strong>Importing:</strong> You use the `require()` function to import modules.
+                <br/><Code>const {'{'} myFunc {'}'} = require('./myFile.js');</Code>
+              </li>
+            </ul>
+
+            <p className="mt-4"><strong>2. ES Modules (ESM) - The "Modern" Way:</strong></p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>This is the modern JavaScript standard, used by browsers and React.</li>
+              <li><strong>Exporting:</strong> You use the `export` keyword.
+                <br/><Code>export const myFunc = () =&gt; {'{...}'}</Code> (named export)
+                <br/><Code>export default myApp;</Code> (default export - only one per file)
+              </li>
+              <li><strong>Importing:</strong> You use the `import` keyword.
+                <br/><Code>import {'{'} myFunc {'}'} from './myFile.js';</Code>
+                <br/><Code>import myApp from './myApp.js';</Code>
+              </li>
+              <li>To use ESM in Node.js, you must either name your files with `.mjs` or add `"type": "module"` to your `package.json`.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: CommonJS vs. ES Modules</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p className="font-semibold mt-2">1. CommonJS (`require` / `module.exports`)</p>
             <CodeBlock code={`
-// This function is private to utils.js
-const privateAdd = (a, b) => {
-  return a + b;
-};
+// --- utils.js ---
+const add = (a, b) => a + b;
+const subtract = (a, b) => a - b;
 
-// This function is public
-const add = (a, b) => {
-  return privateAdd(a, b);
-};
+// Export an object with the functions
+module.exports = { add, subtract };
 
-// This function is also public
-const subtract = (a, b) => {
-  return a - b;
-};
-
-// We "export" the public functions
-module.exports = {
-  add,
-  subtract
-};
-
-// --- OR using the 'exports' shorthand ---
-// exports.add = (a, b) => { ... };
-// exports.subtract = (a, b) => { ... };
-            `} />
-
-            <h4 className="font-semibold mt-2">File: `server.js`</h4>
-            <CodeBlock code={`
-// 1. Import our local utils.js module
-// We use './' to signify a local file
+// --- server.js ---
+// Import the object
 const myUtils = require('./utils.js');
+console.log(myUtils.add(5, 3)); // 8
+            `} language="javascript" />
+            
+            <p className="font-semibold mt-2">2. ES Modules (`import` / `export`)</p>
+            <CodeBlock code={`
+// --- utils.mjs ---
+// Export functions as they are defined (named export)
+export const add = (a, b) => a + b;
+export const subtract = (a, b) => a - b;
 
-// 2. Now we can use the exported functions
-const sum = myUtils.add(5, 3);
-const diff = myUtils.subtract(10, 4);
+// --- server.mjs ---
+// Import using destructuring
+import { add } from './utils.mjs';
+console.log(add(5, 3)); // 8
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-console.log('Sum:', sum);       // Output: Sum: 8
-console.log('Difference:', diff); // Output: Difference: 6
-
-// 3. This will fail, because privateAdd was not exported
-// const privateSum = myUtils.privateAdd(1, 1); // TypeError: myUtils.privateAdd is not a function
-            `} />
-          </NoteSection>
-
-          {/* <NoteSection title="Diagram">
-            <p>This diagram shows <Code>utils.js</Code> placing its public functions onto the <Code>module.exports</Code> object, which <Code>server.js</Code> then imports using <Code>require()</Code>.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/gKkP0C1.png" 
-              alt="CommonJS module.exports workflow" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/800x200/EBF8FF/4299E1?text=utils.js+--%3E+module.exports={...}+--%3E+server.js+imports+with+require()" 
-              alt="CommonJS module.exports" 
-            />
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "What is the difference between <Code>module.exports</Code> and <Code>exports</Code>?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "<Code>exports</Code> is just a reference (shorthand) to <Code>module.exports</Code>. You can add properties to it (e.g., <Code>exports.add = ...</Code>), but you cannot reassign the <Code>exports</Code> variable itself (e.g., <Code>exports = ...</Code>) because that just changes the local variable, not <Code>module.exports</Code>. To export a single class or function, you must assign it directly to <Code>module.exports</Code>."</li>
-              <li><strong className="text-gray-900">Key Question (Infosys/Wipro):</strong> "What is the difference between CommonJS and ES Modules?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "CommonJS is the traditional Node.js module system, using <Code>require()</Code> and <Code>module.exports</Code>. ES Modules (ESM) is the modern JavaScript standard, using <Code>import</Code> and <Code>export</Code>. CommonJS imports are synchronous, while ESM imports are asynchronous."</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Trying to use <Code>import</Code> syntax in a default Node.js file (which expects CommonJS) or vice-versa, leading to syntax errors.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What's the difference between `module.exports` and `exports`?</strong>
+                <p className="pl-4">`exports` is just a *shorthand variable* that points to `module.exports`. You can add properties to it (e.g., `exports.add = ...`), but you *cannot* re-assign it (e.g., `exports = myFunc` will not work). To export a single item, you *must* use `module.exports = myFunc`.</p>
+              </li>
+              <li>
+                <strong>Why am I getting a "Cannot use import statement outside a module" error?</strong>
+                <p className="pl-4">This means you are trying to use `import` syntax in a file that Node.js is treating as CommonJS. To fix it, you must either rename your files to `.mjs` or, more commonly, add the line `"type": "module"` to the top level of your `package.json` file.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <QuizSection> */}
-            <li>What function is used to import a module in CommonJS?</li>
-            <li>What object do you assign functions to in order to make them public?</li>
-            {/* <li>True or False: <Code>exports = { add, subtract }</Code> is a valid way to export modules.</li> */}
-          {/* </QuizSection> */}
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.6: Asynchronous Programming in Node.js ---
     case 'asynchronous-programming-node':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">7.6: Asynchronous Programming in Node.js (Callbacks, Promises, Async/Await)</h2>
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h2 className="text-3xl font-bold mb-4">7.6: Asynchronous Programming (Callbacks, Promises, Async/Await)</h2>
           
-          <NoteSection title="Concept">
-            <p>Because Node.js is single-threaded, synchronous (blocking) code is disastrous. Asynchronous (non-blocking) programming is essential. There are three main patterns for handling asynchronous operations.</p>
-            <ol className="list-decimal list-inside ml-4 space-y-2">
-              <li><strong className="text-gray-900">Callbacks (The "Old Way"):</strong> A function you pass as an argument to another function, which gets "called back" when the operation completes.
-                <ul>
-                  <li><strong className="text-gray-900">Pros:</strong> Simple for one operation.</li>
-                  <li><strong className="text-gray-900">Cons:</strong> Leads to "Callback Hell" (Pyramid of Doom) when nesting many operations, making code hard to read and maintain.</li>
-                </ul>
-              </li>
-              <li><strong className="text-gray-900">Promises (The "Modern Way"):</strong> An object representing the eventual completion (or failure) of an asynchronous operation.
-                <ul>
-                  <li><strong className="text-gray-900">States:</strong> `pending`, `fulfilled` (succeeded), or `rejected` (failed).</li>
-                  <li><strong className="text-gray-900">Pros:</strong> Allows chaining operations with <Code>.then()</Code> (for success) and <Code>.catch()</Code> (for errors), which is much cleaner than callbacks.</li>
-                </ul>
-              </li>
-              <li><strong className="text-gray-900">Async/Await (The "Best Way"):</strong> Syntactic sugar built on top of Promises. It makes your asynchronous code look and behave like synchronous code, making it extremely easy to read.
-                <ul>
-                  <li><strong className="text-gray-900">`async`:</strong> Declares a function as asynchronous; it automatically returns a Promise.</li>
-                  <li><strong className="text-gray-900">`await`:</strong> Pauses the execution of an <Code>async</Code> function *until* a Promise settles (is fulfilled or rejected). It can <strong className="text-gray-900">only</strong> be used inside an <Code>async</Code> function.</li>
-                  <li>You must use <Code>try...catch</Code> blocks to handle errors (rejections) when using <Code>await</Code>.</li>
-                </ul>
-              </li>
-            </ol>
-          </NoteSection>
+          <h3 className="text-2xl font-bold mb-3">Analogy: Ordering at a Restaurant</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>Because Node.js is single-threaded, it must be asynchronous to handle multiple users.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Synchronous (Blocking):</strong> A waiter takes your order, walks to the kitchen, *waits* for the food, brings it to you, and *only then* takes the next table's order. (The entire restaurant is blocked).</li>
+              <li><strong>1. Callbacks:</strong> The waiter takes your order, gives it to the kitchen, and *tells the chef to "call him back" when it's done*. This leads to "Callback Hell" (the waiter is juggling 10 different orders).</li>
+              <li><strong>2. Promises:</strong> The waiter takes your order, and the kitchen gives him a *pager* (a <strong>Promise</strong>). The pager is "pending" but will "resolve" (buzz) when the food is ready. This is cleaner.</li>
+              <li><strong>3. Async/Await:</strong> The waiter, using an `async` function, can `await` the food. This *looks* like he's waiting, but he can magically handle other tasks. This is the cleanest syntax.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>Let's read a file using all three patterns. The <Code>fs/promises</Code> module provides functions that return Promises instead of using callbacks.</p>
-            
-            <h4 className="font-semibold mt-2">Pattern 1: Callback</h4>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>There are three main patterns for handling non-blocking code in Node.js:</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Callbacks:</strong> The "old way." A function passed as an argument to be executed when an async operation completes. Leads to "Callback Hell" (deep nesting).
+                <br/><Code>fs.readFile('file.txt', (err, data) {'=>'} {'{...}'})</Code>
+              </li>
+              <li><strong>Promises:</strong> An object representing the eventual state of an async operation (pending, fulfilled, or rejected). Allows you to chain operations with <Code>.then()</Code> and handle errors with <Code>.catch()</Code>.</li>
+              <li><strong>Async/Await (Best Way):</strong> Syntactic sugar built on top of Promises.
+                <ul className="list-disc ml-6 mt-2">
+                  <li><strong>`async`:</strong> Keyword that makes a function automatically return a Promise.</li>
+                  <li><strong>`await`:</strong> Keyword that *pauses* the `async` function's execution *until* a Promise is settled. It can only be used inside an `async` function.</li>
+                  <li><strong>`try...catch`:</strong> The standard way to handle errors (rejected promises) when using `async/await`.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: The 3 Async Patterns</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p className="font-semibold mt-2">1. Callback (The "Old Way")</p>
             <CodeBlock code={`
 const fs = require('fs');
 fs.readFile('./welcome.txt', 'utf8', (err, data) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log(data);
-  }
+  if (err) { console.error(err); } 
+  else { console.log(data); }
 });
-            `} />
+            `} language="javascript" />
 
-            <h4 className="font-semibold mt-2">Pattern 2: Promise (.then/.catch)</h4>
+            <p className="font-semibold mt-2">2. Promise (`.then/.catch`)</p>
             <CodeBlock code={`
 const fs = require('fs').promises; // Note: .promises
 fs.readFile('./welcome.txt', 'utf8')
-  .then(data => {
-    console.log(data);
-  })
-  .catch(err => {
-    console.error(err);
-  });
-            `} />
+  .then(data => { console.log(data); })
+  .catch(err => { console.error(err); });
+            `} language="javascript" />
 
-            <h4 className="font-semibold mt-2">Pattern 3: Async/Await (Recommended)</h4>
+            <p className="font-semibold mt-2">3. Async/Await (The "Best Way")</p>
             <CodeBlock code={`
 const fs = require('fs').promises;
 
@@ -565,76 +565,80 @@ async function readFileAsync() {
     console.error(err);
   }
 }
+readFileAsync(); // 5. Call the function
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-// 5. Call the function
-readFileAsync();
-            `} />
-          </NoteSection>
-
-          {/* <NoteSection title="Diagram">
-            <p>This shows the evolution of async patterns, from "Callback Hell" to clean, readable "Async/Await."</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/2sL7bH7.png" 
-              alt="Async/Await vs Promises vs Callbacks" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/800x250/EBF8FF/4299E1?text=Callback+Hell+(Pyramid)+--%3E+Promises+(.then+chain)+--%3E+Async/Await+(Linear)" 
-              alt="Async Code Evolution" 
-            />
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (Amazon/Capgemini):</strong> "What is Callback Hell and how do you solve it?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "Callback Hell is when you nest multiple asynchronous callbacks, creating a 'pyramid of doom' that is hard to read and debug. You solve it by using <strong className="text-gray-900">Promises</strong> with <Code>.then()</Code> chains, or even better, by using <strong className="text-gray-900">Async/Await</strong> to write the code in a clean, synchronous-looking style."</li>
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "What is the difference between a Promise and Async/Await?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "A Promise is an object that holds the future state of an async operation. Async/Await is <strong className="text-gray-900">syntactic sugar</strong> for Promises. The <Code>async</Code> keyword makes a function return a Promise, and the <Code>await</Code> keyword pauses the function until a Promise is settled. It just makes Promise-based code look cleaner."</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Forgetting to use <Code>await</Code> on a promise-returning function (e.g., <Code>const data = fs.readFile(...)</Code>). The <Code>data</Code> variable will just be a *pending Promise object*, not the file content.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>What is "Callback Hell" and how do you solve it?</strong>
+                <p className="pl-4">"Callback Hell" (or the "Pyramid of Doom") is when you deeply nest asynchronous callbacks, making the code unreadable and hard to debug. You solve it by refactoring your code to use <strong>Promises</strong> with <Code>.then()</Code> chains, or even better, by using <strong>Async/Await</strong>, which allows you to write the same logic in a clean, linear, synchronous-looking style.</p>
+              </li>
+              <li>
+                <strong>What's the difference between `await` and `.then()`?</strong>
+                <p className="pl-4">`async/await` is just "syntactic sugar" for `.then()`. They both handle promises. `await` simply lets you write the code as if it were synchronous, which is much cleaner. <Code>const data = await myPromise;</Code> is the modern equivalent of `myPromise.then(data =&gt; {'{...}'})`.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What are the three states of a Promise?</li>
-            <li>What keyword pauses execution inside an <Code>async</Code> function until a Promise settles?</li>
-            <li>How do you handle errors when using <Code>await</Code>?</li>
-            <li>True or False: You can use <Code>await</Code> inside any regular function.</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.7: File System Operations ---
     case 'file-system-operations':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
           <h2 className="text-3xl font-bold mb-4">7.7: File System Operations (fs module)</h2>
           
-          <NoteSection title="Concept">
-            <p>The <Code>fs</Code> module is the primary way Node.js interacts with the computer's file system. Almost every method comes in three forms:
-            </p>
-            <ol className="list-decimal list-inside ml-4 space-y-2">
-              <li><strong className="text-gray-900">Asynchronous (Callback):</strong> <Code>fs.readFile(path, cb)</Code>. Non-blocking. The recommended way in older (callback-based) code.</li>
-              <li><strong className="text-gray-900">Synchronous (Blocking):</strong> <Code>fs.readFileSync(path)</Code>. Blocks the entire Event Loop. <strong className="text-gray-900">Never use this in a server's request handler.</strong> Only use it for one-time setup tasks when the server is starting (e.g., loading a config file).</li>
-              <li><strong className="text-gray-900">Promise-based:</strong> <Code>fs.promises.readFile(path)</Code>. Returns a Promise. This is the modern standard, designed to be used with <Code>async/await</Code>.</li>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The File Cabinet</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>The <strong>`fs` (File System)</strong> module is your set of tools for interacting with the server's "file cabinet."</p>
+            <p>When you need a file, you have two ways to get it:</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Synchronous (`fs.readFileSync`):</strong> "Stop <em>everything</em> you are doing, go to the cabinet, find the file, read it, and only then continue working." This is <strong>blocking</strong> and terrible for a server.</li>
+              <li><strong>Asynchronous (`fs.readFile`):</strong> "Send an intern (a `Libuv` thread) to get the file. Continue your own work. The intern will hand you the file (call you back) when they have it." This is <strong>non-blocking</strong> and essential for a fast server.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>The <Code>fs</Code> module provides methods for file I/O. Every method comes in three forms. You should **always use the Promise-based methods** with `async/await` in modern code.</p>
+            <ol className="list-decimal ml-6 space-y-2">
+              <li><strong>Asynchronous (Callback):</strong> `fs.readFile(path, cb)`</li>
+              <li><strong>Synchronous (Blocking):</strong> `fs.readFileSync(path)`</li>
+              <li><strong>Promise-based (Modern):</strong> `fs.promises.readFile(path)`</li>
             </ol>
             
-            <p className="mt-2"><strong className="text-gray-900">Common Methods:</strong></p>
+            <p className="mt-2"><strong>Common Promise-based Methods:</strong></p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">`fs.promises.readFile(path, [options])`:</strong> Reads a file's contents.</li>
-              <li><strong className="text-gray-900">`fs.promises.writeFile(path, data, [options])`:</strong> Writes data to a file, creating it if it doesn't exist (or overwriting it).</li>
-              <li><strong className="text-gray-900">`fs.promises.appendFile(path, data, [options])`:</strong> Appends data to the end of a file.</li>
-              <li><strong className="text-gray-900">`fs.promises.readdir(path)`:</strong> Reads the contents of a directory (returns an array of file/folder names).</li>
-              <li><strong className="text-gray-900">`fs.promises.stat(path)`:</strong> Gets statistics about a file (e.g., size, permissions, <Code>stats.isFile()</Code>, <Code>stats.isDirectory()</Code>).</li>
-              <li><strong className="text-gray-900">`fs.promises.mkdir(path)`:</strong> Creates a new directory.</li>
-              <li><strong className="text-gray-900">`fs.promises.unlink(path)`:</strong> Deletes a file.</li>
-              <li><strong className="text-gray-900">`fs.promises.rmdir(path)`:</strong> Deletes a directory.</li>
+              <li><strong>`fs.promises.readFile(path, 'utf8')`</strong>: Reads a file's contents.</li>
+              <li><strong>`fs.promises.writeFile(path, data)`</strong>: Writes data to a file (overwrites if it exists).</li>
+              <li><strong>`fs.promises.appendFile(path, data)`</strong>: Appends data to the end of a file.</li>
+              <li><strong>`fs.promises.readdir(path)`</strong>: Reads a directory and returns an array of file names.</li>
+              <li><strong>`fs.promises.stat(path)`</strong>: Gets file statistics (e.g., `stats.isFile()`).</li>
+              <li><strong>`fs.promises.mkdir(path)`</strong>: Creates a new directory.</li>
+              <li><strong>`fs.promises.unlink(path)`</strong>: Deletes a file.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>A modern example using <Code>async/await</Code> with the <Code>fs.promises</Code> module to write, read, and then delete a file.</p>
+          <h3 className="text-2xl font-bold mb-3">Example: `fs.promises` with Async/Await</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>A modern example using `async/await` to write, read, and then delete a file.</p>
             <CodeBlock code={`
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs'; // Modern ES Module import
+import path from 'path';
+
+// Helper to get correct path
+const __dirname = path.resolve();
 
 async function fileLifecycleDemo() {
   const filePath = path.join(__dirname, 'demo.txt');
@@ -649,16 +653,7 @@ async function fileLifecycleDemo() {
     const data = await fs.readFile(filePath, 'utf8');
     console.log('File content:', data);
 
-    // 3. Append to the file
-    await fs.appendFile(filePath, '\\nAppended new line.', 'utf8');
-    console.log('File appended successfully.');
-    
-    // 4. Get file stats
-    const stats = await fs.stat(filePath);
-    console.log('Is this a file?', stats.isFile());
-    console.log('File size:', stats.size, 'bytes');
-
-    // 5. Delete the file
+    // 3. Delete the file
     await fs.unlink(filePath);
     console.log('File deleted successfully.');
 
@@ -668,124 +663,146 @@ async function fileLifecycleDemo() {
 }
 
 fileLifecycleDemo();
-            `} />
-          </NoteSection>
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          {/* <NoteSection title="Diagram">
-            <p>This shows the <Code>fs.promises</Code> module providing the `async` functions that your application <Code>await</Code>s.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/k3qC7O4.png" 
-              alt="fs.promises workflow" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/800x200/EBF8FF/4299E1?text=App.js+(await)+--%3E+fs.promises.writeFile()+--%3E+File+System" 
-              alt="fs.promises workflow" 
-            />
-          </NoteSection> */}
-
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "When should you use <Code>fs.readFileSync</Code>?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "Almost never inside a server. The only acceptable time is during the server's <strong className="text-gray-900">initial startup</strong> process, for example, to load a necessary configuration file or an SSL certificate before the server starts accepting requests. In all other cases, you must use the asynchronous <Code>fs.readFile</Code> or <Code>fs.promises.readFile</Code>."</li>
-              <li><strong className="text-gray-900">TCS/Infosys Task:</strong> "Write a Node.js script that reads a directory, filters for all <Code>.txt</Code> files, and logs their names."</li>
-              <li><strong className="text-gray-900">Your approach:</strong> Use <Code>fs.promises.readdir()</Code>, then use <Code>Array.filter()</Code> on the result (e.g., <Code>files.filter(file =&gt; file.endsWith('.txt'))</Code>).</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Using synchronous <Code>fs</Code> methods everywhere. This is the #1 red flag for junior Node.js developers as it shows a misunderstanding of the Event Loop.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>When is it *ever* okay to use `fs.readFileSync` (synchronous)?</strong>
+                <p className="pl-4">The *only* acceptable time is during the **initial startup** of your server, *before* it starts listening for requests. For example, you might synchronously load a `config.json` file or an SSL certificate. Once the server is running (inside `app.listen` or `app.get`), you must *never* use a sync method.</p>
+              </li>
+              <li>
+                <strong>How would you read a directory and filter for only `.txt` files?</strong>
+                <p className="pl-4">You would combine `fs.promises` with array methods.
+                <br/><Code>const allFiles = await fs.promises.readdir('./my-dir');</Code>
+                <br/><Code>const txtFiles = allFiles.filter(file =&gt; file.endsWith('.txt'));</Code>
+                </p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>What module do you <Code>require</Code> to get Promise-based file system methods?</li>
-            <li>What <Code>fs</Code> method is used to delete a file?</li>
-            <li>Why should you avoid <Code>fs.readFileSync</Code> in a web server?</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- 7.8: Environment Variables & dotenv ---
     case 'environment-variables':
       return (
-        <div className="p-8 font-sans max-w-4xl mx-auto">
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
           <h2 className="text-3xl font-bold mb-4">7.8: Environment Variables & dotenv</h2>
           
-          <NoteSection title="Concept">
-            <p><strong className="text-gray-900">Environment Variables</strong> are key-value pairs provided to your application <strong className="text-gray-900">externally</strong> by the operating system (e.g., the server). They are used to store sensitive data (like API keys, database passwords) and configuration (like <Code>PORT</Code> or <Code>NODE_ENV</Code>) that should <strong className="text-gray-900">not</strong> be hard-coded into your application.</p>
+          <h3 className="text-2xl font-bold mb-3">Analogy: The Secret Post-it Note</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>You would never write your bank password in a public letter. The same is true for code. You never, ever write your database password or API keys in your source code (where it can be stolen from GitHub).</p>
+            <p>Instead, you write a "placeholder" in your code: `process.env.DB_PASSWORD`. This tells the code, "Go look for a secret Post-it Note called `DB_PASSWORD`."</p>
             <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Why?</strong> It's a major security risk to commit API keys and passwords to Git. Environment variables keep your secrets separate from your code.</li>
-              <li><strong className="text-gray-900">`process.env`:</strong> Node.js makes all environment variables available on the global <Code>process.env</Code> object (e.g., <Code>process.env.PORT</Code>).</li>
-              <li><strong className="text-gray-900">`dotenv` package:</strong> In development, it's annoying to set 20 variables in your terminal every time. The <Code>dotenv</Code> package (<Code>npm install dotenv</Code>) solves this.</li>
-              <li>It loads variables from a file named <Code>.env</Code> in your project's root directory and automatically adds them to <Code>process.env</Code>.</li>
-              <li>You <strong className="text-gray-900">MUST</strong> add your <Code>.env</Code> file to <Code>.gitignore</Code>. You commit a <Code>.env.example</Code> file instead, which lists the *keys* but not the *values*.</li>
+              <li><strong>In Production:</strong> The server (e.g., Heroku, Vercel) *provides* this "Post-it Note" to your app.</li>
+              <li><strong>In Development:</strong> You don't have a server, so you use the <strong>`dotenv`</strong> package. It reads your secrets from a local `.env` file and provides them to your app, just like a real server would.</li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Example">
-            <p>1. Install <Code>dotenv</Code>: <Code>npm install dotenv</Code><br/>
-               2. Create a <Code>.env</Code> file.<br/>
-               3. Create a <Code>server.js</Code> file.</p>
+          <h3 className="text-2xl font-bold mb-3">Technical Concept</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p><strong>Environment Variables</strong> are external values that configure your application without changing its code. This is a core principle of the <a href="https://12factor.net/config" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">12-Factor App methodology</a>.</p>
+            <ul className="list-disc ml-6 space-y-2">
+              <li><strong>Security:</strong> All secrets (DB passwords, API keys, JWT secrets) *must* be stored as environment variables.</li>
+              <li><strong>Configuration:</strong> Non-secret config that changes between environments (like `PORT`, `NODE_ENV='production'`) should also be env vars.</li>
+              <li><strong>`process.env`:</strong> Node.js automatically makes all environment variables available on the global `process.env` object.</li>
+              <li><strong>`dotenv` Package:</strong> A development tool that loads environment variables from a `.env` file into `process.env` at runtime.
+                <ol className="list-decimal ml-6 mt-2">
+                  <li>Install: `npm install dotenv`</li>
+                  <li>At the *very top* of your main `server.js` file, add: `require('dotenv').config();`</li>
+                </ol>
+              </li>
+              <li><strong>`.gitignore` (CRITICAL):</strong> You **MUST** add your `.env` file to your `.gitignore` file. Committing this file to GitHub is a critical security vulnerability.</li>
+            </ul>
+          </div>
+          <hr className="mb-6 border-gray-200" />
+
+          <h3 className="text-2xl font-bold mb-3">Example: Using `dotenv`</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <p>This shows the two files you need.
+            <br/>1. Run `npm install dotenv express`.
+            <br/>2. Create both files and run `node server.js`.</p>
             
-            <h4 className="font-semibold mt-2">File: `.env` (MUST be in .gitignore)</h4>
+            <p className="font-semibold mt-2">File: `.env` (This file is secret and in `.gitignore`)</p>
             <CodeBlock code={`
 # This is a comment
 PORT=8080
 DATABASE_URL="mongodb://user:password@mydb.com"
 API_KEY="abc123xyz789"
 NODE_ENV="development"
-            `} />
+            `} language="bash" />
 
-            <h4 className="font-semibold mt-2">File: `server.js` (Loads the .env file)</h4>
+            <p className="font-semibold mt-2">File: `server.js` (This code is public and safe to commit)</p>
             <CodeBlock code={`
 // 1. Load variables from .env file FIRST
-// This should be at the very top of your application
-require('dotenv').config();
+// This must be at the very top
+import 'dotenv/config'; 
+import express from 'express';
 
 // 2. Now you can access the variables from process.env
 const port = process.env.PORT || 3000; // Use 3000 as a default
 const dbUrl = process.env.DATABASE_URL;
 const env = process.env.NODE_ENV;
 
-console.log('Application is running in', env, 'mode.');
-console.log('Connecting to database at', dbUrl);
+console.log(\`Application is running in \${env} mode.\`);
+console.log(\`Database URL: \${dbUrl}\`);
 
-// ... (Your Express server code) ...
-// app.listen(port, () => { ... });
-console.log(\`Server will listen on port \${port\}\`);
-            `} />
-          </NoteSection>
+const app = express();
+app.get('/', (req, res) => {
+  // 3. Use the variables in your app
+  res.send(\`Hello! Your API key starts with: \${process.env.API_KEY.substring(0, 3)}\`);
+});
 
-          {/* <NoteSection title="Diagram">
-            <p>This shows <Code>dotenv</Code> reading the <Code>.env</Code> file and injecting its values into the <Code>process.env</Code> object, which your app can then use.</p>
-            <ImageDiagram 
-              src="https://i.imgur.com/v8tA9ZJ.png" 
-              alt="dotenv workflow" 
-            />
-            <ImageDiagram 
-              src="https://placehold.co/800x200/FFF5E5/ED8936?text=.env+File+--%3E+dotenv.config()+--%3E+process.env+Object+--%3E+Your+App.js" 
-              alt="dotenv workflow" 
-            />
-          </NoteSection> */}
+app.listen(port, () => {
+  console.log(\`Server listening on port \${port}\`);
+});
+            `} language="javascript" />
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <NoteSection title="Interview & Company Context">
-            <ul className="list-disc ml-6 space-y-2">
-              <li><strong className="text-gray-900">Key Question (All Companies):</strong> "How do you handle sensitive data like API keys or database passwords in your Node.js application?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "You must <strong className="text-gray-900">never</strong> hard-code them. You store them in <strong className="text-gray-900">Environment Variables</strong>. For development, we use the <Code>dotenv</Code> package to load these variables from a <Code>.env</Code> file, and that <Code>.env</Code> file is always added to <Code>.gitignore</Code> to keep secrets out of the codebase."</li>
-              <li><strong className="text-gray-900">Key Question (Infosys/Wipro):</strong> "What is <Code>process.env.NODE_ENV</Code> used for?"</li>
-              <li><strong className="text-gray-900">Your Answer:</strong> "It's a standard variable used to check if the application is in <Code>'development'</Code>, <Code>'production'</Code>, or <Code>'test'</Code> mode. This allows the app to behave differently, for example, by enabling extra logging in development or using optimized settings in production."</li>
-              <li><strong className="text-gray-900">Common Mistake:</strong> Committing the <Code>.env</Code> file to Git. This is a critical security failure and a major red flag in a code review or interview.</li>
+          <h3 className="text-2xl font-bold mb-3">QnA</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            <ul className="list-disc ml-6 space-y-3">
+              <li>
+                <strong>How do I handle secrets in production?</strong>
+                <p className="pl-4">You do *not* use a `.env` file in production. Instead, you use the "config vars" or "secrets" dashboard provided by your hosting platform (like Vercel, Heroku, AWS, or Azure). You paste your secret values into their web interface, and they will securely provide them to your running application as environment variables.</p>
+              </li>
+              <li>
+                <strong>If `.env` is ignored, how do other developers know what variables are needed?</strong>
+                <p className="pl-4">You create a file called `.env.example` that *is* committed to Git. This file has all the *keys* but with placeholder/empty values.
+                <br/>`PORT=...`
+                <br/>`DATABASE_URL=...`
+                <br/>A new developer just copies this file, renames it to `.env`, and fills in their own secret values.</p>
+              </li>
             </ul>
-          </NoteSection>
+          </div>
+          <hr className="mb-6 border-gray-200" />
 
-          <QuizSection>
-            <li>Why should you not hard-code API keys in your code?</li>
-            <li>What package is used to load environment variables from a file?</li>
-            <li>What file should you <strong className="text-gray-900">always</strong> add to <Code>.gitignore</Code> when using this package?</li>
-            <li>What is the name of the global Node.js object that holds all environment variables?</li>
-          </QuizSection>
+          <h3 className="text-2xl font-bold mb-3">Next Steps</h3>
+          <div className="text-gray-700 space-y-3 mb-6">
+            To test your knowledge, please visit the Quiz and Practice Problems sections for this topic.
+          </div>
         </div>
       );
 
-    // --- Default Case ---
     default:
-      return <div>Select a subchapter</div>;
+      return (
+        <div className="w-full px-4 sm:px-6 py-6 bg-white text-gray-900">
+          <h1 className="text-3xl font-bold mb-4">Select a Subchapter</h1>
+          <div className="space-y-4">
+            <p className="text-lg text-gray-700">Please select a topic from the sidebar to view the notes.</p>
+          </div>
+        </div>
+      );
   }
 };
 
