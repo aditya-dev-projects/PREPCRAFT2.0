@@ -1,5 +1,4 @@
-import React from 'react';
-// FIX: Import all the individual chapter quiz data
+import React, { useState } from 'react';
 import { Chapter1Quiz } from '../subjects/development/quiz/Chapter1Quiz';
 import { Chapter2Quiz } from '../subjects/development/quiz/Chapter2Quiz';
 import { Chapter3Quiz } from '../subjects/development/quiz/Chapter3Quiz';
@@ -10,8 +9,12 @@ import { Chapter7Quiz } from '../subjects/development/quiz/Chapter7Quiz';
 import { Chapter8Quiz } from '../subjects/development/quiz/Chapter8Quiz';
 import { Chapter9Quiz } from '../subjects/development/quiz/Chapter9Quiz';
 import { Chapter10Quiz } from '../subjects/development/quiz/Chapter10Quiz';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle } from 'lucide-react';
 
-// FIX: Merge all quiz objects into one
+// Merge all quiz objects into one
 const allDevelopmentQuizzes = {
   ...Chapter1Quiz,
   ...Chapter2Quiz,
@@ -30,58 +33,201 @@ interface QuizQuestion {
   question: string;
   options: string[];
   answer: string;
+  explanation: string; // Added explanation field
 }
 
 interface QuizDisplayProps {
   subchapterId: string;
 }
 
-// FIX: Helper function to safely get quiz data from the merged object
 const getQuizData = (id: string): QuizQuestion[] | undefined => {
-  return (allDevelopmentQuizzes as Record<string, QuizQuestion[]>)[id];
+  return (allDevelopmentQuizzes as unknown as Record<string, QuizQuestion[]>)[id];
 };
 
 const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
-  // FIX: Use the helper to get the correct quiz questions
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+
   const quizzes = getQuizData(subchapterId);
-  
-  // Get a clean title from the ID
+
   const title = subchapterId
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase());
+    .replace(/\b\w/g, (l) => l.toUpperCase());
 
   if (!quizzes || quizzes.length === 0) {
     return <div className="p-4 text-muted-foreground">No quizzes available for this subchapter yet.</div>;
   }
 
+  const currentQuestion = quizzes[currentQuestionIndex];
+  const selectedOption = selectedAnswers[currentQuestionIndex];
+
+  const handleOptionSelect = (option: string) => {
+    setSelectedAnswers({
+      ...selectedAnswers,
+      [currentQuestionIndex]: option,
+    });
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < quizzes.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  // NEW: Handle previous button click
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleSubmit = () => {
+    setQuizSubmitted(true);
+  };
+  
+  const handleRestart = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswers({});
+    setQuizSubmitted(false);
+  };
+
+  const calculateScore = () => {
+    let correct = 0;
+    quizzes.forEach((quiz, index) => {
+      if (selectedAnswers[index] === quiz.answer) {
+        correct++;
+      }
+    });
+    return {
+      correct,
+      wrong: quizzes.length - correct,
+      total: quizzes.length,
+    };
+  };
+
+  // --- Results Screen ---
+  if (quizSubmitted) {
+    const score = calculateScore();
+    return (
+      <div className="prose prose-slate dark:prose-invert max-w-none">
+        <h1 className="text-3xl font-bold mb-4">Quiz Results: {title}</h1>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-center">Your Score</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-around items-center">
+            <div className="text-center">
+              <p className="text-4xl font-bold text-green-500">{score.correct}</p>
+              <p className="text-muted-foreground">Correct</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-bold text-red-500">{score.wrong}</p>
+              <p className="text-muted-foreground">Wrong</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-bold">{score.total}</p>
+              <p className="text-muted-foreground">Total</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold mt-8 mb-4">Review Your Answers</h2>
+            <Button variant="outline" onClick={handleRestart}>Restart Quiz</Button>
+        </div>
+        {quizzes.map((quiz, index) => {
+          const userAnswer = selectedAnswers[index];
+          const isCorrect = userAnswer === quiz.answer;
+          return (
+            <div key={index} className="mb-6 p-4 border rounded-lg">
+              <p className="font-semibold text-lg mb-4">{index + 1}. {quiz.question}</p>
+              <div className="space-y-2">
+                {quiz.options.map((option) => {
+                  const isUserAnswer = userAnswer === option;
+                  const isCorrectAnswer = quiz.answer === option;
+
+                  let variant: "default" | "secondary" | "destructive" | "outline" = "secondary";
+                  if (isCorrectAnswer) variant = "default";
+                  if (isUserAnswer && !isCorrect) variant = "destructive";
+                  if (!isUserAnswer && !isCorrectAnswer) variant = "outline";
+
+                  return (
+                    <Badge
+                      key={option}
+                      variant={variant}
+                      className={`p-3 text-base w-full justify-start ${
+                        isCorrectAnswer ? 'border-2 border-green-500' : ''
+                      } ${isUserAnswer && !isCorrect ? 'border-2 border-red-500' : ''}`}
+                    >
+                      {isUserAnswer && !isCorrect && <XCircle className="h-4 w-4 mr-2" />}
+                      {isCorrectAnswer && <CheckCircle className="h-4 w-4 mr-2" />}
+                      {option}
+                    </Badge>
+                  );
+                })}
+              </div>
+              <div className="mt-4 p-4 bg-muted rounded-md">
+                <p className="font-semibold">Explanation:</p>
+                <p>{quiz.explanation || "No explanation provided."}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // --- Quiz Screen ---
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">
       <h1 className="text-3xl font-bold mb-6">Quiz: {title}</h1>
-      {quizzes.map((quiz, index) => (
-        <div key={index} className="mb-6 p-4 border rounded-lg shadow-sm bg-background">
-          <p className="font-semibold text-lg mb-2">{index + 1}. {quiz.question}</p>
-          <div className="space-y-2">
-            {quiz.options.map((option, optIndex) => (
-              <div key={optIndex} className="flex items-center">
-                <input
-                  type="radio"
-                  id={`quiz-${subchapterId}-${index}-option-${optIndex}`}
-                  name={`quiz-${subchapterId}-${index}`}
-                  value={option}
-                  className="mr-2"
-                  disabled // Disable for display, enable for interactive quiz
-                />
-                <label htmlFor={`quiz-${subchapterId}-${index}-option-${optIndex}`} className="text-foreground">
-                  {option}
-                </label>
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Question {currentQuestionIndex + 1} of {quizzes.length}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xl font-semibold mb-6">{currentQuestion.question}</p>
+          <div className="space-y-3">
+            {currentQuestion.options.map((option) => (
+              <Button
+                key={option}
+                variant={selectedOption === option ? "default" : "secondary"}
+                className="w-full justify-start h-auto p-4 text-left whitespace-normal"
+                onClick={() => handleOptionSelect(option)}
+              >
+                {option}
+              </Button>
             ))}
           </div>
-          <p className="mt-3 text-sm text-green-600 font-medium">
-            Correct Answer: {quiz.answer}
-          </p>
-        </div>
-      ))}
+          {/* UPDATED: Added Previous button and logic */}
+          <div className="mt-8 flex justify-between">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+            >
+              Previous
+            </Button>
+            {currentQuestionIndex < quizzes.length - 1 ? (
+              <Button
+                onClick={handleNext}
+                disabled={!selectedOption}
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={!selectedOption}
+                variant="default"
+              >
+                Submit
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

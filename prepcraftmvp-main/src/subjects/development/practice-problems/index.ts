@@ -1,5 +1,5 @@
 import PracticeProblemDisplay from '../../../components/PracticeProblemDisplay';
-// Import from 'practiceChapters' instead of 'chapters'
+// Import from 'practiceChapters'
 import { practiceChapters } from '../practiceChapters';
 
 // Map over 'practiceChapters'

@@ -172,9 +172,11 @@ const SidebarContent = ({
                 <button
                   key={subchapter.id}
                   onClick={() => {
+                    // FIX: Use practiceProblemId
                     handlePracticeSubchapterClick(subchapter.practiceProblemId);
                     if (isMobile) setSidebarOpen(false);
                   }}
+                  // FIX: Use practiceProblemId
                   className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
                     problemMeta?.id === subchapter.practiceProblemId
                       ? "text-black"
@@ -183,6 +185,7 @@ const SidebarContent = ({
                 >
                   <div className="flex items-center justify-between">
                     <span>{subchapter.title}</span>
+                    {/* FIX: Use practiceProblemId */}
                     {isCompleted(subchapter.practiceProblemId) && (
                       <CheckCircle2 className="h-4 w-4 text-success" />
                     )}

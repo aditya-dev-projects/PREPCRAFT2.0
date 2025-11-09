@@ -1,5 +1,4 @@
 import React from 'react';
-// Import all the individual chapter problem data
 import { Chapter1Problem } from '../subjects/development/practice-problems/Chapter1Problem';
 import { Chapter2Problem } from '../subjects/development/practice-problems/Chapter2Problem';
 import { Chapter3Problem } from '../subjects/development/practice-problems/Chapter3Problem';
@@ -26,7 +25,6 @@ const allDevelopmentProblems = {
 };
 
 // --- Types ---
-// FIX 1: Interface now matches the actual data properties
 interface PracticeProblem {
   title: string;
   problem: string;
@@ -37,26 +35,21 @@ interface PracticeProblemDisplayProps {
   subchapterId: string;
 }
 
-// FIX 2: Helper function now correctly returns an array of problems
 const getProblemData = (id: string): PracticeProblem[] | undefined => {
-  // Use 'unknown' as suggested by the error to fix the type conflict
   return (allDevelopmentProblems as unknown as Record<string, PracticeProblem[]>)[id];
 };
 
 const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchapterId }) => {
-  // FIX 3: Rename 'problem' to 'problems' since it's an array
   const problems = getProblemData(subchapterId);
 
   const title = subchapterId
     .replace(/-/g, ' ')
     .replace(/\b\w/g, l => l.toUpperCase());
 
-  // FIX 4: Check if the array is empty
   if (!problems || problems.length === 0) {
     return <div className="p-4 text-muted-foreground">No practice problems available for this subchapter yet.</div>;
   }
 
-  // FIX 5: Map over the array to display each problem
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">
       <h1 className="text-3xl font-bold mb-6">Practice: {title}</h1>
