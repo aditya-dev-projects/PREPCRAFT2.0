@@ -1,278 +1,102 @@
-import VariablesDataTypes from './VariablesDataTypes';
-import ConditionalStatements from './ConditionalStatements';
-import Operators from './Operators';
-import Loops from './Loops';
-import Functions from './Functions';
-import ArrayBasics from './ArrayBasics';
-import TwoDArrays from './TwoDArrays';
-import Strings from './Strings';
-import WhatIsSorting from './WhatIsSorting';
-import BubbleSort from './BubbleSort';
-import SelectionSort from './SelectionSort';
-import InsertionSort from './InsertionSort';
-import Counting from './Counting';
-import Recursion from './Recursion';
-import Backtracking from './Backtracking';
-import DivideAndConqueror from './DivideAndConqueror';
-import BitManipulation from './BitManipulation';
-import TimeAndSpaceComplexity from './TimeAndSpaceComplexity';
-import GreedyAlgorithim from './GreedyAlgorithim';
-import BasicOfOOPs from './BasicOfOOPs';
-import AdvancedOOPs from './AdvancedOOPs';
-import ArrayLists from './ArrayLists';
-import LinkedLists from './LinkedLists';
-import Stacks from './Stacks';
-import Queues from './Queues';
+import Chapter1 from './Chapter1';
+import Chapter2 from './Chapter2';
+import Chapter3 from './Chapter3';
+import Chapter4 from './Chapter4';
+import Chapter5 from './Chapter5';
+import Chapter6 from './Chapter6';
+import Chapter7 from './Chapter7';
+import Chapter8 from './Chapter8';
+import Chapter9 from './Chapter9';
 
 export const dsaNotes = [
   {
-    id: 'dsa-variables-data-types',
-    title: 'Variables & Data Types',
-    component: VariablesDataTypes,
+    id: 'Chapter1',
+    title: 'Chapter 1: Basics Of Programming',
+    component: Chapter1,
     meta: {
-      id: 'dsa-variables-data-types',
-      title: 'Variables & Data Types',
+      id: 'Chapter1',
+      title: 'Chapter 1: Basics Of Programming',
       difficulty: 'easy'
     }
   },
   {
-    id: 'dsa-conditional-statements',
-    title: 'Conditional Statements',
-    component: ConditionalStatements,
+    id: 'Chapter2',
+    title: 'Chapter 2: Arrays',
+    component: Chapter2,
     meta: {
-      id: 'dsa-conditional-statements',
-      title: 'Conditional Statements',
+      id: 'Chapter2',
+      title: 'Chapter 2: Arrays',
       difficulty: 'easy'
     }
   },
   {
-    id: 'dsa-operators',
-    title: 'Operators',
-    component: Operators,
+    id: 'Chapter3',
+    title: 'Chapter 3: Sorting Techniques',
+    component: Chapter3,
     meta: {
-      id: 'dsa-operators',
-      title: 'Operators',
+      id: 'Chapter3',
+      title: 'Chapter 3: Sorting Techniques',
       difficulty: 'easy'
     }
   },
   {
-    id: 'dsa-loops',
-    title: 'Loops',
-    component: Loops,
+    id: 'Chapter4',
+    title: 'Chapter 4: Problem Solving Techniques',
+    component: Chapter4,
     meta: {
-      id: 'dsa-loops',
-      title: 'Loops',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-functions',
-    title: 'Functions',
-    component: Functions,
-    meta: {
-      id: 'dsa-functions',
-      title: 'Functions',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-array-basics',
-    title: 'Array Basics',
-    component: ArrayBasics,
-    meta: {
-      id: 'dsa-array-basics',
-      title: 'Array Basics',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-2d-arrays',
-    title: '2D Arrays',
-    component: TwoDArrays,
-    meta: {
-      id: 'dsa-2d-arrays',
-      title: '2D Arrays',
+      id: 'Chapter4',
+      title: 'Chapter 4: Problem Solving Techniques',
       difficulty: 'medium'
     }
   },
   {
-    id: 'dsa-strings',
-    title: 'Strings',
-    component: Strings,
+    id: 'Chapter5',
+    title: 'Chapter 5: Object Oriented Programming',
+    component: Chapter5,
     meta: {
-      id: 'dsa-strings',
-      title: 'Strings',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-what-is-sorting',
-    title: 'What Is Sorting',
-    component: WhatIsSorting,
-    meta: {
-      id: 'dsa-what-is-sorting',
-      title: 'What Is Sorting',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-bubble-sort',
-    title: 'Bubble Sort',
-    component: BubbleSort,
-    meta: {
-      id: 'dsa-bubble-sort',
-      title: 'Bubble Sort',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-selection-sort',
-    title: 'Selection Sort',
-    component: SelectionSort,
-    meta: {
-      id: 'dsa-selection-sort',
-      title: 'Selection Sort',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-insertion-sort',
-    title: 'Insertion Sort',
-    component: InsertionSort,
-    meta: {
-      id: 'dsa-insertion-sort',
-      title: 'Insertion Sort',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-counting',
-    title: 'Counting',
-    component: Counting,
-    meta: {
-      id: 'dsa-counting',
-      title: 'Counting',
+      id: 'Chapter5',
+      title: 'Chapter 5: Object Oriented Programming',
       difficulty: 'medium'
     }
   },
   {
-    id: 'dsa-recursion',
-    title: 'Recursion',
-    component: Recursion,
+    id: 'Chapter6',
+    title: 'Chapter 6: Linear Data Structures',
+    component: Chapter6,
     meta: {
-      id: 'dsa-recursion',
-      title: 'Recursion',
+      id: 'Chapter6',
+      title: 'Chapter 6: Linear Data Structures',
+      difficulty: 'easy'
+    }
+  },
+  {
+    id: 'Chapter7',
+    title: 'Chapter 7: Trees',
+    component: Chapter7,
+    meta: {
+      id: 'Chapter7',
+      title: 'Chapter 7: Trees',
       difficulty: 'medium'
     }
   },
   {
-    id: 'dsa-backtracking',
-    title: 'Backtracking',
-    component: Backtracking,
+    id: 'Chapter8',
+    title: 'Chapter 8: Advanced Data Structures',
+    component: Chapter8,
     meta: {
-      id: 'dsa-backtracking',
-      title: 'Backtracking',
+      id: 'Chapter8',
+      title: 'Chapter 8: Advanced Data Structures',
       difficulty: 'hard'
     }
   },
   {
-    id: 'dsa-divide-and-conqueror',
-    title: 'Divide & Conqueror',
-    component: DivideAndConqueror,
+    id: 'Chapter9',
+    title: 'Chapter 9: Dynamic Programming',
+    component: Chapter9,
     meta: {
-      id: 'dsa-divide-and-conqueror',
-      title: 'Divide & Conqueror',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'dsa-bit-manipulation',
-    title: 'Bit Manipulation',
-    component: BitManipulation,
-    meta: {
-      id: 'dsa-bit-manipulation',
-      title: 'Bit Manipulation',
+      id: 'Chapter9',
+      title: 'Chapter 9: Dynamic Programming',
       difficulty: 'hard'
-    }
-  },
-  {
-    id: 'dsa-time-and-space-complexity',
-    title: 'Time & Space Complexity',
-    component: TimeAndSpaceComplexity,
-    meta: {
-      id: 'dsa-time-and-space-complexity',
-      title: 'Time & Space Complexity',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'dsa-greedy-algorithim',
-    title: 'Greedy Algorithim',
-    component: GreedyAlgorithim,
-    meta: {
-      id: 'dsa-greedy-algorithim',
-      title: 'Greedy Algorithim',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'dsa-basic-of-oops',
-    title: 'Basic Of OOPs',
-    component: BasicOfOOPs,
-    meta: {
-      id: 'dsa-basic-of-oops',
-      title: 'Basic Of OOPs',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'dsa-advanced-oops',
-    title: 'Advanced OOPs',
-    component: AdvancedOOPs,
-    meta: {
-      id: 'dsa-advanced-oops',
-      title: 'Advanced OOPs',
-      difficulty: 'hard'
-    }
-  },
-  {
-    id: 'dsa-array-lists',
-    title: 'Array Lists',
-    component: ArrayLists,
-    meta: {
-      id: 'dsa-array-lists',
-      title: 'Array Lists',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-linked-lists',
-    title: 'Linked Lists',
-    component: LinkedLists,
-    meta: {
-      id: 'dsa-linked-lists',
-      title: 'Linked Lists',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'dsa-stacks',
-    title: 'Stacks',
-    component: Stacks,
-    meta: {
-      id: 'dsa-stacks',
-      title: 'Stacks',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'dsa-queues',
-    title: 'Queues',
-    component: Queues,
-    meta: {
-      id: 'dsa-queues',
-      title: 'Queues',
-      difficulty: 'easy'
     }
   }
 ];

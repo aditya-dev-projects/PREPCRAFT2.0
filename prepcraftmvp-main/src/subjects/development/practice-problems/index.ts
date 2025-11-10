@@ -1,8 +1,8 @@
 import PracticeProblemDisplay from '../../../components/PracticeProblemDisplay';
-// Import from 'practiceChapters'
+// FIX: Import from 'practiceChapters' instead of 'chapters'
 import { practiceChapters } from '../practiceChapters';
 
-// Map over 'practiceChapters'
+// FIX: Map over 'practiceChapters'
 export const developmentPracticeProblems = practiceChapters.flatMap(chapter =>
   chapter.subchapters.map(subchapter => ({
     component: PracticeProblemDisplay,

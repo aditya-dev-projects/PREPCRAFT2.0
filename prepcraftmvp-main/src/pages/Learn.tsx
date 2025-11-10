@@ -109,7 +109,7 @@ const SidebarContent = ({
             }
           >
             <CollapsibleTrigger className="w-full">
-              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
+              <div className="flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-muted">
                 <span className="text-sm font-semibold">{chapter.title}</span>
                 <ChevronDown
                   className={`h-5 w-5 transition-transform ${
@@ -126,13 +126,13 @@ const SidebarContent = ({
                     handleNoteSubchapterClick(subchapter.id);
                     if (isMobile) setSidebarOpen(false);
                   }}
-                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                  className={`w-full text-center p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
                     noteMeta?.id === subchapter.id
                       ? "text-black"
                       : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center">
                     <span>{subchapter.title}</span>
                     {isCompleted(subchapter.id) && (
                       <CheckCircle2 className="h-4 w-4 text-success" />
@@ -158,7 +158,7 @@ const SidebarContent = ({
             }
           >
             <CollapsibleTrigger className="w-full" asChild>
-              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer">
+              <div className="flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer">
                 <span className="text-sm font-semibold">{chapter.title}</span>
                 <ChevronDown
                   className={`h-5 w-5 transition-transform ${
@@ -172,20 +172,17 @@ const SidebarContent = ({
                 <button
                   key={subchapter.id}
                   onClick={() => {
-                    // FIX: Use practiceProblemId
                     handlePracticeSubchapterClick(subchapter.practiceProblemId);
                     if (isMobile) setSidebarOpen(false);
                   }}
-                  // FIX: Use practiceProblemId
-                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                  className={`w-full text-center p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
                     problemMeta?.id === subchapter.practiceProblemId
                       ? "text-black"
                       : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center">
                     <span>{subchapter.title}</span>
-                    {/* FIX: Use practiceProblemId */}
                     {isCompleted(subchapter.practiceProblemId) && (
                       <CheckCircle2 className="h-4 w-4 text-success" />
                     )}
@@ -211,7 +208,7 @@ const SidebarContent = ({
           >
             <CollapsibleTrigger className="w-full" asChild>
               <div
-                className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer"
+                className="flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer"
                 
               >
                 <span className="text-sm font-semibold">{chapter.title}</span>
@@ -230,13 +227,13 @@ const SidebarContent = ({
                     handleQuizSubchapterClick(subchapter.quizId);
                     if (isMobile) setSidebarOpen(false);
                   }}
-                  className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                  className={`w-full text-center p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
                     quizMeta?.id === subchapter.quizId
                       ? "text-black"
                       : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center">
                     <span>{subchapter.title}</span>
                     {isCompleted(subchapter.quizId) && (
                       <CheckCircle2 className="h-4 w-4 text-success" />
@@ -271,11 +268,12 @@ export default function Learn() {
   const [openQuizChapter, setOpenQuizChapter] = useState<number | null>(null);
   const [progress, setProgress] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  
+  // FIX: Set showComingSoon to true to display the message
+  const [showComingSoon, setShowComingSoon] = useState(true);
 
   const subject = getSubjectBySlug(subjectSlug || "");
 
-  // FIX: Added the missing updateLastVisited function
   const updateLastVisited = async () => {
     try {
       await supabase.rpc("update_user_streak", { user_id_param: user?.id });
@@ -291,7 +289,7 @@ export default function Learn() {
   useEffect(() => {
     if (subjectSlug && user) {
       fetchProgress();
-      updateLastVisited(); // This call will now work
+      updateLastVisited();
     }
   }, [subjectSlug, user]);
 
@@ -526,8 +524,18 @@ export default function Learn() {
                 </div>
               )}
 
+              {/* FIX: Logic is re-ordered to prioritize showComingSoon */}
               {/* Practice */}
-              {activeTab === "practice" && ProblemComponent && (
+              {activeTab === "practice" && showComingSoon && (
+                <div className="text-center py-12">
+                  <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Coming Soon!
+                  </p>
+                </div>
+              )}
+
+              {activeTab === "practice" && !showComingSoon && ProblemComponent && (
                 <div>
                   <ProblemComponent subchapterId={problemMeta.subchapterId} />
                 </div>
@@ -562,27 +570,12 @@ export default function Learn() {
                   </p>
                 </div>
               )}
-              {activeTab === "practice" && showComingSoon && (
-                <div className="text-center py-12">
-                  <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Coming Soon!
-                  </p>
-                </div>
-              )}
+              
               {activeTab === "practice" && !ProblemComponent && !showComingSoon && (
                 <div className="text-center py-12">
                   <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">
                     Select a practice problem from the sidebar.
-                  </p>
-                </div>
-              )}
-              {activeTab === "quiz" && showComingSoon && (
-                <div className="text-center py-12">
-                  <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Coming Soon!
                   </p>
                 </div>
               )}
