@@ -1,118 +1,45 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { subjects } from "@/subjects";
+import { ArrowRight, BookOpen, Target, Brain } from "lucide-react";
+import { allSubjects } from "@/subjects"; // Use allSubjects to get the array
+
+const subjectIcons = {
+  development: <BookOpen className="h-8 w-8 text-primary" />,
+  dsa: <Target className="h-8 w-8 text-primary" />,
+  aptitude: <Brain className="h-8 w-8 text-primary" />,
+};
 
 export default function Explore() {
-  const { user } = useAuth();
-  const [progress, setProgress] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      updateStreak();
-    }
-    fetchProgress();
-  }, [user]);
-
-  const updateStreak = async () => {
-    try {
-      await supabase.rpc('update_user_streak', { user_id_param: user?.id });
-    } catch (error) {
-      console.error('Error updating streak:', error);
-    }
-  };
-
-  const fetchProgress = async () => {
-    try {
-      if (user) {
-        const progressRes = await supabase
-          .from('progress')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (progressRes.data) setProgress(progressRes.data);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="container py-8">
-        <Skeleton className="h-8 w-64 mb-8" />
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-64" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Explore Subjects</h1>
-        <p className="text-muted-foreground">
-          Choose your learning path and start mastering placement prep
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">Explore Subjects</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Choose a subject to start learning, practicing, and conquering.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {subjects.map((subject) => {
-          const Icon = subject.icon;
-          const subjectProgress = progress.find(p => p.subject_id === subject.slug);
-          const percent = subjectProgress?.percent || 0;
-          const hasStarted = percent > 0;
-
-          return (
-            <Card 
-              key={subject.slug} 
-              className="group overflow-hidden transition-all hover:shadow-lg"
-            >
-              <CardHeader>
-                <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
-                  <Icon className="h-8 w-8 text-primary" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {allSubjects.map((subject) => (
+          // FIX: Corrected the 'to' prop to only use subject.id
+          <Link to={`/learn/${subject.id}`} key={subject.id}>
+            <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
+              <CardHeader className="items-center text-center">
+                <div className="p-4 bg-primary/10 rounded-full mb-4">
+                  {subjectIcons[subject.id as keyof typeof subjectIcons]}
                 </div>
-                <CardTitle className="text-xl">{subject.title}</CardTitle>
-                <CardDescription className="line-clamp-2">
-                  {subject.description}
-                </CardDescription>
+                <CardTitle className="text-2xl font-bold">{subject.title}</CardTitle>
+                <CardDescription>{subject.description}</CardDescription>
               </CardHeader>
-              <CardContent>
-                {hasStarted && (
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Progress</span>
-                      <span className="font-medium">{Math.round(percent)}%</span>
-                    </div>
-                    <div className="h-2 w-full rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary transition-all"
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-                <Button asChild className="w-full">
-                  <Link to={`/learn/${subject.slug}`}>
-                    {hasStarted ? 'Continue' : 'Start Learning'}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
+              <CardContent className="flex-grow flex flex-col justify-end">
+                <Button className="w-full mt-4">
+                  Start Learning <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </CardContent>
             </Card>
-          );
-        })}
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -8,7 +8,8 @@ import { StreakDisplay } from "@/components/StreakDisplay";
 import { ProgressRing } from "@/components/ProgressRing";
 import { ArrowRight, BookOpen, Target, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { subjects } from "@/subjects";
+// FIX: Import 'allSubjects' (the array) instead of 'subjects' (the object)
+import { allSubjects } from "@/subjects";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -78,10 +79,9 @@ export default function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-3 mb-8">
+        {/* This line is correct and fixes the error you reported */}
         <StreakDisplay days={profile?.streak_days || 0} />
         
-
-
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
             <ProgressRing progress={totalProgress} size={80} strokeWidth={6} />
@@ -125,14 +125,15 @@ export default function Dashboard() {
           <CardDescription>Track your learning across subjects</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {subjects.map((subject) => {
+          {/* FIX: Map over 'allSubjects' (the array) */}
+          {allSubjects.map((subject) => {
             const subjectProgress = progress.find(p => p.subject_id === subject.id);
             const percent = subjectProgress?.percent || 0;
             
             return (
               <Link
-                key={subject.slug}
-                to={`/learn/${subject.slug}`}
+                key={subject.id} // Use subject.id for the key
+                to={`/learn/${subject.id}`} // Use subject.id for the link
                 className="block"
               >
                 <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50">

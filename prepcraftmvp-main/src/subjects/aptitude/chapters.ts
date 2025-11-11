@@ -1,4 +1,3 @@
-
 export const chapters = [
   {
     id: 1,
@@ -11,7 +10,7 @@ export const chapters = [
       { id: "idioms-phrases", title: "Idioms & Phrases", noteId: "idioms-phrases" },
     ],
   },
-,
+  // FIX: Removed extra comma
   {
     id: 2,
     title: "Chapter 2: Logical Reasoning",
@@ -32,7 +31,7 @@ export const chapters = [
       { id: "data-sufficiency", title: "Data Sufficiency", noteId: "data-sufficiency" },
     ],
   },
-,
+  // FIX: Removed extra comma
   {
     id: 3,
     title: "Chapter 3: Quantitative Aptitude",
@@ -58,3 +57,4 @@ export const chapters = [
     ],
   },
 ];
+// FIX: Removed extra '}'

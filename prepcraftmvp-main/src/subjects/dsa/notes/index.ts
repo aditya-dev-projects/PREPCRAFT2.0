@@ -9,94 +9,55 @@ import Chapter8 from './Chapter8';
 import Chapter9 from './Chapter9';
 
 export const dsaNotes = [
-  {
-    id: 'Chapter1',
-    title: 'Chapter 1: Basics Of Programming',
-    component: Chapter1,
-    meta: {
-      id: 'Chapter1',
-      title: 'Chapter 1: Basics Of Programming',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'Chapter2',
-    title: 'Chapter 2: Arrays',
-    component: Chapter2,
-    meta: {
-      id: 'Chapter2',
-      title: 'Chapter 2: Arrays',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'Chapter3',
-    title: 'Chapter 3: Sorting Techniques',
-    component: Chapter3,
-    meta: {
-      id: 'Chapter3',
-      title: 'Chapter 3: Sorting Techniques',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'Chapter4',
-    title: 'Chapter 4: Problem Solving Techniques',
-    component: Chapter4,
-    meta: {
-      id: 'Chapter4',
-      title: 'Chapter 4: Problem Solving Techniques',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'Chapter5',
-    title: 'Chapter 5: Object Oriented Programming',
-    component: Chapter5,
-    meta: {
-      id: 'Chapter5',
-      title: 'Chapter 5: Object Oriented Programming',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'Chapter6',
-    title: 'Chapter 6: Linear Data Structures',
-    component: Chapter6,
-    meta: {
-      id: 'Chapter6',
-      title: 'Chapter 6: Linear Data Structures',
-      difficulty: 'easy'
-    }
-  },
-  {
-    id: 'Chapter7',
-    title: 'Chapter 7: Trees',
-    component: Chapter7,
-    meta: {
-      id: 'Chapter7',
-      title: 'Chapter 7: Trees',
-      difficulty: 'medium'
-    }
-  },
-  {
-    id: 'Chapter8',
-    title: 'Chapter 8: Advanced Data Structures',
-    component: Chapter8,
-    meta: {
-      id: 'Chapter8',
-      title: 'Chapter 8: Advanced Data Structures',
-      difficulty: 'hard'
-    }
-  },
-  {
-    id: 'Chapter9',
-    title: 'Chapter 9: Dynamic Programming',
-    component: Chapter9,
-    meta: {
-      id: 'Chapter9',
-      title: 'Chapter 9: Dynamic Programming',
-      difficulty: 'hard'
-    }
-  }
+  // --- Chapter 1: Basics Of Programming ---
+  { component: Chapter1, meta: { id: 'variables-data-types' } },
+  { component: Chapter1, meta: { id: 'conditional-statements' } },
+  { component: Chapter1, meta: { id: 'operators' } },
+  { component: Chapter1, meta: { id: 'loops' } },
+  { component: Chapter1, meta: { id: 'functions' } },
+
+  // --- Chapter 2: Arrays ---
+  { component: Chapter2, meta: { id: 'array-basics' } },
+  { component: Chapter2, meta: { id: '2d-arrays' } },
+  { component: Chapter2, meta: { id: 'strings' } },
+
+  // --- Chapter 3: Sorting Techniques ---
+  { component: Chapter3, meta: { id: 'what-is-sorting' } },
+  { component: Chapter3, meta: { id: 'bubble-sort' } },
+  { component: Chapter3, meta: { id: 'selection-sort' } },
+  { component: Chapter3, meta: { id: 'insertion-sort' } },
+  { component: Chapter3, meta: { id: 'counting' } },
+
+  // --- Chapter 4: Problem Solving Techniques ---
+  { component: Chapter4, meta: { id: 'recursion' } },
+  { component: Chapter4, meta: { id: 'backtracking' } },
+  { component: Chapter4, meta: { id: 'divide-and-conqueror' } },
+  { component: Chapter4, meta: { id: 'bit-manipulation' } },
+  { component: Chapter4, meta: { id: 'time-and-space-complexity' } },
+  { component: Chapter4, meta: { id: 'greedy-algorithim' } },
+
+  // --- Chapter 5: Object Oriented Programming ---
+  { component: Chapter5, meta: { id: 'basic-of-oops' } },
+  { component: Chapter5, meta: { id: 'advanced-oops' } },
+
+  // --- Chapter 6: Linear Data Structures ---
+  { component: Chapter6, meta: { id: 'array-lists' } },
+  { component: Chapter6, meta: { id: 'linked-lists' } },
+  { component: Chapter6, meta: { id: 'stacks' } },
+  { component: Chapter6, meta: { id: 'queues' } },
+
+  // --- Chapter 7: Trees ---
+  { component: Chapter7, meta: { id: 'binary-trees' } },
+  { component: Chapter7, meta: { id: 'binary-search-trees' } },
+
+  // --- Chapter 8: Advanced Data Structures ---
+  { component: Chapter8, meta: { id: 'heaps-priority-queues' } },
+  { component: Chapter8, meta: { id: 'hashing-maps-sets' } },
+  { component: Chapter8, meta: { id: 'tries' } },
+  { component: Chapter8, meta: { id: 'graphs' } },
+  { component: Chapter8, meta: { id: 'segment-trees' } },
+
+  // --- Chapter 9: Dynamic Programming ---
+  { component: Chapter9, meta: { id: 'basic-dp' } },
+  { component: Chapter9, meta: { id: 'advance-dp' } },
 ];

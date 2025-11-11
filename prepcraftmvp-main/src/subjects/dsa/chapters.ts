@@ -1,90 +1,90 @@
-export const chapters = [
+export const dsaChapters = [
   {
-    id: 'dsa-chapter-1',
+    id: 1,
     title: 'Chapter 1: Basics Of Programming',
     subchapters: [
-      { id: 'dsa-subchapter-1-1', title: 'Variables & Data Types', noteId: 'Chapter1' },
-      { id: 'dsa-subchapter-1-2', title: 'Conditional Statements', noteId: 'Chapter1' },
-      { id: 'dsa-subchapter-1-3', title: 'Operators', noteId: 'Chapter1' },
-      { id: 'dsa-subchapter-1-4', title: 'Loops', noteId: 'Chapter1' },
-      { id: 'dsa-subchapter-1-5', title: 'Functions', noteId: 'Chapter1' }
-    ]
+      { id: 'variables-data-types', title: 'Variables & Data Types' },
+      { id: 'conditional-statements', title: 'Conditional Statements' },
+      { id: 'operators', title: 'Operators' },
+      { id: 'loops', title: 'Loops' },
+      { id: 'functions', title: 'Functions' },
+    ],
   },
   {
-    id: 'dsa-chapter-2',
+    id: 2,
     title: 'Chapter 2: Arrays',
     subchapters: [
-      { id: 'dsa-subchapter-2-1', title: 'Array Basics', noteId: 'Chapter2' },
-      { id: 'dsa-subchapter-2-2', title: '2D Arrays', noteId: 'Chapter2' },
-      { id: 'dsa-subchapter-2-3', title: 'Strings', noteId: 'Chapter2' }
-    ]
+      { id: 'array-basics', title: 'Array Basics' },
+      { id: '2d-arrays', title: '2D Arrays' },
+      { id: 'strings', title: 'Strings' },
+    ],
   },
   {
-    id: 'dsa-chapter-3',
+    id: 3,
     title: 'Chapter 3: Sorting Techniques',
     subchapters: [
-      { id: 'dsa-subchapter-3-1', title: 'What Is Sorting', noteId: 'Chapter3' },
-      { id: 'dsa-subchapter-3-2', title: 'Bubble Sort', noteId: 'Chapter3' },
-      { id: 'dsa-subchapter-3-3', title: 'Selection Sort', noteId: 'Chapter3' },
-      { id: 'dsa-subchapter-3-4', title: 'Insertion Sort', noteId: 'Chapter3' },
-      { id: 'dsa-subchapter-3-5', title: 'Counting', noteId: 'Chapter3' }
-    ]
+      { id: 'what-is-sorting', title: 'What Is Sorting' },
+      { id: 'bubble-sort', title: 'Bubble Sort' },
+      { id: 'selection-sort', title: 'Selection Sort' },
+      { id: 'insertion-sort', title: 'Insertion Sort' },
+      { id: 'counting', title: 'Counting' },
+    ],
   },
   {
-    id: 'dsa-chapter-4',
+    id: 4,
     title: 'Chapter 4: Problem Solving Techniques',
     subchapters: [
-      { id: 'dsa-subchapter-4-1', title: 'Recursion', noteId: 'Chapter4' },
-      { id: 'dsa-subchapter-4-2', title: 'Backtracking', noteId: 'Chapter4' },
-      { id: 'dsa-subchapter-4-3', title: 'Divide & Conqueror', noteId: 'Chapter4' },
-      { id: 'dsa-subchapter-4-4', title: 'Bit Manipulation', noteId: 'Chapter4' },
-      { id: 'dsa-subchapter-4-5', title: 'Time & Space Complexity', noteId: 'Chapter4' },
-      { id: 'dsa-subchapter-4-6', title: 'Greedy Algorithim', noteId: 'Chapter4' }
-    ]
+      { id: 'recursion', title: 'Recursion' },
+      { id: 'backtracking', title: 'Backtracking' },
+      { id: 'divide-and-conqueror', title: 'Divide & Conqueror' },
+      { id: 'bit-manipulation', title: 'Bit Manipulation' },
+      { id: 'time-and-space-complexity', title: 'Time & Space Complexity' },
+      { id: 'greedy-algorithim', title: 'Greedy Algorithm' },
+    ],
   },
   {
-    id: 'dsa-chapter-5',
+    id: 5,
     title: 'Chapter 5: Object Oriented Programming',
     subchapters: [
-      { id: 'dsa-subchapter-5-1', title: 'Basic Of OOPs', noteId: 'Chapter5' },
-      { id: 'dsa-subchapter-5-2', title: 'Advanced OOPs', noteId: 'Chapter5' }
-    ]
+      { id: 'basic-of-oops', title: 'Basic Of OOPs' },
+      { id: 'advanced-oops', title: 'Advanced OOPs' },
+    ],
   },
   {
-    id: 'dsa-chapter-6',
+    id: 6,
     title: 'Chapter 6: Linear Data Structures',
     subchapters: [
-      { id: 'dsa-subchapter-6-1', title: 'Array Lists', noteId: 'Chapter6' },
-      { id: 'dsa-subchapter-6-2', title: 'Linked Lists', noteId: 'Chapter6' },
-      { id: 'dsa-subchapter-6-3', title: 'Stacks', noteId: 'Chapter6' },
-      { id: 'dsa-subchapter-6-4', title: 'Queues', noteId: 'Chapter6' }
-    ]
+      { id: 'array-lists', title: 'Array Lists' },
+      { id: 'linked-lists', title: 'Linked Lists' },
+      { id: 'stacks', title: 'Stacks' },
+      { id: 'queues', title: 'Queues' },
+    ],
   },
   {
-    id: 'dsa-chapter-7',
+    id: 7,
     title: 'Chapter 7: Trees',
     subchapters: [
-      { id: 'dsa-subchapter-7-1', title: 'Binary Trees', noteId: 'Chapter7' },
-      { id: 'dsa-subchapter-7-2', title: 'Binary Search Trees (BST)', noteId: 'Chapter7' }
-    ]
+      { id: 'binary-trees', title: 'Binary Trees' },
+      { id: 'binary-search-trees', title: 'Binary Search Trees (BST)' },
+    ],
   },
   {
-    id: 'dsa-chapter-8',
+    id: 8,
     title: 'Chapter 8: Advanced Data Structures',
     subchapters: [
-      { id: 'dsa-subchapter-8-1', title: 'Heaps/Priority Queues', noteId: 'Chapter8' },
-      { id: 'dsa-subchapter-8-2', title: 'Hashing (Maps & Sets)', noteId: 'Chapter8' },
-      { id: 'dsa-subchapter-8-3', title: 'Tries', noteId: 'Chapter8' },
-      { id: 'dsa-subchapter-8-4', title: 'Graphs', noteId: 'Chapter8' },
-      { id: 'dsa-subchapter-8-5', title: 'Segment Trees', noteId: 'Chapter8' }
-    ]
+      { id: 'heaps-priority-queues', title: 'Heaps/Priority Queues' },
+      { id: 'hashing-maps-sets', title: 'Hashing (Maps & Sets)' },
+      { id: 'tries', title: 'Tries' },
+      { id: 'graphs', title: 'Graphs' },
+      { id: 'segment-trees', title: 'Segment Trees' },
+    ],
   },
   {
-    id: 'dsa-chapter-9',
-    title: 'Chapter 9: Dynammic Programming',
+    id: 9,
+    title: 'Chapter 9: Dynamic Programming',
     subchapters: [
-      { id: 'dsa-subchapter-9-1', title: 'Basic DP', noteId: 'Chapter9' },
-      { id: 'dsa-subchapter-9-2', title: 'Advance DP', noteId: 'Chapter9' }
-    ]
-  }
+      { id: 'basic-dp', title: 'Basic DP' },
+      { id: 'advance-dp', title: 'Advance DP' },
+    ],
+  },
 ];
