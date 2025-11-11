@@ -1,28 +1,33 @@
+// Chapter lists
 import { chapters as developmentChapters } from './development/chapters';
 import { dsaChapters } from './dsa/chapters';
 import { chapters as aptitudeChapters } from './aptitude/chapters';
 
-// Import practice and quiz chapters
-import { practiceChapters as developmentPracticeChapters } from './development/practiceChapters';
-import { quizChapters as developmentQuizChapters } from './development/quizChapters';
-import { practiceChapters as dsaPracticeChapters } from './dsa/practiceChapters';
-import { quizChapters as dsaQuizChapters } from './dsa/quizChapters';
-import { practiceChapters as aptitudePracticeChapters } from './aptitude/practiceChapters';
-import { quizChapters as aptitudeQuizChapters } from './aptitude/quizChapters';
-
-
-// (The rest of your imports)
-import { developmentPracticeProblems } from './development/developmentPracticeProblems';
-import { developmentQuizzes } from './development/developmentQuizzes';
-import { dsaPracticeProblems } from './dsa/practice-problems';
-import { dsaQuizzes } from './dsa/quiz';
-import { aptitudePracticeProblems } from './aptitude/practice-problems';
-import { aptitudeQuizzes } from './aptitude/quiz';
-import { dsaNotes } from './dsa/notes';
+// Note component lists
 import { developmentNotes } from './development/notes';
+import { dsaNotes } from './dsa/notes';
 import { aptitudeNotes } from './aptitude/notes';
 
-// FIX: Added 'export' so other files can import this object
+// Practice Problem component lists
+import { developmentPracticeProblems } from './development/practice-problems';
+import { dsaPracticeProblems } from './dsa/practice-problems';
+import { aptitudePracticeProblems } from './aptitude/practice-problems';
+
+// Quiz component lists
+import { developmentQuizzes } from './development/quiz';
+import { dsaQuizzes } from './dsa/quiz';
+import { aptitudeQuizzes } from './aptitude/quiz';
+
+// Import the sidebar chapter lists
+import { quizChapters as developmentQuizChapters } from './development/quizChapters';
+import { practiceChapters as developmentPracticeChapters } from './development/practiceChapters';
+import { dsaQuizChapters } from './dsa/quizChapters';
+// FIX: Use the 'as' alias to correctly import 'practiceChapters'
+import { practiceChapters as dsaPracticeChapters } from './dsa/practiceChapters';
+import { quizChapters as aptitudeQuizChapters } from './aptitude/quizChapters';
+import { practiceChapters as aptitudePracticeChapters } from './aptitude/practiceChapters';
+
+
 export const subjects = {
   development: {
     id: 'development',
@@ -32,8 +37,8 @@ export const subjects = {
     notes: developmentNotes,
     practiceProblems: developmentPracticeProblems,
     quizzes: developmentQuizzes,
+    quizChapters: developmentQuizChapters, 
     practiceChapters: developmentPracticeChapters,
-    quizChapters: developmentQuizChapters,
   },
   dsa: {
     id: 'dsa',
@@ -43,8 +48,8 @@ export const subjects = {
     notes: dsaNotes,
     practiceProblems: dsaPracticeProblems,
     quizzes: dsaQuizzes,
-    practiceChapters: dsaPracticeChapters,
-    quizChapters: dsaQuizChapters,
+    quizChapters: dsaQuizChapters, 
+    practiceChapters: dsaPracticeChapters, // This will now work
   },
   aptitude: {
     id: 'aptitude',
@@ -54,8 +59,8 @@ export const subjects = {
     notes: aptitudeNotes,
     practiceProblems: aptitudePracticeProblems,
     quizzes: aptitudeQuizzes,
+    quizChapters: aptitudeQuizChapters, 
     practiceChapters: aptitudePracticeChapters,
-    quizChapters: aptitudeQuizChapters,
   },
 };
 

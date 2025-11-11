@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle } from 'lucide-react';
+
+// --- Development Imports ---
 import { Chapter1Quiz } from '../subjects/development/quiz/Chapter1Quiz';
 import { Chapter2Quiz } from '../subjects/development/quiz/Chapter2Quiz';
 import { Chapter3Quiz } from '../subjects/development/quiz/Chapter3Quiz';
@@ -9,13 +15,21 @@ import { Chapter7Quiz } from '../subjects/development/quiz/Chapter7Quiz';
 import { Chapter8Quiz } from '../subjects/development/quiz/Chapter8Quiz';
 import { Chapter9Quiz } from '../subjects/development/quiz/Chapter9Quiz';
 import { Chapter10Quiz } from '../subjects/development/quiz/Chapter10Quiz';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle } from 'lucide-react';
+
+// --- DSA Imports ---
+import { Chapter1Quiz as DSAChapter1Quiz } from '../subjects/dsa/quiz/Chapter1Quiz';
+import { Chapter2Quiz as DSAChapter2Quiz } from '../subjects/dsa/quiz/Chapter2Quiz';
+import { Chapter3Quiz as DSAChapter3Quiz } from '../subjects/dsa/quiz/Chapter3Quiz';
+import { Chapter4Quiz as DSAChapter4Quiz } from '../subjects/dsa/quiz/Chapter4Quiz';
+import { Chapter5Quiz as DSAChapter5Quiz } from '../subjects/dsa/quiz/Chapter5Quiz';
+import { Chapter6Quiz as DSAChapter6Quiz } from '../subjects/dsa/quiz/Chapter6Quiz';
+import { Chapter7Quiz as DSAChapter7Quiz } from '../subjects/dsa/quiz/Chapter7Quiz';
+import { Chapter8Quiz as DSAChapter8Quiz } from '../subjects/dsa/quiz/Chapter8Quiz';
+import { Chapter9Quiz as DSAChapter9Quiz } from '../subjects/dsa/quiz/Chapter9Quiz';
 
 // Merge all quiz objects into one
-const allDevelopmentQuizzes = {
+const allQuizzes = {
+  // Development
   ...Chapter1Quiz,
   ...Chapter2Quiz,
   ...Chapter3Quiz,
@@ -26,6 +40,17 @@ const allDevelopmentQuizzes = {
   ...Chapter8Quiz,
   ...Chapter9Quiz,
   ...Chapter10Quiz,
+  
+  // DSA
+  ...DSAChapter1Quiz,
+  ...DSAChapter2Quiz,
+  ...DSAChapter3Quiz,
+  ...DSAChapter4Quiz,
+  ...DSAChapter5Quiz,
+  ...DSAChapter6Quiz,
+  ...DSAChapter7Quiz,
+  ...DSAChapter8Quiz,
+  ...DSAChapter9Quiz,
 };
 
 // --- Types ---
@@ -33,21 +58,34 @@ interface QuizQuestion {
   question: string;
   options: string[];
   answer: string;
-  explanation: string; // Added explanation field
+  explanation: string; 
 }
 
 interface QuizDisplayProps {
-  subchapterId: string;
+  // FIX: Make subchapterId optional to satisfy Aptitude's props
+  subchapterId?: string;
 }
 
 const getQuizData = (id: string): QuizQuestion[] | undefined => {
-  return (allDevelopmentQuizzes as unknown as Record<string, QuizQuestion[]>)[id];
+  return (allQuizzes as unknown as Record<string, QuizQuestion[]>)[id];
 };
 
 const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+
+  // Reset state if subchapterId changes
+  React.useEffect(() => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswers({});
+    setQuizSubmitted(false);
+  }, [subchapterId]);
+  
+  // FIX: Add a guard clause in case subchapterId is not passed
+  if (!subchapterId) {
+    return <div className="p-4 text-red-500">Error: No subchapterId provided to QuizDisplay.</div>;
+  }
 
   const quizzes = getQuizData(subchapterId);
 
@@ -75,7 +113,6 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
     }
   };
 
-  // NEW: Handle previous button click
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
@@ -200,7 +237,6 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
               </Button>
             ))}
           </div>
-          {/* UPDATED: Added Previous button and logic */}
           <div className="mt-8 flex justify-between">
             <Button
               variant="outline"

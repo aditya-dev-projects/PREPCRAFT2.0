@@ -1,55 +1,17 @@
-import BasicsOfProgrammingProblems from './BasicsOfProgrammingProblems';
-import ArrayProblems from './ArrayProblems';
-import SortingProblems from './SortingProblems';
-import ProblemSolvingProblems from './ProblemSolvingProblems';
+import DSAPracticeProblemDisplay from '@/components/DSAPracticeProblemDisplay';
+// Import the correct variable name 'practiceChapters'
+import { practiceChapters } from '../practiceChapters';
 
-export const dsaPracticeProblems = [
-  {
-    id: 'dsa-basics-of-programming-problems',
-    title: 'Basics of Programming Problems',
-    component: BasicsOfProgrammingProblems,
+// Use the correct variable name 'practiceChapters'
+export const dsaPracticeProblems = practiceChapters.flatMap(chapter =>
+  chapter.subchapters.map(subchapter => ({
+    component: DSAPracticeProblemDisplay,
     meta: {
-      id: 'dsa-basics-of-programming-problems',
-      title: 'Basics of Programming Problems',
-      difficulty: 'easy',
-      points: 20,
-      items: [] // will be populated later
-    }
-  },
-  {
-    id: 'dsa-array-problems',
-    title: 'Array Problems',
-    component: ArrayProblems,
-    meta: {
-      id: 'dsa-array-problems',
-      title: 'Array Problems',
-      difficulty: 'medium',
-      points: 30,
-      items: [] // will be populated later
-    }
-  },
-  {
-    id: 'dsa-sorting-problems',
-    title: 'Sorting Problems',
-    component: SortingProblems,
-    meta: {
-      id: 'dsa-sorting-problems',
-      title: 'Sorting Problems',
-      difficulty: 'medium',
-      points: 40,
-      items: [] // will be populated later
-    }
-  },
-  {
-    id: 'dsa-problem-solving-problems',
-    title: 'Problem Solving Problems',
-    component: ProblemSolvingProblems,
-    meta: {
-      id: 'dsa-problem-solving-problems',
-      title: 'Problem Solving Problems',
-      difficulty: 'hard',
-      points: 50,
-      items: [] // will be populated later
-    }
-  }
-];
+      // FIX: Use 'subchapter.problemId' as defined in your 'practiceChapters.ts'
+      id: subchapter.problemId,
+      title: `${subchapter.title} Practice`,
+      // FIX: Pass 'subchapter.problemId' to the component
+      subchapterId: subchapter.problemId,
+    },
+  }))
+);

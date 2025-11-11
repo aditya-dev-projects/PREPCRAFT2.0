@@ -98,7 +98,7 @@ const SidebarContent = ({
 
       {/* Notes Section */}
       <TabsContent value="notes" className="space-y-2 mt-0">
-        {subject.chapters.map((chapter: any) => (
+        {subject.chapters?.map((chapter: any) => (
           <Collapsible
             key={chapter.id}
             open={openNoteChapter === chapter.id}
@@ -109,7 +109,7 @@ const SidebarContent = ({
             }
           >
             <CollapsibleTrigger className="w-full">
-              <div className="flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-muted">
+              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted">
                 <span className="text-sm font-semibold">{chapter.title}</span>
                 <ChevronDown
                   className={`h-5 w-5 transition-transform ${
@@ -119,27 +119,30 @@ const SidebarContent = ({
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 mt-1 space-y-1">
-              {chapter.subchapters.map((subchapter: any) => (
-                <button
-                  key={subchapter.id}
-                  onClick={() => {
-                    handleNoteSubchapterClick(subchapter.id);
-                    if (isMobile) setSidebarOpen(false);
-                  }}
-                  className={`w-full text-center p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
-                    noteMeta?.id === subchapter.id
-                      ? "text-black"
-                      : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-center">
-                    <span>{subchapter.title}</span>
-                    {isCompleted(subchapter.id) && (
-                      <CheckCircle2 className="h-4 w-4 text-success" />
-                    )}
-                  </div>
-                </button>
-              ))}
+              {chapter.subchapters.map((subchapter: any) => {
+                const noteId = subchapter.noteId || subchapter.id;
+                return (
+                  <button
+                    key={subchapter.id}
+                    onClick={() => {
+                      handleNoteSubchapterClick(noteId);
+                      if (isMobile) setSidebarOpen(false);
+                    }}
+                    className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                      noteMeta?.id === noteId
+                        ? "text-black"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{subchapter.title}</span>
+                      {isCompleted(noteId) && (
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </CollapsibleContent>
           </Collapsible>
         ))}
@@ -147,7 +150,7 @@ const SidebarContent = ({
 
       {/* Practice Section */}
       <TabsContent value="practice" className="space-y-2 mt-0">
-        {subject.practiceChapters.map((chapter: any) => (
+        {subject.practiceChapters?.map((chapter: any) => (
           <Collapsible
             key={chapter.id}
             open={openPracticeChapter === chapter.id}
@@ -158,7 +161,7 @@ const SidebarContent = ({
             }
           >
             <CollapsibleTrigger className="w-full" asChild>
-              <div className="flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer">
+              <div className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer">
                 <span className="text-sm font-semibold">{chapter.title}</span>
                 <ChevronDown
                   className={`h-5 w-5 transition-transform ${
@@ -168,27 +171,30 @@ const SidebarContent = ({
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 mt-1 space-y-1">
-              {chapter.subchapters.map((subchapter: any) => (
-                <button
-                  key={subchapter.id}
-                  onClick={() => {
-                    handlePracticeSubchapterClick(subchapter.practiceProblemId);
-                    if (isMobile) setSidebarOpen(false);
-                  }}
-                  className={`w-full text-center p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
-                    problemMeta?.id === subchapter.practiceProblemId
-                      ? "text-black"
-                      : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-center">
-                    <span>{subchapter.title}</span>
-                    {isCompleted(subchapter.practiceProblemId) && (
-                      <CheckCircle2 className="h-4 w-4 text-success" />
-                    )}
-                  </div>
-                </button>
-              ))}
+              {chapter.subchapters.map((subchapter: any) => {
+                const problemId = subchapter.practiceProblemId || subchapter.problemId || subchapter.id;
+                return (
+                  <button
+                    key={subchapter.id}
+                    onClick={() => {
+                      handlePracticeSubchapterClick(problemId);
+                      if (isMobile) setSidebarOpen(false);
+                    }}
+                    className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                      problemMeta?.id === problemId
+                        ? "text-black"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{subchapter.title}</span>
+                      {isCompleted(problemId) && (
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </CollapsibleContent>
           </Collapsible>
         ))}
@@ -196,7 +202,7 @@ const SidebarContent = ({
 
       {/* Quiz Section */}
       <TabsContent value="quiz" className="space-y-2 mt-0">
-        {subject.quizChapters.map((chapter: any) => (
+        {subject.quizChapters?.map((chapter: any) => (
           <Collapsible
             key={chapter.id}
             open={openQuizChapter === chapter.id}
@@ -208,7 +214,7 @@ const SidebarContent = ({
           >
             <CollapsibleTrigger className="w-full" asChild>
               <div
-                className="flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer"
+                className="flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted cursor-pointer"
                 
               >
                 <span className="text-sm font-semibold">{chapter.title}</span>
@@ -220,27 +226,30 @@ const SidebarContent = ({
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-4 mt-1 space-y-1">
-              {chapter.subchapters.map((subchapter: any) => (
-                <button
-                  key={subchapter.id}
-                  onClick={() => {
-                    handleQuizSubchapterClick(subchapter.quizId);
-                    if (isMobile) setSidebarOpen(false);
-                  }}
-                  className={`w-full text-center p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
-                    quizMeta?.id === subchapter.quizId
-                      ? "text-black"
-                      : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-center">
-                    <span>{subchapter.title}</span>
-                    {isCompleted(subchapter.quizId) && (
-                      <CheckCircle2 className="h-4 w-4 text-success" />
-                    )}
-                  </div>
-                </button>
-              ))}
+              {chapter.subchapters.map((subchapter: any) => {
+                const quizId = subchapter.quizId || subchapter.id;
+                return (
+                  <button
+                    key={subchapter.id}
+                    onClick={() => {
+                      handleQuizSubchapterClick(quizId);
+                      if (isMobile) setSidebarOpen(false);
+                    }}
+                    className={`w-full text-left p-2.5 rounded-md transition-colors text-sm hover:bg-muted ${
+                      quizMeta?.id === quizId
+                        ? "text-black"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{subchapter.title}</span>
+                      {isCompleted(quizId) && (
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </CollapsibleContent>
           </Collapsible>
         ))}
@@ -268,9 +277,7 @@ export default function Learn() {
   const [openQuizChapter, setOpenQuizChapter] = useState<number | null>(null);
   const [progress, setProgress] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  
-  // FIX: Set showComingSoon to true to display the message
-  const [showComingSoon, setShowComingSoon] = useState(true);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const subject = getSubjectBySlug(subjectSlug || "");
 
@@ -405,9 +412,9 @@ export default function Learn() {
   const quiz =
     selectedQuiz !== null ? subject.quizzes[selectedQuiz] : undefined;
 
-  const NoteComponent = note?.component;
-  const ProblemComponent = problem?.component;
-  const QuizComponent = quiz?.component;
+  const NoteComponent = note?.component as React.ComponentType<any> | undefined;
+  const ProblemComponent = problem?.component as React.ComponentType<any> | undefined;
+  const QuizComponent = quiz?.component as React.ComponentType<any> | undefined;
 
   const noteMeta = note?.meta;
   const problemMeta = problem?.meta;
@@ -500,16 +507,11 @@ export default function Learn() {
               {/* Notes */}
               {activeTab === "notes" && NoteComponent && (
                 <div>
-                  <NoteComponent noteId={noteMeta.id} />
+                  {/* FIX: Pass all meta props */}
+                  <NoteComponent {...noteMeta} />
                   {noteMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Trophy className="h-4 w-4" />
-                        <span>{noteMeta.points} points</span>
-                        <Badge variant="secondary">
-                          {noteMeta.difficulty}
-                        </Badge>
-                      </div>
+                      <div></div> 
                       {isCompleted(noteMeta.id) ? (
                         <Button variant="destructive" onClick={handleReset}>
                           Reset Progress
@@ -524,7 +526,6 @@ export default function Learn() {
                 </div>
               )}
 
-              {/* FIX: Logic is re-ordered to prioritize showComingSoon */}
               {/* Practice */}
               {activeTab === "practice" && showComingSoon && (
                 <div className="text-center py-12">
@@ -534,17 +535,26 @@ export default function Learn() {
                   </p>
                 </div>
               )}
-
               {activeTab === "practice" && !showComingSoon && ProblemComponent && (
                 <div>
-                  <ProblemComponent subchapterId={problemMeta.subchapterId} />
+                  {/* FIX: Pass all meta props */}
+                  <ProblemComponent {...problemMeta} />
                 </div>
               )}
 
               {/* Quiz */}
-              {activeTab === "quiz" && QuizComponent && (
+              {activeTab === "quiz" && showComingSoon && (
+                <div className="text-center py-12">
+                  <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Coming Soon!
+                  </p>
+                </div>
+              )}
+              {activeTab === "quiz" && !showComingSoon && QuizComponent && (
                 <div>
-                  <QuizComponent subchapterId={quizMeta.subchapterId} />
+                  {/* FIX: Pass all meta props */}
+                  <QuizComponent {...quizMeta} />
                   {quizMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
                       {isCompleted(quizMeta.id) ? (

@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { Copy, Check, Terminal, Lightbulb } from 'lucide-react';
 
-// Import all problem data files
+// --- Development Imports ONLY ---
 import { Chapter1Problem } from '../subjects/development/practice-problems/Chapter1Problem';
 import { Chapter2Problem } from '../subjects/development/practice-problems/Chapter2Problem';
 import { Chapter3Problem } from '../subjects/development/practice-problems/Chapter3Problem';
@@ -35,20 +35,22 @@ const allDevelopmentProblems = {
   ...Chapter10Problem,
 };
 
-// --- New Data Structure Interface ---
+// --- Data Structure Interface ---
 interface PracticeProblem {
   title: string;
-  problemDescription: string;
-  setupSteps: string[];
-  solutionSteps: string[];
-  solutionCode: string;
+  problemDescription?: string; // Made optional
+  setupSteps?: string[];       // Made optional
+  solutionSteps?: string[];      // Made optional
+  solutionCode?: string;         // Made optional
+  // Added old properties as optional
+  problem?: string;
+  solution?: string;
 }
 
 interface PracticeProblemDisplayProps {
-  subchapterId: string;
+  subchapterId?: string;
 }
 
-// Helper to get the correct data
 const getProblemData = (id: string): PracticeProblem[] | undefined => {
   return (allDevelopmentProblems as unknown as Record<string, PracticeProblem[]>)[id];
 };
@@ -81,6 +83,10 @@ const CopyButton = ({ text }: { text: string }) => {
 
 // --- Main Display Component ---
 const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchapterId }) => {
+  if (!subchapterId) {
+    return <div className="p-4 text-red-500">Error: No subchapterId provided to PracticeProblemDisplay.</div>;
+  }
+
   const problems = getProblemData(subchapterId);
 
   const title = subchapterId
@@ -108,59 +114,98 @@ const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchap
       {problems.map((problem, index) => (
         <div key={index} className="mb-12 p-4 border rounded-lg shadow-sm bg-background not-prose">
           
-          {/* Problem Title */}
           <h2 className="text-2xl font-semibold mt-4 mb-4 text-primary">{index + 1}. {problem.title}</h2>
           
-          {/* Problem Description with Copy Button */}
-          <h3 className="text-lg font-semibold mb-2">Problem:</h3>
-          <div className="relative p-4 bg-muted rounded-md mb-4">
-            <CopyButton text={problem.problemDescription} />
-            <p className="text-foreground whitespace-pre-wrap">{problem.problemDescription}</p>
-          </div>
+          {/* ---- CONDITIONAL RENDER ---- */}
+          {/* Check if new step-by-step data exists */}
+          {problem.problemDescription ? (
+            <>
+              {/* Problem Description with Copy Button */}
+              <h3 className="text-lg font-semibold mb-2">Problem:</h3>
+              <div className="relative p-4 bg-muted rounded-md mb-4">
+                <CopyButton text={problem.problemDescription} />
+                <p className="text-foreground whitespace-pre-wrap">{problem.problemDescription}</p>
+              </div>
 
-          {/* Setup Steps */}
-          <Alert className="mb-4">
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>How to Get Started</AlertTitle>
-            <AlertDescription>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                {problem.setupSteps.map((step, i) => (
-                  <li key={i}>{step}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-          
-          {/* Collapsible Solution */}
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="text-lg font-semibold">
-                <div className="flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
-                  Show Solution
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pt-4">
-                
-                <h4 className="text-md font-semibold mb-2">Step-by-step solution:</h4>
-                <ul className="list-decimal pl-5 space-y-2 mb-4 text-muted-foreground">
-                  {problem.solutionSteps.map((step, i) => (
-                    <li key={i}>{renderWithNewlines(step)}</li>
-                  ))}
-                </ul>
+              {/* Setup Steps */}
+              {problem.setupSteps && (
+                <Alert className="mb-4">
+                  <Terminal className="h-4 w-4" />
+                  <AlertTitle>How to Get Started</AlertTitle>
+                  <AlertDescription>
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      {problem.setupSteps.map((step, i) => (
+                        <li key={i}>{step}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              {/* Collapsible Solution */}
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center">
+                      <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
+                      Show Solution
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    
+                    {problem.solutionSteps && (
+                      <>
+                        <h4 className="text-md font-semibold mb-2">Step-by-step solution:</h4>
+                        <ul className="list-decimal pl-5 space-y-2 mb-4 text-muted-foreground">
+                          {problem.solutionSteps.map((step, i) => (
+                            <li key={i}>{renderWithNewlines(step)}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
 
-                <h4 className="text-md font-semibold mb-2">Final Code:</h4>
-                <p className="text-sm text-muted-foreground mb-2">Run this below given code and check if you get the same result.</p>
-                <div className="relative">
-                  <CopyButton text={problem.solutionCode} />
-                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
-                    <code>{problem.solutionCode.trim()}</code>
-                  </pre>
-                </div>
-
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                    {problem.solutionCode && (
+                      <>
+                        <h4 className="text-md font-semibold mb-2">Final Code:</h4>
+                        <p className="text-sm text-muted-foreground mb-2">Run this below given code and check if you get the same result.</p>
+                        <div className="relative">
+                          <CopyButton text={problem.solutionCode} />
+                          <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+                            <code>{problem.solutionCode.trim()}</code>
+                          </pre>
+                        </div>
+                      </>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </>
+          ) : (
+            <>
+              {/* --- Fallback for OLD data format --- */}
+              <div className="p-4 bg-muted rounded-md mb-4">
+                <p className="text-foreground whitespace-pre-wrap">{problem.problem}</p>
+              </div>
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center">
+                      <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
+                      Show Solution
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <div className="relative">
+                      <CopyButton text={problem.solution || ""} />
+                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+                        <code>{problem.solution?.trim()}</code>
+                      </pre>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </>
+          )}
 
         </div>
       ))}
