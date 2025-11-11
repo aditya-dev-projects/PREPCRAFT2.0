@@ -1,12 +1,13 @@
+import QuizDisplay from '@/components/QuizDisplay';
+import { quizChapters } from '../quizChapters';
 
-import { VerbalAbilityQuiz, verbalAbilityQuizMeta } from './VerbalAbilityQuiz';
-
-import { LogicalReasoningQuiz, logicalReasoningQuizMeta } from './LogicalReasoningQuiz';
-
-import { QuantitativeAptitudeQuiz, quantitativeAptitudeQuizMeta } from './QuantitativeAptitudeQuiz';
-
-export const aptitudeQuizzes = [
-  { component: VerbalAbilityQuiz, meta: verbalAbilityQuizMeta },
-  { component: LogicalReasoningQuiz, meta: logicalReasoningQuizMeta },
-  { component: QuantitativeAptitudeQuiz, meta: quantitativeAptitudeQuizMeta },
-];
+export const aptitudeQuizzes = quizChapters.flatMap(chapter =>
+  chapter.subchapters.map(subchapter => ({
+    component: QuizDisplay,
+    meta: {
+      id: subchapter.quizId,
+      title: `${subchapter.title} Quiz`,
+      subchapterId: subchapter.quizId,
+    },
+  }))
+);

@@ -1,78 +1,56 @@
-
-import { ReadingComprehension, readingComprehensionMeta } from './ReadingComprehension';
-import { SpottingErrors, spottingErrorsMeta } from './SpottingErrors';
-import { SentenceFormation, sentenceFormationMeta } from './SentenceFormation';
-import { SynonymsAndAntonyms, synonymsAndAntonymsMeta } from './SynonymsAndAntonyms';
-import { IdiomsAndPhrases, idiomsAndPhrasesMeta } from './IdiomsAndPhrases';
-import { NumberSeries, numberSeriesMeta } from './NumberSeries';
-import { SeatingArrangements, seatingArrangementsMeta } from './SeatingArrangements';
-import { ClockProblems, clockProblemsMeta } from './ClockProblems';
-import { Calendar, calendarMeta } from './Calendar';
-import { BloodRelations, bloodRelationsMeta } from './BloodRelations';
-import { Directions, directionsMeta } from './Directions';
-import { WordPattern, wordPatternMeta } from './WordPattern';
-import { CodingDecoding, codingDecodingMeta } from './CodingDecoding';
-import { MathematicalOperations, mathematicalOperationsMeta } from './MathematicalOperations';
-import { VennDiagrams, vennDiagramsMeta } from './VennDiagrams';
-import { VisualReasoning, visualReasoningMeta } from './VisualReasoning';
-import { PaperCuttingAdding, paperCuttingAddingMeta } from './PaperCuttingAdding';
-import { CubesDices, cubesDicesMeta } from './CubesDices';
-import { DataSufficiency, dataSufficiencyMeta } from './DataSufficiency';
-import { NumberSystem, numberSystemMeta } from './NumberSystem';
-import { LcmHcf, lcmHcfMeta } from './LcmHcf';
-import { Percentages, percentagesMeta } from './Percentages';
-import { ProfitLoss, profitLossMeta } from './ProfitLoss';
-import { SimpleCompoundInterest, simpleCompoundInterestMeta } from './SimpleCompoundInterest';
-import { RatioProportion, ratioProportionMeta } from './RatioProportion';
-import { PipesCisterns, pipesCisternsMeta } from './PipesCisterns';
-import { TimeWork, timeWorkMeta } from './TimeWork';
-import { Average, averageMeta } from './Average';
-import { PermutationsCombinations, permutationsCombinationsMeta } from './PermutationsCombinations';
-import { Probability, probabilityMeta } from './Probability';
-import { AgeProblems, ageProblemsMeta } from './AgeProblems';
-import { Partnerships, partnershipsMeta } from './Partnerships';
-import { AllegationsMixtures, allegationsMixturesMeta } from './AllegationsMixtures';
-import { ChainRule, chainRuleMeta } from './ChainRule';
-import { TrainProblems, trainProblemsMeta } from './TrainProblems';
-import { BoatsStreams, boatsStreamsMeta } from './BoatsStreams';
-import { DataInterpretation, dataInterpretationMeta } from './DataInterpretation';
+import Chapter1Part1 from './Chapter1Part1';
+import Chapter1Part2 from './Chapter1Part2';
+import Chapter1Part3 from './Chapter1Part3';
+import Chapter2Part1 from './Chapter2Part1';
+import Chapter2Part2 from './Chapter2Part2';
+import Chapter2Part3 from './Chapter2Part3';
+import Chapter3 from './Chapter3';
 
 export const aptitudeNotes = [
-  { component: ReadingComprehension, meta: readingComprehensionMeta },
-  { component: SpottingErrors, meta: spottingErrorsMeta },
-  { component: SentenceFormation, meta: sentenceFormationMeta },
-  { component: SynonymsAndAntonyms, meta: synonymsAndAntonymsMeta },
-  { component: IdiomsAndPhrases, meta: idiomsAndPhrasesMeta },
-  { component: NumberSeries, meta: numberSeriesMeta },
-  { component: SeatingArrangements, meta: seatingArrangementsMeta },
-  { component: ClockProblems, meta: clockProblemsMeta },
-  { component: Calendar, meta: calendarMeta },
-  { component: BloodRelations, meta: bloodRelationsMeta },
-  { component: Directions, meta: directionsMeta },
-  { component: WordPattern, meta: wordPatternMeta },
-  { component: CodingDecoding, meta: codingDecodingMeta },
-  { component: MathematicalOperations, meta: mathematicalOperationsMeta },
-  { component: VennDiagrams, meta: vennDiagramsMeta },
-  { component: VisualReasoning, meta: visualReasoningMeta },
-  { component: PaperCuttingAdding, meta: paperCuttingAddingMeta },
-  { component: CubesDices, meta: cubesDicesMeta },
-  { component: DataSufficiency, meta: dataSufficiencyMeta },
-  { component: NumberSystem, meta: numberSystemMeta },
-  { component: LcmHcf, meta: lcmHcfMeta },
-  { component: Percentages, meta: percentagesMeta },
-  { component: ProfitLoss, meta: profitLossMeta },
-  { component: SimpleCompoundInterest, meta: simpleCompoundInterestMeta },
-  { component: RatioProportion, meta: ratioProportionMeta },
-  { component: PipesCisterns, meta: pipesCisternsMeta },
-  { component: TimeWork, meta: timeWorkMeta },
-  { component: Average, meta: averageMeta },
-  { component: PermutationsCombinations, meta: permutationsCombinationsMeta },
-  { component: Probability, meta: probabilityMeta },
-  { component: AgeProblems, meta: ageProblemsMeta },
-  { component: Partnerships, meta: partnershipsMeta },
-  { component: AllegationsMixtures, meta: allegationsMixturesMeta },
-  { component: ChainRule, meta: chainRuleMeta },
-  { component: TrainProblems, meta: trainProblemsMeta },
-  { component: BoatsStreams, meta: boatsStreamsMeta },
-  { component: DataInterpretation, meta: dataInterpretationMeta },
+  // Chapter 1: Quantitative Aptitude
+  { component: Chapter1Part1, meta: { id: 'number-system' } },
+  { component: Chapter1Part1, meta: { id: 'lcm-hcf' } },
+  { component: Chapter1Part1, meta: { id: 'percentages' } },
+  { component: Chapter1Part1, meta: { id: 'profit-loss' } },
+  { component: Chapter1Part1, meta: { id: 'simple-compound-interest' } },
+  { component: Chapter1Part1, meta: { id: 'ratio-proportion' } },
+  
+  { component: Chapter1Part2, meta: { id: 'pipes-cisterns' } },
+  { component: Chapter1Part2, meta: { id: 'time-work' } },
+  { component: Chapter1Part2, meta: { id: 'average' } },
+  { component: Chapter1Part2, meta: { id: 'permutations-combinations' } },
+  { component: Chapter1Part2, meta: { id: 'probability' } },
+  { component: Chapter1Part2, meta: { id: 'age-problems' } },
+
+  { component: Chapter1Part3, meta: { id: 'partnerships' } },
+  { component: Chapter1Part3, meta: { id: 'allegations-mixtures' } },
+  { component: Chapter1Part3, meta: { id: 'chain-rule' } },
+  { component: Chapter1Part3, meta: { id: 'train-problems' } },
+  { component: Chapter1Part3, meta: { id: 'boats-streams' } },
+  { component: Chapter1Part3, meta: { id: 'data-interpretation' } },
+
+  // Chapter 2: Logical Reasoning
+  { component: Chapter2Part1, meta: { id: 'number-series' } },
+  { component: Chapter2Part1, meta: { id: 'seating-arrangements' } },
+  { component: Chapter2Part1, meta: { id: 'clock-problems' } },
+  { component: Chapter2Part1, meta: { id: 'calendar' } },
+  { component: Chapter2Part1, meta: { id: 'blood-relations' } },
+  { component: Chapter2Part1, meta: { id: 'directions' } },
+
+  { component: Chapter2Part2, meta: { id: 'word-pattern' } },
+  { component: Chapter2Part2, meta: { id: 'coding-decoding' } },
+  { component: Chapter2Part2, meta: { id: 'mathematical-operations' } },
+  { component: Chapter2Part2, meta: { id: 'venn-diagrams' } },
+  { component: Chapter2Part2, meta: { id: 'visual-reasoning' } },
+  { component: Chapter2Part2, meta: { id: 'paper-cutting-adding' } },
+
+  { component: Chapter2Part3, meta: { id: 'cubes-dices' } },
+  { component: Chapter2Part3, meta: { id: 'data-sufficiency' } },
+  
+  // Chapter 3: Verbal Ability
+  { component: Chapter3, meta: { id: 'reading-comprehension' } },
+  { component: Chapter3, meta: { id: 'spotting-errors' } },
+  { component: Chapter3, meta: { id: 'sentence-formation' } },
+  { component: Chapter3, meta: { id: 'synonyms-antonyms' } },
+  { component: Chapter3, meta: { id: 'idioms-phrases' } },
 ];

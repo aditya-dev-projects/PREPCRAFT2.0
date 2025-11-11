@@ -1,12 +1,13 @@
+// import AptitudePracticeProblemDisplay from '@/components/AptitudePracticeProblemDisplay';
+import { practiceChapters } from '../practiceChapters';
 
-import { VerbalAbilityProblems, verbalAbilityProblemsMeta } from './VerbalAbilityProblems';
-
-import { LogicalReasoningProblems, logicalReasoningProblemsMeta } from './LogicalReasoningProblems';
-
-import { QuantitativeAptitudeProblems, quantitativeAptitudeProblemsMeta } from './QuantitativeAptitudeProblems';
-
-export const aptitudePracticeProblems = [
-  { component: VerbalAbilityProblems, meta: verbalAbilityProblemsMeta },
-  { component: LogicalReasoningProblems, meta: logicalReasoningProblemsMeta },
-  { component: QuantitativeAptitudeProblems, meta: quantitativeAptitudeProblemsMeta },
-];
+export const aptitudePracticeProblems = practiceChapters.flatMap(chapter =>
+  chapter.subchapters.map(subchapter => ({
+    // component: AptitudePracticeProblemDisplay, 
+    meta: {
+      id: subchapter.id,
+      title: `${subchapter.title} Practice`,
+      subchapterId: subchapter.id, // Pass id as subchapterId
+    },
+  }))
+);

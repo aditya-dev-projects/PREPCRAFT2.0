@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { Copy, Check, Terminal, Lightbulb } from 'lucide-react';
 
-// --- Development Imports ONLY ---
+// --- Development Imports ---
 import { Chapter1Problem } from '../subjects/development/practice-problems/Chapter1Problem';
 import { Chapter2Problem } from '../subjects/development/practice-problems/Chapter2Problem';
 import { Chapter3Problem } from '../subjects/development/practice-problems/Chapter3Problem';
@@ -21,8 +21,30 @@ import { Chapter8Problem } from '../subjects/development/practice-problems/Chapt
 import { Chapter9Problem } from '../subjects/development/practice-problems/Chapter9Problem';
 import { Chapter10Problem } from '../subjects/development/practice-problems/Chapter10Problem';
 
+// --- DSA Imports ---
+import { Chapter1Problem as DSAChapter1Problem } from '../subjects/dsa/practice-problems/Chapter1Problem';
+import { Chapter2Problem as DSAChapter2Problem } from '../subjects/dsa/practice-problems/Chapter2Problem';
+import { Chapter3Problem as DSAChapter3Problem } from '../subjects/dsa/practice-problems/Chapter3Problem';
+import { Chapter4Problem as DSAChapter4Problem } from '../subjects/dsa/practice-problems/Chapter4Problem';
+import { Chapter5Problem as DSAChapter5Problem } from '../subjects/dsa/practice-problems/Chapter5Problem';
+import { Chapter6Problem as DSAChapter6Problem } from '../subjects/dsa/practice-problems/Chapter6Problem';
+import { Chapter7Problem as DSAChapter7Problem } from '../subjects/dsa/practice-problems/Chapter7Problem';
+import { Chapter8Problem as DSAChapter8Problem } from '../subjects/dsa/practice-problems/Chapter8Problem';
+import { Chapter9Problem as DSAChapter9Problem } from '../subjects/dsa/practice-problems/Chapter9Problem';
+
+// --- FIX: Aptitude Imports ---
+import { Chapter1Part1Problem as AptChapter1Part1Problem } from '../subjects/aptitude/practice-problems/Chapter1Part1Problem';
+import { Chapter1Part2Problem as AptChapter1Part2Problem } from '../subjects/aptitude/practice-problems/Chapter1Part2Problem';
+import { Chapter1Part3Problem as AptChapter1Part3Problem } from '../subjects/aptitude/practice-problems/Chapter1Part3Problem';
+import { Chapter2Part1Problem as AptChapter2Part1Problem } from '../subjects/aptitude/practice-problems/Chapter2Part1Problem';
+import { Chapter2Part2Problem as AptChapter2Part2Problem } from '../subjects/aptitude/practice-problems/Chapter2Part2Problem';
+import { Chapter2Part3Problem as AptChapter2Part3Problem } from '../subjects/aptitude/practice-problems/Chapter2Part3Problem';
+import { Chapter3Problem as AptChapter3Problem } from '../subjects/aptitude/practice-problems/Chapter3Problem';
+
+
 // Merge all problem objects into one
-const allDevelopmentProblems = {
+const allProblems = {
+  // Development
   ...Chapter1Problem,
   ...Chapter2Problem,
   ...Chapter3Problem,
@@ -33,16 +55,33 @@ const allDevelopmentProblems = {
   ...Chapter8Problem,
   ...Chapter9Problem,
   ...Chapter10Problem,
+  // DSA
+  ...DSAChapter1Problem,
+  ...DSAChapter2Problem,
+  ...DSAChapter3Problem,
+  ...DSAChapter4Problem,
+  ...DSAChapter5Problem,
+  ...DSAChapter6Problem,
+  ...DSAChapter7Problem,
+  ...DSAChapter8Problem,
+  ...DSAChapter9Problem,
+  // Aptitude
+  ...AptChapter1Part1Problem,
+  ...AptChapter1Part2Problem,
+  ...AptChapter1Part3Problem,
+  ...AptChapter2Part1Problem,
+  ...AptChapter2Part2Problem,
+  ...AptChapter2Part3Problem,
+  ...AptChapter3Problem,
 };
 
 // --- Data Structure Interface ---
 interface PracticeProblem {
   title: string;
-  problemDescription?: string; // Made optional
-  setupSteps?: string[];       // Made optional
-  solutionSteps?: string[];      // Made optional
-  solutionCode?: string;         // Made optional
-  // Added old properties as optional
+  problemDescription?: string; 
+  setupSteps?: string[];       
+  solutionSteps?: string[];      
+  solutionCode?: string;         
   problem?: string;
   solution?: string;
 }
@@ -52,7 +91,7 @@ interface PracticeProblemDisplayProps {
 }
 
 const getProblemData = (id: string): PracticeProblem[] | undefined => {
-  return (allDevelopmentProblems as unknown as Record<string, PracticeProblem[]>)[id];
+  return (allProblems as unknown as Record<string, PracticeProblem[]>)[id];
 };
 
 // --- Reusable Copy Button Component ---
@@ -116,8 +155,6 @@ const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchap
           
           <h2 className="text-2xl font-semibold mt-4 mb-4 text-primary">{index + 1}. {problem.title}</h2>
           
-          {/* ---- CONDITIONAL RENDER ---- */}
-          {/* Check if new step-by-step data exists */}
           {problem.problemDescription ? (
             <>
               {/* Problem Description with Copy Button */}
@@ -127,7 +164,6 @@ const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchap
                 <p className="text-foreground whitespace-pre-wrap">{problem.problemDescription}</p>
               </div>
 
-              {/* Setup Steps */}
               {problem.setupSteps && (
                 <Alert className="mb-4">
                   <Terminal className="h-4 w-4" />
@@ -142,7 +178,6 @@ const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchap
                 </Alert>
               )}
               
-              {/* Collapsible Solution */}
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-lg font-semibold">
@@ -182,7 +217,7 @@ const PracticeProblemDisplay: React.FC<PracticeProblemDisplayProps> = ({ subchap
             </>
           ) : (
             <>
-              {/* --- Fallback for OLD data format --- */}
+              {/* Fallback for OLD data format */}
               <div className="p-4 bg-muted rounded-md mb-4">
                 <p className="text-foreground whitespace-pre-wrap">{problem.problem}</p>
               </div>

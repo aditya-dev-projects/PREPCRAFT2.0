@@ -1,6 +1,6 @@
 const chapter1Practice = {
   id: 1,
-  title: 'Basics Of Programming',
+  title: 'Chapter 1: Basics Of Programming',
   subchapters: [
     { id: 'variables-data-types-problem', title: 'Variables & Data Types', problemId: 'variables-data-types-problem' },
     { id: 'conditional-statements-problem', title: 'Conditional Statements', problemId: 'conditional-statements-problem' },
@@ -12,7 +12,7 @@ const chapter1Practice = {
 
 const chapter2Practice = {
   id: 2,
-  title: 'Arrays',
+  title: 'Chapter 2: Arrays',
   subchapters: [
     { id: 'array-basics-problem', title: 'Array Basics', problemId: 'array-basics-problem' },
     { id: '2d-arrays-problem', title: '2D Arrays', problemId: '2d-arrays-problem' },
@@ -22,7 +22,7 @@ const chapter2Practice = {
 
 const chapter3Practice = {
   id: 3,
-  title: 'Sorting Techniques',
+  title: 'Chapter 3: Sorting Techniques',
   subchapters: [
     { id: 'what-is-sorting-problem', title: 'What Is Sorting', problemId: 'what-is-sorting-problem' },
     { id: 'bubble-sort-problem', title: 'Bubble Sort', problemId: 'bubble-sort-problem' },
@@ -34,7 +34,7 @@ const chapter3Practice = {
 
 const chapter4Practice = {
   id: 4,
-  title: 'Problem Solving Techniques',
+  title: 'Chapter 4: Problem Solving Techniques',
   subchapters: [
     { id: 'recursion-problem', title: 'Recursion', problemId: 'recursion-problem' },
     { id: 'backtracking-problem', title: 'Backtracking', problemId: 'backtracking-problem' },
@@ -47,7 +47,7 @@ const chapter4Practice = {
 
 const chapter5Practice = {
   id: 5,
-  title: 'Object Oriented Programming',
+  title: 'Chapter 5: Object Oriented Programming',
   subchapters: [
     { id: 'basic-of-oops-problem', title: 'Basic Of OOPs', problemId: 'basic-of-oops-problem' },
     { id: 'advanced-oops-problem', title: 'Advanced OOPs', problemId: 'advanced-oops-problem' },
@@ -56,7 +56,7 @@ const chapter5Practice = {
 
 const chapter6Practice = {
   id: 6,
-  title: 'Linear Data Structures',
+  title: 'Chapter 6: Linear Data Structures',
   subchapters: [
     { id: 'array-lists-problem', title: 'Array Lists', problemId: 'array-lists-problem' },
     { id: 'linked-lists-problem', title: 'Linked Lists', problemId: 'linked-lists-problem' },
@@ -67,7 +67,7 @@ const chapter6Practice = {
 
 const chapter7Practice = {
   id: 7,
-  title: 'Trees',
+  title: 'Chapter 7: Trees',
   subchapters: [
     { id: 'binary-trees-problem', title: 'Binary Trees', problemId: 'binary-trees-problem' },
     { id: 'binary-search-trees-problem', title: 'Binary Search Trees (BST)', problemId: 'binary-search-trees-problem' },
@@ -76,7 +76,7 @@ const chapter7Practice = {
 
 const chapter8Practice = {
   id: 8,
-  title: 'Advanced Data Structures',
+  title: 'Chapter 8: Advanced Data Structures',
   subchapters: [
     { id: 'heaps-priority-queues-problem', title: 'Heaps/Priority Queues', problemId: 'heaps-priority-queues-problem' },
     { id: 'hashing-maps-sets-problem', title: 'Hashing (Maps & Sets)', problemId: 'hashing-maps-sets-problem' },
@@ -88,7 +88,7 @@ const chapter8Practice = {
 
 const chapter9Practice = {
   id: 9,
-  title: 'Dynamic Programming',
+  title: 'Chapter 9: Dynamic Programming',
   subchapters: [
     { id: 'basic-dp-problem', title: 'Basic DP', problemId: 'basic-dp-problem' },
     { id: 'advance-dp-problem', title: 'Advance DP', problemId: 'advance-dp-problem' },

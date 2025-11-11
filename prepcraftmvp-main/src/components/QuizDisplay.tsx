@@ -27,6 +27,15 @@ import { Chapter7Quiz as DSAChapter7Quiz } from '../subjects/dsa/quiz/Chapter7Qu
 import { Chapter8Quiz as DSAChapter8Quiz } from '../subjects/dsa/quiz/Chapter8Quiz';
 import { Chapter9Quiz as DSAChapter9Quiz } from '../subjects/dsa/quiz/Chapter9Quiz';
 
+// --- Aptitude Imports ---
+import { Chapter1Part1Quiz as AptChapter1Part1Quiz } from '../subjects/aptitude/quiz/Chapter1Part1Quiz';
+import { Chapter1Part2Quiz as AptChapter1Part2Quiz } from '../subjects/aptitude/quiz/Chapter1Part2Quiz';
+import { Chapter1Part3Quiz as AptChapter1Part3Quiz } from '../subjects/aptitude/quiz/Chapter1Part3Quiz';
+import { Chapter2Part1Quiz as AptChapter2Part1Quiz } from '../subjects/aptitude/quiz/Chapter2Part1Quiz';
+import { Chapter2Part2Quiz as AptChapter2Part2Quiz } from '../subjects/aptitude/quiz/Chapter2Part2Quiz';
+import { Chapter2Part3Quiz as AptChapter2Part3Quiz } from '../subjects/aptitude/quiz/Chapter2Part3Quiz';
+import { Chapter3Quiz as AptChapter3Quiz } from '../subjects/aptitude/quiz/Chapter3Quiz';
+
 // Merge all quiz objects into one
 const allQuizzes = {
   // Development
@@ -51,6 +60,15 @@ const allQuizzes = {
   ...DSAChapter7Quiz,
   ...DSAChapter8Quiz,
   ...DSAChapter9Quiz,
+  
+  // Aptitude
+  ...AptChapter1Part1Quiz,
+  ...AptChapter1Part2Quiz,
+  ...AptChapter1Part3Quiz,
+  ...AptChapter2Part1Quiz,
+  ...AptChapter2Part2Quiz,
+  ...AptChapter2Part3Quiz,
+  ...AptChapter3Quiz,
 };
 
 // --- Types ---
@@ -62,7 +80,6 @@ interface QuizQuestion {
 }
 
 interface QuizDisplayProps {
-  // FIX: Make subchapterId optional to satisfy Aptitude's props
   subchapterId?: string;
 }
 
@@ -82,7 +99,6 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ subchapterId }) => {
     setQuizSubmitted(false);
   }, [subchapterId]);
   
-  // FIX: Add a guard clause in case subchapterId is not passed
   if (!subchapterId) {
     return <div className="p-4 text-red-500">Error: No subchapterId provided to QuizDisplay.</div>;
   }

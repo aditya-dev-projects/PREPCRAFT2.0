@@ -507,8 +507,8 @@ export default function Learn() {
               {/* Notes */}
               {activeTab === "notes" && NoteComponent && (
                 <div>
-                  {/* FIX: Pass all meta props */}
-                  <NoteComponent {...noteMeta} />
+                  {/* FIX: Pass 'noteId' and spread the rest */}
+                  <NoteComponent noteId={noteMeta.id} {...noteMeta} />
                   {noteMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
                       <div></div> 
@@ -537,8 +537,8 @@ export default function Learn() {
               )}
               {activeTab === "practice" && !showComingSoon && ProblemComponent && (
                 <div>
-                  {/* FIX: Pass all meta props */}
-                  <ProblemComponent {...problemMeta} />
+                  {/* FIX: Pass 'subchapterId' and spread the rest */}
+                  <ProblemComponent subchapterId={problemMeta.id} {...problemMeta} />
                 </div>
               )}
 
@@ -553,8 +553,8 @@ export default function Learn() {
               )}
               {activeTab === "quiz" && !showComingSoon && QuizComponent && (
                 <div>
-                  {/* FIX: Pass all meta props */}
-                  <QuizComponent {...quizMeta} />
+                  {/* FIX: Pass 'subchapterId' and spread the rest */}
+                  <QuizComponent subchapterId={quizMeta.id} {...quizMeta} />
                   {quizMeta && (
                     <div className="mt-8 pt-6 border-t flex items-center justify-between">
                       {isCompleted(quizMeta.id) ? (
